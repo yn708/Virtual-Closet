@@ -25,6 +25,7 @@ jobs:
       - name: Install bun and Dependencies
         working-directory: ./frontend
         env:
+          # フロントエンドには必要ないが、エラー回避のため設定
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}

@@ -8,8 +8,6 @@ services:
       dockerfile: Dockerfile
     environment:
       TZ: Asia/Tokyo
-    env_file:
-      - ./frontend/.env.local
     volumes:
       - ./frontend:/frontend
     command: bun run dev -p 4000
