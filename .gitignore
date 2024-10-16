@@ -20,6 +20,7 @@ node_modules/
 /frontend/coverage/
 /frontend/*.tsbuildinfo
 /frontend/next-env.d.ts
+/frontend/.swc
 
 # Backend
 /backend/venv/

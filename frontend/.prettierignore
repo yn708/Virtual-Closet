@@ -12,3 +12,6 @@ public/
 package-lock.json
 bun.lockb
 next.config.js
+# shadcn/ui
+src/hooks/use-toast.ts
+src/components/ui/

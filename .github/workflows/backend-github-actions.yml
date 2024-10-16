@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - feature/**
     paths:
       - 'backend/**'
   pull_request:
@@ -18,14 +19,39 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Build and run Docker containers
+      - name: Create .env file
+        run: |
+          # ルートの .env ファイルを生成
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> .env
+          echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env
+
+
+          # frontend/.env.local ファイルを生成
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> frontend/.env.local
+          echo "NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV }}" >> frontend/.env.local
+
+          # backend/.env ファイルを生成
+          echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> backend/.env
+          echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> backend/.env
+          echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> backend/.env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> backend/.env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> backend/.env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> backend/.env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> backend/.env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> backend/.env
+          echo "TZ=${{ secrets.TZ }}" >> backend/.env
+
+      - name: Build and run backend Docker containers
         working-directory: ./backend
         run: |
-          docker compose build --no-cache
-          docker compose up -d
+          docker compose build backend db
+          docker compose up -d backend db
           docker compose ps
 
       - name: Run migrations
