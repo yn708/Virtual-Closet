@@ -30,27 +30,27 @@ jobs:
       - name: Build and run Docker containers
         working-directory: ./frontend
         run: |
-          docker-compose build --no-cache
-          docker-compose up -d
-          docker-compose ps
+          docker compose build --no-cache
+          docker compose up -d
+          docker compose ps
 
       - name: Install Dependencies
-        run: docker-compose exec -T frontend bun install
+        run: docker compose exec -T frontend bun install
         working-directory: ./frontend
 
       - name: Run format check
-        run: docker-compose exec -T frontend bun run format
+        run: docker compose exec -T frontend bun run format
         working-directory: ./frontend
 
       - name: Run linter
-        run: docker-compose exec -T frontend bun run lint
+        run: docker compose exec -T frontend bun run lint
         working-directory: ./frontend
 
       - name: Run Test
-        run: docker-compose exec -T frontend bun run test
+        run: docker compose exec -T frontend bun run test
         working-directory: ./frontend
 
       - name: Stop and remove Docker containers
-        run: docker-compose down
+        run: docker compose down
         working-directory: ./frontend
 # ＊リリース時にはデプロイの設定も
