@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - feature/**
     paths:
       - 'frontend/**'
   pull_request:
@@ -27,11 +28,11 @@ jobs:
           npm install -g bun
           bun install
 
-      - name: Build and run Docker containers
+      - name: Build and run frontend Docker container
         working-directory: ./frontend
         run: |
-          docker compose build --no-cache
-          docker compose up -d
+          docker compose build frontend
+          docker compose up -d frontend
           docker compose ps
 
       - name: Install Dependencies

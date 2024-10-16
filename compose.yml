@@ -2,6 +2,7 @@
 services:
   # フロントエンド（React/Next.js）
   frontend:
+    container_name: VC_frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -17,6 +18,7 @@ services:
 
   #バックエンド（Django）
   backend:
+    container_name: VC_backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -32,6 +34,7 @@ services:
 
   # DB(postgresql)
   db:
+    container_name: VC_db
     image: postgres:16.2
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -42,6 +45,7 @@ services:
 
   # pgAdmin4
   pgadmin4:
+    container_name: VC_pgadmin4
     image: dpage/pgadmin4
     ports:
       - 8888:80

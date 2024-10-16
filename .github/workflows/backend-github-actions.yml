@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - feature/**
     paths:
       - 'backend/**'
   pull_request:
@@ -21,11 +22,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build and run Docker containers
+      - name: Build and run backend Docker containers
         working-directory: ./backend
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          PGADMIN_DEFAULT_EMAIL: ${{ secrets.PGADMIN_DEFAULT_EMAIL }}
+          PGADMIN_DEFAULT_PASSWORD: ${{ secrets.PGADMIN_DEFAULT_PASSWORD }}
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+          DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          TZ: ${{ secrets.TZ }}
+
         run: |
-          docker compose build --no-cache
-          docker compose up -d
+          docker compose build backend db
+          docker compose up -d backend db
           docker compose ps
 
       - name: Run migrations
