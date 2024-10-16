@@ -1,0 +1,65 @@
+{
+  // 推奨設定とプラグインの設定を継承
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "next/core-web-vitals",
+    "plugin:tailwindcss/recommended",
+    "prettier",
+    "next"
+  ],
+  // TypeScriptのパーサーを使用
+  "parser": "@typescript-eslint/parser",
+
+  // 特定のパターンのファイルを無視
+  "ignorePatterns": ["node_modules", "dist"],
+  // パーサーオプション: Next.jsのBabel設定を使用
+  "parserOptions": {
+    "babelOptions": {
+      "presets": ["next/babel"]
+    }
+  },
+  // 使用するプラグイン
+  "plugins": ["unused-imports", "@typescript-eslint"],
+  // カスタムルール設定
+  "rules": {
+    // 未使用のインポートを警告
+    "unused-imports/no-unused-imports": "warn",
+    // 一貫した型インポートを強制
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }
+    ],
+    // 未使用の変数を警告（特定のパターンは除外）
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    // オブジェクトのショートハンド記法を強制
+    "object-shorthand": "error",
+    // Tailwind CSSのカスタムクラス名チェックを無効化
+    "tailwindcss/no-custom-classname": "off",
+    // JSXでの不要な波括弧を禁止
+    "react/jsx-curly-brace-presence": "error",
+    // 自己終了タグの使用を強制（HTMLタグは除外）
+    "react/self-closing-comp": [
+      "error",
+      {
+        "component": true,
+        "html": false
+      }
+    ],
+    // Next.jsの<img>タグ使用警告を無効化
+    "@next/next/no-img-element": "off",
+    // Tailwind CSSのクラス名順序チェックを無効化
+    "tailwindcss/classnames-order": "off"
+  }
+}

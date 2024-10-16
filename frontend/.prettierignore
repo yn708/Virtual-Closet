@@ -1,0 +1,14 @@
+**/*.min.js
+*.config.js
+.*lintrc.js
+**/node_modules/
+.next/
+.nuxt/
+.astro/
+build/
+dist/
+out/
+public/
+package-lock.json
+bun.lockb
+next.config.js

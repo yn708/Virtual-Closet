@@ -1,0 +1,58 @@
+# version: '3.9'
+services:
+  # フロントエンド（React/Next.js）
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Tokyo
+    env_file:
+      - ./frontend/.env.local
+    volumes:
+      - ./frontend:/frontend
+    command: bun run dev -p 4000
+    ports:
+      - '4000:4000'
+
+  #バックエンド（Django）
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/backend
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+
+  # DB(postgresql)
+  db:
+    image: postgres:16.2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - '5432:5432'
+
+  # pgAdmin4
+  pgadmin4:
+    image: dpage/pgadmin4
+    ports:
+      - 8888:80
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+# 永続化ボリュームの定義
+volumes:
+  postgres_data:
+  pgadmin_data:

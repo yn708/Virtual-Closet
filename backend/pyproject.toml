@@ -1,0 +1,43 @@
+[tool.ruff]
+# 1行の最大文字数
+line-length = 100
+
+[tool.ruff.format]
+# ドキュメント文字列（docstring）内のコードブロックもフォーマットの対象にする
+docstring-code-format = true
+
+[tool.ruff.lint]
+# チェックするエラーの種類
+select = [
+    "E",  # pycodestyle errors (PEP8エラー)
+    "W",  # pycodestyle warnings (PEP8警告)
+    "F",  # pyflakes (未使用のインポートなど)
+    "I",  # isort (インポートの順序)
+    "B",  # flake8-bugbear (バグの可能性が高いコード)
+    "C4", # flake8-comprehensions (リスト内包表記の改善)
+    "UP", # pyupgrade (新しいPython文法の提案)
+]
+
+# 除外するエラーの種類
+ignore = [
+    "E501",  # 行が長すぎる（line-lengthで制御するため）
+    "B008",  # 関数呼び出しをデフォルト引数で使用（デコレータで一般的）
+    "W191",  # インデントにタブが含まれている
+]
+
+
+[tool.ruff.lint.pylint]
+# 関数やメソッドの引数の最大数
+max-args = 6
+
+# ファイルごとのエラー除外
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+# isort の設定
+[tool.ruff.lint.isort]
+known-third-party = ["fastapi", "pydantic", "starlette"]
+
+[tool.ruff.lint.pyupgrade]
+# Python3.8互換のための設定
+keep-runtime-typing = true

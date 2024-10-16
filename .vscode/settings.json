@@ -1,0 +1,33 @@
+{
+  // グローバル設定
+  "editor.formatOnSave": true, // ファイル保存時に自動的にフォーマットを適用
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit", // すべての自動修正を適用（明示的に設定された場合のみ）
+    "source.organizeImports": "explicit", // インポートの整理（明示的に設定された場合のみ）
+    "source.addMissingImports": "explicit" // 不足しているインポートを追加（明示的に設定された場合のみ）
+  },
+
+  // フロントエンド（TypeScript/JavaScript）の設定
+  "prettier.configPath": "frontend/.prettierrc.json", // Prettierの設定ファイルのパス
+  "typescript.tsdk": "frontend/node_modules/typescript/lib", // 使用するTypeScriptのバージョンを指定
+  "eslint.workingDirectories": ["frontend"], // ESLintが動作するディレクトリを指定
+
+  // Python（Django）バックエンドの設定
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff", // Pythonファイルのデフォルトフォーマッターとしてruffを使用
+    "editor.formatOnSave": true, // Python固有の保存時フォーマット設定
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit", // すべての自動修正を適用
+      "source.organizeImports": "explicit" // インポートの整理
+    }
+  },
+
+  // プロジェクト全体のファイル関連付け
+  "files.associations": {
+    "*.js": "javascript",
+    "*.jsx": "javascriptreact",
+    "*.ts": "typescript",
+    "*.tsx": "typescriptreact",
+    "*.py": "python"
+  }
+}
