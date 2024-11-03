@@ -9,11 +9,16 @@ PyJWT==2.9.0
 # Utils
 ruff==0.6.9
 pytest-django==4.9.0
+pytest-mock==3.14.0
+freezegun==1.5.1
+pillow==11.0.0
+drf-yasg==1.21.8
 
 # ソーシャルログイン
 dj-rest-auth==6.0.0
-
 django-allauth==65.0.2
+requests==2.32.3
+cryptography==43.0.1
 
 # その他
 django-filter==24.3
@@ -23,6 +28,5 @@ django-environ==0.11.2
 # インフラ関係も後々インストール
 
 # 必要な場合にインストール
-# Pillow==10.4.0
 # rembg==2.0.59
 

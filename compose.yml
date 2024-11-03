@@ -15,6 +15,12 @@ services:
     command: bun run dev -p 4000
     ports:
       - '4000:4000'
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
 
   #バックエンド（Django）
   backend:
@@ -31,6 +37,12 @@ services:
       - db
     env_file:
       - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
 
   # DB(postgresql)
   db:
@@ -42,6 +54,17 @@ services:
       - .env
     ports:
       - '5432:5432'
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # pgAdmin4
   pgadmin4:
@@ -55,6 +78,12 @@ services:
       - .env
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
 
 # 永続化ボリュームの定義
 volumes:

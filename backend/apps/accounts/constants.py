@@ -1,0 +1,4 @@
+USERNAME_LENGTH = 15  # ユーザー名の長さ
+CONFIRMATION_CODE_EXPIRATION_MINUTES = 20  # 確認コードの有効期限（分）
+CODE_LENGTH = 6  # 確認コードの長さ
+EMAIL_SUBJECT = "登録確認コード"
