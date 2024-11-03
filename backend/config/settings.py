@@ -144,12 +144,12 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": env("POSTGRES_DB"),
-        "HOST": env("POSTGRES_HOST"),
-        "PORT": env("POSTGRES_PORT"),
+        "HOST": env("POSTGRES_HOST", default="db"),
+        "PORT": env("POSTGRES_PORT", default=5432),
         "USER": env("POSTGRES_USER"),
         "PASSWORD": env("POSTGRES_PASSWORD"),
         "ATOMIC_REQUESTS": True,
-        "TIME_ZONE": env("TZ"),
+        "TIME_ZONE": env("TZ", default="Asia/Tokyo"),
         "TEST": {
             "NAME": env("POSTGRES_DB") + "_test",  # テスト用DBの名前
             "CHARSET": "UTF8",
@@ -190,7 +190,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "ja"
 
-TIME_ZONE = env("TZ")
+TIME_ZONE = env("TZ", default="Asia/Tokyo")
 
 USE_I18N = True
 
