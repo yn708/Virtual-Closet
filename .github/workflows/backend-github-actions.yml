@@ -43,6 +43,10 @@ jobs:
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           EOF
 
+          # 空のfrontend/.env.local ファイルを生成（エラー回避のため）
+          mkdir -p frontend
+          touch frontend/.env.local
+
           # backendの .env ファイルを生成
           cat > backend/.env << EOF
           DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}

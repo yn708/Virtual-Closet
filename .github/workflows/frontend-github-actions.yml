@@ -32,6 +32,10 @@ jobs:
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           EOF
 
+          # 空のbackend/.env ファイルを生成（エラー回避のため）
+          mkdir -p backend
+          touch backend/.env
+
           # frontend/.env.local ファイルを生成
           cat > frontend/.env.local << EOF
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
