@@ -1,9 +1,3 @@
-import LogoutButton from '@/features/auth/components/elements/button/LogoutButton';
-
 export default async function TopPage() {
-  return (
-    <>
-      <LogoutButton />
-    </>
-  );
+  return <div className="min-h-screen flex justify-center items-center">TOP PAGE</div>;
 }

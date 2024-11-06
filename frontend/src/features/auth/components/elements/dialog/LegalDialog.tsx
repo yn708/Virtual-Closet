@@ -8,21 +8,21 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import type { LegalDocument } from '@/features/auth/types';
-import type { LabelType } from '@/types';
+import type { ClassNameType, LabelType } from '@/types';
 
-interface LegalDialogProps extends LabelType {
+interface LegalDialogProps extends LabelType, ClassNameType {
   data: LegalDocument;
 }
 
-export function LegalDialog({ data, label }: LegalDialogProps) {
+export function LegalDialog({
+  data,
+  label,
+  className = 'p-0 h-auto font-medium text-blue-500 hover:text-blue-700 hover:underline',
+}: LegalDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="link"
-          className="p-0 h-auto font-medium text-blue-500 hover:text-blue-700 hover:underline"
-        >
+        <Button type="button" variant="link" className={className}>
           {label}
         </Button>
       </DialogTrigger>

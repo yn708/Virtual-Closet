@@ -19,3 +19,15 @@ export interface BaseInputFieldProps extends LabelType {
   type?: HTMLInputTypeAttribute;
   placeholder?: string;
 }
+
+/* ----------------------------------------------------------------
+Field
+------------------------------------------------------------------ */
+export interface FileInputType {
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+// 何か行う場合がある時の型
+export interface OnClickType {
+  onClick?: () => void;
+}
