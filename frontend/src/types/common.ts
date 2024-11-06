@@ -1,9 +1,7 @@
+import type { ReactNode } from 'react';
 /* ----------------------------------------------------------------
 よく使用される共通のタイプ（最小限）
 ------------------------------------------------------------------ */
-
-import type { ReactNode } from 'react';
-
 export interface ChildrenType {
   children: React.ReactNode;
 }

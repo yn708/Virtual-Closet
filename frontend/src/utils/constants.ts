@@ -48,6 +48,7 @@ URL
 ------------------------------------------------------------------ */
 // トップ
 export const TOP_URL = '/top';
+export const APP_ABOUT_URL = '/';
 
 // 認証系
 export const LOGIN_URL = '/auth/login';
@@ -58,6 +59,13 @@ export const PASSWORD_RESET_URL = '/auth/password/reset';
 
 // コンタクト
 export const CONTACT_URL = '/contact';
+// マイページ
+export const MY_PAGE_URL = '/my-page';
+// ファッションアイテム
+export const ITEM_EDIT_URL = '/outfit/item/edit';
+// コーディネート作成
+export const COORDINATE_EDIT_URL = '/outfit/coordinate/edit';
+export const COORDINATE_CREATE_CANVAS_URL = '/outfit/coordinate/canvas';
 
 /* ----------------------------------------------------------------
 ERROR MESSAGE
@@ -65,3 +73,10 @@ ERROR MESSAGE
 
 export const ERROR_MESSAGE = '何らかの問題が発生しました';
 export const ERROR_DESCRIPTION_MESSAGE = '時間をおいてから再度お試しください。';
+
+/* ----------------------------------------------------------------
+image
+------------------------------------------------------------------ */
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/heic'];
+export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.heic'];
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
