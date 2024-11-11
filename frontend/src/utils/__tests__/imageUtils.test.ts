@@ -1,6 +1,7 @@
+import imageCompression from 'browser-image-compression';
 import heic2any from 'heic2any';
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from '../constants';
-import { processImage, validateImage } from '../imageUtils';
+import { compressImage, processImage, validateImage } from '../imageUtils';
 
 // heic2anyのモック
 jest.mock('heic2any', () => ({
@@ -8,8 +9,17 @@ jest.mock('heic2any', () => ({
   default: jest.fn(),
 }));
 
+// imageCompressionのモック
+jest.mock('browser-image-compression', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(async (file: File, _options: unknown) => {
+    return new File(['compressed'], file.name, { type: file.type });
+  }),
+}));
+
 describe('imageUtils', () => {
   let consoleErrorSpy: jest.SpyInstance;
+  const mockImageCompression = imageCompression as jest.MockedFunction<typeof imageCompression>;
 
   beforeAll(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -121,6 +131,62 @@ describe('imageUtils', () => {
 
       expect(validateImage(jpegFile, customTypes)).toMatch(/未対応のファイル形式です/);
       expect(validateImage(pngFile, customTypes)).toBeNull();
+    });
+  });
+
+  describe('compressImage', () => {
+    beforeEach(() => {
+      mockImageCompression.mockReset();
+    });
+
+    // デフォルト設定での圧縮が正しく動作することを確認
+    it('should compress image with default options', async () => {
+      const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+      const compressedFile = new File(['compressed'], file.name, { type: 'image/jpeg' });
+      mockImageCompression.mockResolvedValue(compressedFile);
+
+      const result = await compressImage(file);
+
+      expect(result).toBeInstanceOf(File);
+      expect(mockImageCompression).toHaveBeenCalledWith(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+        fileType: 'image/jpeg',
+      });
+    });
+
+    // カスタム設定での圧縮が正しく動作することを確認
+    it('should compress image with custom options', async () => {
+      const file = new File(['test'], 'test.png', { type: 'image/png' });
+      const compressedFile = new File(['compressed'], file.name, { type: 'image/png' });
+      mockImageCompression.mockResolvedValue(compressedFile);
+
+      const customOptions = {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 800,
+        fileType: 'image/png',
+      };
+
+      const result = await compressImage(file, customOptions);
+
+      expect(result).toBeInstanceOf(File);
+      expect(mockImageCompression).toHaveBeenCalledWith(file, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+        fileType: 'image/png',
+      });
+    });
+
+    // 圧縮時のエラーが適切に処理されることを確認
+    it('should handle compression errors properly', async () => {
+      const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+      const error = new Error('Compression failed');
+      mockImageCompression.mockRejectedValue(error);
+
+      await expect(compressImage(file)).rejects.toThrow('Compression failed');
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error compressing image:', error);
     });
   });
 });

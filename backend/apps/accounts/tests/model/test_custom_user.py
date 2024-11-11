@@ -36,7 +36,7 @@ class TestCustomUser:
         }
         user = self.create_user(**required_fields)
 
-        assert all(getattr(user, field) is None for field in ["name", "birth_date", "gender", "height"])
+        assert all(getattr(user, field) is None for field in ["name", "birth_date", "height"])
         assert user.profile_image.name is None
 
     def test_user_id(self, valid_user_data):
@@ -99,6 +99,7 @@ class TestCustomUser:
                 not user.is_staff,
                 not user.is_active,
                 user.auth_provider == "email",
+                user.gender == "unanswered",
                 user.created_at is not None,
                 user.updated_at is not None,
             ]

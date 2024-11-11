@@ -2,7 +2,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
+
+from apps.accounts.constants import MAX_IMAGE_SIZE
 
 User = get_user_model()
 
@@ -94,3 +98,33 @@ def mock_auth_service():
 def enable_db_access_for_all_tests(db):
     """全テストでDBアクセスを有効化"""
     pass
+
+
+@pytest.fixture
+def auth_token(active_user):
+    """認証トークンを生成するフィクスチャ"""
+    token = Token.objects.create(user=active_user)
+    return token
+
+
+@pytest.fixture
+def auth_client(api_client, auth_token):
+    """認証済みAPIクライアントを返すフィクスチャ"""
+    # 認証ヘッダーを設定
+    api_client.force_authenticate(user=auth_token.user, token=auth_token)
+    return api_client
+
+
+@pytest.fixture
+def valid_image():
+    """テスト用画像ファイル"""
+    content = (
+        b"GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00ccc,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+    )
+    return SimpleUploadedFile("test_image.jpg", content, content_type="image/jpeg")
+
+
+@pytest.fixture
+def large_image():
+    """サイズ制限を超える画像ファイルを作成するフィクスチャ"""
+    return SimpleUploadedFile(name="large_image.jpg", content=b"x" * (MAX_IMAGE_SIZE + 1), content_type="image/jpeg")

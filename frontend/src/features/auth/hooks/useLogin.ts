@@ -3,7 +3,7 @@
 import { useGenericForm } from '@/hooks/form/useGenericForm';
 import { useToast } from '@/hooks/use-toast';
 import { TOP_URL } from '@/utils/constants';
-import { loginFormSchema } from '@/utils/validations/user-validation';
+import { loginFormSchema } from '@/utils/validations/auth-validation';
 import { signIn } from 'next-auth/react';
 import type { LoginFormData } from '../types';
 

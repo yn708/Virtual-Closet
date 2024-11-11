@@ -2,7 +2,7 @@
 import { useGenericForm } from '@/hooks/form/useGenericForm';
 import { signUpAPI } from '@/lib/api/authApi';
 import { CONFIRM_CODE_URL } from '@/utils/constants';
-import { signUpFormSchema } from '@/utils/validations/user-validation';
+import { signUpFormSchema } from '@/utils/validations/auth-validation';
 import type { SignUpFormData } from '../types';
 
 export const useSignUp = (onSuccess?: () => void) => {

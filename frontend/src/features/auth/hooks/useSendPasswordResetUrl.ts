@@ -4,7 +4,7 @@ import { useGenericForm } from '@/hooks/form/useGenericForm';
 import { useToast } from '@/hooks/use-toast';
 import { sendPasswordResetAPI } from '@/lib/api/authApi';
 import { ERROR_DESCRIPTION_MESSAGE, ERROR_MESSAGE } from '@/utils/constants';
-import { passwordResetFormSchema } from '@/utils/validations/user-validation';
+import { passwordResetFormSchema } from '@/utils/validations/auth-validation';
 import type { PasswordResetFormData } from '../types';
 
 export const useSendPasswordResetUrl = () => {

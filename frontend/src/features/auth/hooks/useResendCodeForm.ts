@@ -4,7 +4,7 @@ import { useGenericForm } from '@/hooks/form/useGenericForm';
 import { useToast } from '@/hooks/use-toast';
 import { resendCodeAPI } from '@/lib/api/authApi';
 
-import { loginFormSchema } from '@/utils/validations/user-validation';
+import { loginFormSchema } from '@/utils/validations/auth-validation';
 import type { LoginFormData } from '../types';
 
 export const useResendCodeForm = (email: string | null, onResendSuccess: () => void) => {

@@ -1,7 +1,7 @@
 import { useLogin } from '@/features/auth/hooks/useLogin';
 import type { LoginFormData } from '@/features/auth/types';
 import { SIGN_UP_URL } from '@/utils/constants';
-import { loginFormSchema } from '@/utils/validations/user-validation';
+import { loginFormSchema } from '@/utils/validations/auth-validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { render, screen } from '@testing-library/react';
 import { FormProvider, useForm } from 'react-hook-form';

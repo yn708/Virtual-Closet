@@ -22,3 +22,7 @@ export interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 /* ----------------------------------------------------------------
 要素
 ------------------------------------------------------------------ */
+export interface ImageDisplayProps {
+  src: string | undefined | null;
+  alt: string;
+}

@@ -5,7 +5,7 @@ import { useGenericForm } from '@/hooks/form/useGenericForm';
 import { useToast } from '@/hooks/use-toast';
 import { passwordResetAPI } from '@/lib/api/authApi';
 import { ERROR_DESCRIPTION_MESSAGE, ERROR_MESSAGE, LOGIN_URL } from '@/utils/constants';
-import { passwordResetConfirmFormSchema } from '@/utils/validations/user-validation';
+import { passwordResetConfirmFormSchema } from '@/utils/validations/auth-validation';
 import AuthForm from '../form/AuthForm';
 
 type PasswordResetContentProps = {

@@ -79,13 +79,3 @@ function FloatingLabelInputFormField<T extends FieldValues>({
 }
 
 export default FloatingLabelInputFormField;
-
-// // 使用例
-// {
-//   /* <FloatingLabelInputFormField
-//   control={form.control}
-//   name="password"
-//   label="パスワード"
-//   type="password"
-// /> */
-// }

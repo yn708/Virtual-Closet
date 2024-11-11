@@ -4,7 +4,7 @@ import { useImage } from '@/context/ImageContext';
 import Image from 'next/image';
 
 export default function ItemEditPage() {
-  const { image, preview, isProcessing } = useImage();
+  const { preview, isProcessing } = useImage();
 
   if (!preview) {
     return null;
@@ -13,7 +13,7 @@ export default function ItemEditPage() {
   return (
     <div className="min-h-screen flex justify-center items-center relative">
       {isProcessing && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
           <div className="text-white">画像を処理中...</div>
         </div>
       )}

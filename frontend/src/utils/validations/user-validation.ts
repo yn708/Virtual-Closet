@@ -1,54 +1,53 @@
 import { z } from 'zod';
-import { AUTH_CODE_LENGTH, MIN_PASSWORD_LENGTH } from '../constants';
-import { createPasswordSchema, emailSchema } from './common-validation';
+import { imageSchema } from './common-validation';
 
 /* ----------------------------------------------------------------
-サインアップ
+プロフィールアップデート用
 ------------------------------------------------------------------ */
-export const signUpFormSchema = z
+export const ProfileUpdateFormSchema = z
   .object({
-    email: emailSchema,
-    password: createPasswordSchema,
-    passwordConfirmation: z.string(),
+    username: z
+      .string()
+      .min(5, { message: 'ユーザー名は5文字以上で入力してください。' })
+      .max(30, { message: 'ユーザー名は30文字以内で入力してください。' }),
+    name: z
+      .string()
+      .max(30, { message: '名前は30文字以内で入力してください。' })
+      .optional()
+      .nullable(),
+    birth_year: z.string().optional().nullable(),
+    birth_month: z.string().optional().nullable(),
+    birth_day: z.string().optional().nullable(),
+
+    gender: z
+      .union([z.enum(['male', 'female', 'other', 'unanswered']), z.literal('')])
+      .optional()
+      .nullable(),
+
+    profile_image: imageSchema.optional().nullable(),
+    height: z
+      .string()
+      .refine(
+        (val) => {
+          if (val === '') return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 1 && num < 300;
+        },
+        { message: '身長は1cm以上300cm未満で入力してください。' },
+      )
+      .optional()
+      .nullable(),
   })
-  .refine((data) => data.password === data.passwordConfirmation, {
-    message: 'パスワードが一致しません',
-    path: ['passwordConfirmation'],
-  });
-
-/* ----------------------------------------------------------------
-ログイン
------------------------------------------------------------------- */
-export const loginFormSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(MIN_PASSWORD_LENGTH, {
-    message: `パスワードは${MIN_PASSWORD_LENGTH}文字以上である必要があります`,
-  }),
-});
-/* ----------------------------------------------------------------
-認証コード
------------------------------------------------------------------- */
-export const authCodeFormSchema = z.object({
-  code: z.string().length(AUTH_CODE_LENGTH, {
-    message: `認証コードは${AUTH_CODE_LENGTH}桁で入力してください。`,
-  }),
-});
-
-/* ----------------------------------------------------------------
-パスワードリセット用
------------------------------------------------------------------- */
-// Email送信
-export const passwordResetFormSchema = z.object({
-  email: emailSchema,
-});
-
-// パスワード設定
-export const passwordResetConfirmFormSchema = z
-  .object({
-    password: createPasswordSchema,
-    passwordConfirmation: z.string(),
-  })
-  .refine((data) => data.password === data.passwordConfirmation, {
-    message: 'パスワードが一致しません',
-    path: ['passwordConfirmation'],
-  });
+  .refine(
+    (data) => {
+      const { birth_year, birth_month, birth_day } = data;
+      // すべてnullの場合は有効
+      if (!birth_year && !birth_month && !birth_day) return true;
+      // 一部でも値がある場合は、すべての値が必要
+      return !!birth_year && !!birth_month && !!birth_day;
+    },
+    {
+      message: '生年月日は年、月、日のすべてを入力してください。',
+      path: ['birth_year'],
+    },
+  );
