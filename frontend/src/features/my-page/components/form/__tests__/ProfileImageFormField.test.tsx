@@ -3,7 +3,8 @@ import { useImageSelection } from '@/hooks/image/useImageSelection';
 import { useToast } from '@/hooks/use-toast';
 import { BACKEND_URL } from '@/utils/constants';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ChangeEvent, ForwardedRef, forwardRef } from 'react';
+import type { ChangeEvent, ForwardedRef } from 'react';
+import { forwardRef } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useImageProcessing } from '../../../hooks/useImageProcessing';
 import type { ProfileEditFormData } from '../../../types';
@@ -16,20 +17,28 @@ class ResizeObserverMock {
 }
 global.ResizeObserver = ResizeObserverMock;
 
-jest.mock('@/components/elements/form/HiddenFileInput', () => ({
-  __esModule: true,
-  default: forwardRef(
+jest.mock('@/components/elements/form/HiddenFileInput', () => {
+  const MockHiddenFileInput = forwardRef(
     (
       { onChange }: { onChange: (event: ChangeEvent<HTMLInputElement>) => void },
       ref: ForwardedRef<HTMLInputElement>,
     ) => <input type="file" data-testid="file-input" onChange={onChange} ref={ref} />,
-  ),
-}));
+  );
+  MockHiddenFileInput.displayName = 'MockHiddenFileInput';
+  return {
+    __esModule: true,
+    default: MockHiddenFileInput,
+  };
+});
 
 jest.mock('@/components/ui/form', () => ({
-  FormField: ({ render }: any) => render({ field: { value: '', onChange: jest.fn() } }),
-  FormItem: ({ children }: any) => <div>{children}</div>,
-  FormControl: ({ children }: any) => <div>{children}</div>,
+  FormField: ({
+    render,
+  }: {
+    render: (args: { field: { value: string; onChange: jest.Mock } }) => JSX.Element;
+  }) => render({ field: { value: '', onChange: jest.fn() } }),
+  FormItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  FormControl: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   FormMessage: () => null,
 }));
 

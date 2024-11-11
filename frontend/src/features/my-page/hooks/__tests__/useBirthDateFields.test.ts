@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import type { UseFormReturn } from 'react-hook-form';
-import { ProfileEditFormData } from '../../types';
+import type { ProfileEditFormData } from '../../types';
 import { useBirthDateFields } from '../useBirthDateFields';
 
 describe('useBirthDateFields', () => {

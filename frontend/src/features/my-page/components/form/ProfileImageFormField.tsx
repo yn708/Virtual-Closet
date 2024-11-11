@@ -46,11 +46,13 @@ const ProfileImageFormField: React.FC<ProfileImageFormFieldProps> = ({
         setIsDialogOpen(true);
       }
     } catch (error) {
-      toast({
-        title: 'エラー',
-        description: '画像の処理中にエラーが発生しました',
-        variant: 'destructive',
-      });
+      if (error) {
+        toast({
+          title: 'エラー',
+          description: '画像の処理中にエラーが発生しました',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsProcessing(false);
     }
