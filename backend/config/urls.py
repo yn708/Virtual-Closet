@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
@@ -17,5 +19,5 @@ urlpatterns = [
     *swagger_patterns,
     # 認証関連のURL
     path("accounts/", include("allauth.urls")),  # allauth による認証機能へのルーティング 必須
-    path("api/auth/", include("apps.accounts.urls")),  # 認証用
-]
+    path("api/auth/", include("apps.accounts.urls")),  # 認証、ユーザー関連
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # 画像の保存先をローカルに設定しているため、後々変更

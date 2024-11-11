@@ -1,5 +1,5 @@
 import type { LoginFormData } from '@/features/auth/types';
-import { loginFormSchema } from '@/utils/validations/user-validation';
+import { loginFormSchema } from '@/utils/validations/auth-validation';
 import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { useGenericForm } from '../useGenericForm';

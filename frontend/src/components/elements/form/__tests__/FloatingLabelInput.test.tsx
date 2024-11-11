@@ -2,7 +2,7 @@ import { Form } from '@/components/ui/form';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
-import FloatingLabelInputFormField from '../FloatingLabelInput';
+import FloatingLabelInputFormField from '../FloatingLabelInputFormField';
 
 // テスト用のラッパーコンポーネント
 const TestWrapper = ({ type = 'text', label = 'テストラベル', name = 'testField' }) => {

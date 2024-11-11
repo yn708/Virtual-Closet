@@ -3,7 +3,7 @@ import { useGenericForm } from '@/hooks/form/useGenericForm';
 import { useToast } from '@/hooks/use-toast';
 import { verifyEmailPasswordAPI } from '@/lib/api/authApi';
 
-import { loginFormSchema } from '@/utils/validations/user-validation';
+import { loginFormSchema } from '@/utils/validations/auth-validation';
 import type { LoginFormData } from '../types';
 
 export const useEmailPasswordForm = (onEmailVerified: (email: string) => void) => {

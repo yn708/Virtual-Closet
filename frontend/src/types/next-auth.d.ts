@@ -1,40 +1,33 @@
 import 'next-auth';
+import type { JWT as DefaultJWT } from 'next-auth/jwt';
+
+export interface BackendTokens {
+  access: string;
+  refresh: string;
+  expires_at: string;
+  refresh_expires_at: string;
+}
 
 declare module 'next-auth' {
   interface Session {
-    backendTokens?: {
-      access_token?: string;
-      id_token?: string;
-      key?: string;
-    };
+    backendTokens?: BackendTokens;
     user: {
-      key?: string;
       isNewUser?: boolean;
-    } & NextAuth.DefaultSession['user'];
+    } & DefaultSession['user'];
   }
 
   interface User {
     isNewUser?: boolean;
-    backendTokens?: {
-      access_token?: string;
-      id_token?: string;
-      key?: string;
-    };
+    backendTokens?: BackendTokens;
   }
-
   interface Account {
-    backendTokens?: {
-      access_token?: string;
-      id_token?: string;
-    };
+    backendTokens?: BackendTokens;
   }
 }
 
 declare module 'next-auth/jwt' {
-  interface JWT {
-    backendTokens?: {
-      access_token?: string;
-      id_token?: string;
-    };
+  interface JWT extends DefaultJWT {
+    backendTokens?: BackendTokens;
+    isNewUser?: boolean;
   }
 }

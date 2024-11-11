@@ -98,7 +98,9 @@ describe('API Utilities', () => {
     it('認証済みユーザーのリクエストを正しく処理する', async () => {
       // セッションモックの設定
       const mockSession = {
-        backendTokens: 'test-token',
+        backendTokens: {
+          access: 'test-token',
+        },
       };
       (getServerSession as jest.Mock).mockResolvedValueOnce(mockSession);
 
@@ -116,7 +118,7 @@ describe('API Utilities', () => {
         expect.any(String),
         expect.objectContaining({
           headers: expect.objectContaining({
-            Authorization: `Token ${mockSession.backendTokens}`,
+            Authorization: `Bearer ${mockSession.backendTokens.access}`,
           }),
         }),
       );
@@ -136,7 +138,9 @@ describe('API Utilities', () => {
     it('既存のヘッダーを保持しながら認証ヘッダーを追加する', async () => {
       // セッションモックの設定
       const mockSession = {
-        backendTokens: 'test-token',
+        backendTokens: {
+          access: 'test-token',
+        },
       };
       (getServerSession as jest.Mock).mockResolvedValueOnce(mockSession);
 
@@ -162,7 +166,7 @@ describe('API Utilities', () => {
         expect.objectContaining({
           headers: expect.objectContaining({
             ...customHeaders,
-            Authorization: `Token ${mockSession.backendTokens}`,
+            Authorization: `Bearer ${mockSession.backendTokens.access}`,
           }),
         }),
       );

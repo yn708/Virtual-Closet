@@ -1,3 +1,4 @@
+import type { BackendTokens } from '@/types/next-auth';
 import {
   BASE_URL,
   LOGIN_AFTER_VERIFICATION_ENDPOINT,
@@ -5,6 +6,7 @@ import {
   LOGIN_ERROR_URL,
   LOGIN_GOOGLE_ENDPOINT,
   LOGIN_URL,
+  TOKEN_REFRESH_ENDPOINT,
 } from '@/utils/constants';
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -35,15 +37,16 @@ export const authOptions: NextAuthOptions = {
               body: JSON.stringify(credentials),
               headers: { 'Content-Type': 'application/json' },
             });
-            const user = await res.json();
-            if (res.ok && user) {
+            const data = await res.json();
+
+            if (res.ok && data) {
               // バックエンドからのレスポンスを適切な形式に変換
               return {
-                id: user.user.id,
-                email: user.user.email,
-                name: user.user.username,
-                isNewUser: user.is_new_user,
-                backendTokens: user.access,
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.username,
+                isNewUser: data.is_new_user,
+                backendTokens: data.tokens as BackendTokens,
               };
             }
           } catch (e) {
@@ -59,14 +62,15 @@ export const authOptions: NextAuthOptions = {
                 'Content-Type': 'application/json',
               },
             });
-            const user = await res.json();
-            if (res.ok && user) {
+            const data = await res.json();
+
+            if (res.ok && data) {
               return {
-                id: user.id,
-                email: user.email,
-                name: user.username,
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.username,
                 isNewUser: true,
-                backendTokens: credentials.token,
+                backendTokens: data.tokens as BackendTokens,
               };
             }
           } catch (e) {
@@ -81,10 +85,10 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 30 * 24 * 60 * 60, // 30 days (リフレッシュトークンの有効期限に合わせる)
   },
   jwt: {
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: LOGIN_URL,
@@ -111,7 +115,7 @@ export const authOptions: NextAuthOptions = {
           if (response.status === 200 || response.status === 201) {
             const data = await response.json();
 
-            account.backendTokens = data.access;
+            account.backendTokens = data.tokens;
             user.isNewUser = data.is_new_user;
 
             return true;
@@ -132,7 +136,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     // JWTの作成・更新時に呼び出されるコールバック
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.isNewUser = user.isNewUser;
         if (user.backendTokens) {
@@ -143,17 +147,51 @@ export const authOptions: NextAuthOptions = {
         token.backendTokens = account.backendTokens;
       }
 
+      // セッション更新時のisNewUser状態の反映
+      if (trigger === 'update' && session?.user) {
+        token.isNewUser = session.user.isNewUser;
+      }
+
+      // アクセストークンの有効期限をチェック
+      if (token.backendTokens) {
+        const accessTokenExpiresAt = new Date(token.backendTokens.expires_at);
+        const now = new Date();
+
+        // トークンの期限切れが近い（5分前）の場合、リフレッシュを試みる
+        if (accessTokenExpiresAt.getTime() - now.getTime() < 29 * 60 * 1000) {
+          try {
+            const response = await fetch(BASE_URL + TOKEN_REFRESH_ENDPOINT, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                refresh: token.backendTokens.refresh,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              token.backendTokens = data;
+            }
+          } catch (error) {
+            console.error('Token refresh failed:', error);
+            // リフレッシュに失敗した場合、セッションを無効化する可能性
+            delete token.backendTokens;
+          }
+        }
+      }
+
       return token;
     },
 
     // セッションの作成・更新時に呼び出されるコールバック
     async session({ session, token }) {
-      session.user.isNewUser = token.isNewUser;
-      session.backendTokens = token.backendTokens;
-      if (token.backendTokens?.access_token) {
-        session.user.access = token.backendTokens.access_token;
+      if (token.backendTokens) {
+        session.user.isNewUser = token.isNewUser;
+        session.backendTokens = token.backendTokens;
       }
-
       return session;
     },
   },

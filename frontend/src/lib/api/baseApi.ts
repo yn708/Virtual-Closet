@@ -38,13 +38,12 @@ export async function baseFetchAuthAPI(endpoint: string, options: RequestInit = 
   if (!session) {
     throw new Error('認証されていません');
   }
-
   // 認証トークンを含めて基本フェッチ関数を呼び出し
   return baseFetchAPI(endpoint, {
     ...options, // 渡されたオプションをスプレッド
     headers: {
       ...options.headers, // 既存のヘッダーを保持
-      Authorization: `Token ${session.backendTokens}`, // 認証トークンを追加
+      Authorization: `Bearer ${session.backendTokens?.access}`, // 認証トークンを追加
     },
   });
 }

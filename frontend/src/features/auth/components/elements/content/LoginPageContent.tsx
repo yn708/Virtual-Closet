@@ -12,7 +12,7 @@ export default function LoginPageContent() {
   const { form, onSubmit } = useLogin();
 
   return (
-    <>
+    <div>
       <SocialAuthButtons text="ログイン" />
       <DividerWithText className="text-sm font-medium py-4" text="または" />
       <AuthForm<LoginFormData>
@@ -28,6 +28,6 @@ export default function LoginPageContent() {
         className="text-center text-sm text-gray-600"
       />
       <LinkWithText text="まだアカウントをお持ちでない方は" href={SIGN_UP_URL} label="新規登録" />
-    </>
+    </div>
   );
 }

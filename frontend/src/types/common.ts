@@ -31,7 +31,11 @@ export interface SubDescriptionType {
 }
 
 export interface LoadingType {
-  loading: boolean;
+  loading?: boolean;
+}
+
+export interface SizeType {
+  size?: 'sm' | 'md' | 'lg';
 }
 
 /* ----------------------------------------------------------------

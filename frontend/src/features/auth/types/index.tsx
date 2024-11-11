@@ -5,7 +5,7 @@ import type {
   passwordResetConfirmFormSchema,
   passwordResetFormSchema,
   signUpFormSchema,
-} from '@/utils/validations/user-validation';
+} from '@/utils/validations/auth-validation';
 import type { z } from 'zod';
 
 /* ----------------------------------------------------------------

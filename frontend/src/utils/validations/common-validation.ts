@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MIN_PASSWORD_LENGTH } from '../constants';
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, MIN_PASSWORD_LENGTH } from '../constants';
 
 /* ----------------------------------------------------------------
 認証系
@@ -25,3 +25,25 @@ export const createPasswordSchema = z
 
 // Email
 export const emailSchema = z.string().email({ message: 'メールアドレスの形式ではありません' });
+
+/* ----------------------------------------------------------------
+画像関連
+------------------------------------------------------------------ */
+export const imageSchema = z
+  .instanceof(File)
+  .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.type), {
+    message: 'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+  })
+  .refine((file) => file.size <= MAX_FILE_SIZE, {
+    message: `画像サイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください。`,
+  })
+  .or(
+    z.string().refine(() => false, {
+      message: '画像ファイルのみをアップロードしてください。URLは許可されていません。',
+    }),
+  )
+  .or(
+    z.null().refine(() => false, {
+      message: '画像ファイルを選択してください。',
+    }),
+  );

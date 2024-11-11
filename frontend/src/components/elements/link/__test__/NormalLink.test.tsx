@@ -1,4 +1,4 @@
-import { BaseLinkProps, LabelType } from '@/types';
+import type { BaseLinkProps, LabelType } from '@/types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NormalLink from '../NormalLink';

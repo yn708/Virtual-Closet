@@ -1,5 +1,5 @@
 import SubmitButton from '@/components/elements/button/SubmitButton';
-import FloatingLabelInputFormField from '@/components/elements/form/FloatingLabelInput';
+import FloatingLabelInputFormField from '@/components/elements/form/FloatingLabelInputFormField';
 import { Form } from '@/components/ui/form';
 import type { BaseFormProps } from '@/types';
 import type { FieldValues } from 'react-hook-form';

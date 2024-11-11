@@ -27,10 +27,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimestampMixin, Confirmatio
         "性別",
         max_length=10,
         choices=[
+            ("unanswered", "未回答"),
             ("male", "男性"),
             ("female", "女性"),
             ("other", "その他"),
         ],
+        default="unanswered",  # デフォルトで未回答
         null=True,
         blank=True,
     )
