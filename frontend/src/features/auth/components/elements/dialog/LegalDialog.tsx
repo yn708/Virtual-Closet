@@ -7,12 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import type { LegalDocument } from '@/features/auth/types';
-import type { ClassNameType, LabelType } from '@/types';
-
-interface LegalDialogProps extends LabelType, ClassNameType {
-  data: LegalDocument;
-}
+import type { LegalDialogProps } from '@/features/auth/types';
 
 export function LegalDialog({
   data,

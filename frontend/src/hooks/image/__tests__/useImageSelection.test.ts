@@ -44,22 +44,57 @@ describe('useImageSelection', () => {
     } as ChangeEvent<HTMLInputElement>;
   };
 
+  // DOM要素のモックを設定するヘルパー関数
+  const setupMockFileInput = () => {
+    const mockFileInput = document.createElement('input');
+    mockFileInput.id = 'image-upload';
+    mockFileInput.type = 'file';
+    const clickSpy = jest.spyOn(mockFileInput, 'click');
+    document.body.appendChild(mockFileInput);
+    return { mockFileInput, clickSpy };
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     (useToast as jest.Mock).mockReturnValue({ toast: mockToast });
+    // テスト前にDOMをクリーンアップ
+    document.body.innerHTML = '';
   });
 
   afterAll(() => {
     consoleErrorSpy.mockRestore();
   });
+
   // フックの初期値をテスト
   it('should initialize with default values', () => {
     const { result } = renderHook(() => useImageSelection());
 
-    expect(result.current.fileInputRef.current).toBe(null);
     expect(result.current.isLoading).toBe(false);
-    expect(typeof result.current.handleFileInput).toBe('function');
+    expect(typeof result.current.openFileDialog).toBe('function');
     expect(typeof result.current.handleFileChange).toBe('function');
+  });
+
+  // openFileDialog のテスト
+  it('should trigger file input click when openFileDialog is called', () => {
+    const { mockFileInput, clickSpy } = setupMockFileInput();
+    const { result } = renderHook(() => useImageSelection());
+
+    act(() => {
+      result.current.openFileDialog();
+    });
+
+    expect(clickSpy).toHaveBeenCalled();
+    mockFileInput.remove();
+  });
+
+  it('should not throw error when file input is not found', () => {
+    const { result } = renderHook(() => useImageSelection());
+
+    expect(() => {
+      act(() => {
+        result.current.openFileDialog();
+      });
+    }).not.toThrow();
   });
 
   // 有効なファイルが選択された場合のテスト
@@ -127,5 +162,20 @@ describe('useImageSelection', () => {
     });
     expect(result.current.isLoading).toBe(false);
     expect(consoleErrorSpy).toHaveBeenCalled();
+  });
+
+  // ファイルが選択されなかった場合のテスト
+  it('should handle no file selection', async () => {
+    const { result } = renderHook(() => useImageSelection());
+    const event = createMockFileEvent([]);
+
+    let selectionResult;
+    await act(async () => {
+      selectionResult = await result.current.handleFileChange(event);
+    });
+
+    expect(selectionResult).toEqual({ file: null });
+    expect(result.current.isLoading).toBe(false);
+    expect(mockToast).not.toHaveBeenCalled();
   });
 });

@@ -12,9 +12,32 @@ jest.mock('react-icons/ai', () => ({
   AiFillDelete: () => <div data-testid="mock-delete-icon" />,
 }));
 
+// shadcn/uiコンポーネントのモック
+jest.mock('@/components/ui/dropdown-menu', () => ({
+  DropdownMenu: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dropdown-menu">{children}</div>
+  ),
+  DropdownMenuTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dropdown-trigger">{children}</div>
+  ),
+  DropdownMenuContent: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dropdown-content">{children}</div>
+  ),
+  DropdownMenuItem: ({
+    children,
+    onClick,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+  }) => (
+    <div data-testid="dropdown-item" onClick={onClick}>
+      {children}
+    </div>
+  ),
+}));
+
 // テスト用の共通props
 const mockProps = {
-  onSelectImage: jest.fn(),
   onDeleteImage: jest.fn(),
   hasImage: false,
   hasPreview: false,
@@ -27,91 +50,76 @@ describe('ProfileImageDropdownMenu', () => {
 
   // 基本的なレンダリングテスト
   describe('Basic Rendering', () => {
-    // 編集ボタンが表示されることを確認
-    it('should render edit button correctly', () => {
+    it('should render with correct structure', () => {
       render(<ProfileImageDropdownMenu {...mockProps} />);
 
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      expect(editButton).toBeInTheDocument();
+      expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
+      expect(screen.getByTestId('dropdown-trigger')).toBeInTheDocument();
+      expect(screen.getByTestId('dropdown-content')).toBeInTheDocument();
       expect(screen.getByTestId('mock-edit-icon')).toBeInTheDocument();
     });
 
-    // 初期状態でドロップダウンが閉じていることを確認
-    it('should start with dropdown menu closed', () => {
+    it('should render upload button with correct attributes', () => {
       render(<ProfileImageDropdownMenu {...mockProps} />);
 
-      expect(screen.queryByText('カメラロールから選択')).not.toBeInTheDocument();
-    });
-  });
-
-  // ドロップダウンの操作テスト
-  describe('Dropdown Operations', () => {
-    // 編集ボタンクリックでメニューが開くことを確認
-    it('should open dropdown menu when edit button is clicked', async () => {
-      render(<ProfileImageDropdownMenu {...mockProps} />);
-
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      await userEvent.click(editButton);
-
-      expect(screen.getByText('カメラロールから選択')).toBeInTheDocument();
+      const button = screen.getByRole('button', { name: 'アップロード' });
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveClass(
+        'absolute bottom-0 -right-2 bg-slate-50 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-700',
+      );
     });
 
-    // 画像選択メニューをクリックしたときのコールバック確認
-    it('should call onSelectImage when select image option is clicked', async () => {
+    it('should render camera roll selection option', () => {
       render(<ProfileImageDropdownMenu {...mockProps} />);
 
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      await userEvent.click(editButton);
-
-      const selectButton = screen.getByText('カメラロールから選択');
-      await userEvent.click(selectButton);
-
-      expect(mockProps.onSelectImage).toHaveBeenCalledTimes(1);
+      const menuItem = screen.getByText('カメラロールから選択');
+      expect(menuItem).toBeInTheDocument();
+      expect(screen.getByTestId('mock-picture-icon')).toBeInTheDocument();
+      expect(menuItem.closest('label')).toHaveAttribute('for', 'image-upload');
     });
   });
 
   // 削除オプションの表示制御テスト
   describe('Delete Option Display Control', () => {
-    // hasImage=false, hasPreview=falseの場合の表示確認
-    it('should not show delete option when hasImage and hasPreview are false', async () => {
+    it('should not show delete option when hasImage and hasPreview are false', () => {
       render(<ProfileImageDropdownMenu {...mockProps} />);
-
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      await userEvent.click(editButton);
 
       expect(screen.queryByText('削除')).not.toBeInTheDocument();
       expect(screen.queryByText('選択取り消し')).not.toBeInTheDocument();
     });
 
-    // プレビュー時の選択取り消しオプション表示確認
-    it('should show cancel selection option when hasPreview is true', async () => {
+    it('should show "選択取り消し" option when hasPreview is true', () => {
       render(<ProfileImageDropdownMenu {...mockProps} hasPreview={true} />);
 
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      await userEvent.click(editButton);
-
-      expect(screen.getByText('選択取り消し')).toBeInTheDocument();
+      const deleteOption = screen.getByText('選択取り消し');
+      expect(deleteOption).toBeInTheDocument();
+      expect(deleteOption).toHaveClass('text-red-500');
+      expect(screen.getByTestId('mock-delete-icon')).toBeInTheDocument();
     });
 
-    // 画像がある場合の削除オプション表示確認
-    it('should show delete option when hasImage is true', async () => {
+    it('should show "削除" option when hasImage is true', () => {
       render(<ProfileImageDropdownMenu {...mockProps} hasImage={true} />);
 
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      await userEvent.click(editButton);
-
-      expect(screen.getByText('削除')).toBeInTheDocument();
+      const deleteOption = screen.getByText('削除');
+      expect(deleteOption).toBeInTheDocument();
+      expect(deleteOption).toHaveClass('text-red-500');
+      expect(screen.getByTestId('mock-delete-icon')).toBeInTheDocument();
     });
 
-    // 削除オプションクリック時のコールバック確認
     it('should call onDeleteImage when delete option is clicked', async () => {
       render(<ProfileImageDropdownMenu {...mockProps} hasImage={true} />);
 
-      const editButton = screen.getByRole('button', { name: 'アップロード' });
-      await userEvent.click(editButton);
-
       const deleteButton = screen.getByText('削除');
       await userEvent.click(deleteButton);
+
+      expect(mockProps.onDeleteImage).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onDeleteImage when cancel selection option is clicked', async () => {
+      render(<ProfileImageDropdownMenu {...mockProps} hasPreview={true} />);
+
+      const cancelButton = screen.getByText('選択取り消し');
+      await userEvent.click(cancelButton);
 
       expect(mockProps.onDeleteImage).toHaveBeenCalledTimes(1);
     });

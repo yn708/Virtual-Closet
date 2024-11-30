@@ -4,12 +4,12 @@
 export interface UserType {
   userId: string;
   username: string;
-  name: string;
+  name?: string;
   email: string;
-  birth_date?: string | null;
-  gender?: 'male' | 'female' | 'other' | null;
-  profile_image?: string | null;
-  height?: string | null;
+  birth_date?: string;
+  gender?: 'unanswered' | 'male' | 'female' | 'other';
+  profile_image?: string;
+  height?: string;
 }
 
 export interface UserDetailType {

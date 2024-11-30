@@ -45,13 +45,15 @@ export const LOGIN_AFTER_VERIFICATION_ENDPOINT = `${BASE_LOGIN_ENDPOINT}/after-v
 export const SEND_AUTH_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/send/`;
 export const RESEND_AUTH_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/resend/`;
 export const VERIFY_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/verify/`;
-export const VERIFY_EMAIL_PASSWORD_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/verify-email-password/`;
 export const SEND_PASSWORD_RESET_ENDPOINT = `${BASE_AUTH_ENDPOINT}/password/reset/`;
 export const PASSWORD_RESET_CONFIRM_ENDPOINT = `${BASE_AUTH_ENDPOINT}/password/reset/confirm/`;
 export const TOKEN_REFRESH_ENDPOINT = `${BASE_AUTH_ENDPOINT}/token-refresh/`;
 // User関連（情報、更新等）
 export const BASE_USER_DETAIL_ENDPOINT = `${BASE_USER_ENDPOINT}/detail/`;
 export const BASE_USER_UPDATE_ENDPOINT = `${BASE_USER_ENDPOINT}/update/`;
+
+// 画像
+export const IMAGE_REMOVE_BG_ENDPOINT = `/api/image/remove-bg/`;
 
 /* ----------------------------------------------------------------
 URL

@@ -5,9 +5,9 @@ import type { UseIsOpenOnCloseType } from '@/types';
 import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_EDIT_URL } from '@/utils/constants';
 import { BiCloset } from 'react-icons/bi';
 import { MdOutlineSwipe } from 'react-icons/md';
-import { ImageUploadSection } from './ImageUploadSection';
+import ImageUploadSection from './ImageUploadSection';
 
-export const CreateOutfitSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
+const CreateOutfitSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
   return (
     <ImageUploadSection
       value="create-outfit"
@@ -28,3 +28,4 @@ export const CreateOutfitSection: React.FC<UseIsOpenOnCloseType> = ({ onClose })
     </ImageUploadSection>
   );
 };
+export default CreateOutfitSection;

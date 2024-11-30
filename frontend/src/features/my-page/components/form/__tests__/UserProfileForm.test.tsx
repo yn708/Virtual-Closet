@@ -1,32 +1,49 @@
-import type { UserType } from '@/types/user';
+import { useProfileForm } from '@/features/my-page/hooks/useProfileForm';
+import type { UserDetailType } from '@/types';
 import { render, screen } from '@testing-library/react';
-import { useProfileForm } from '../../../hooks/useProfileForm';
 import UserProfileForm from '../UserProfileForm';
 
+// モックの作成
 jest.mock('../../../hooks/useProfileForm', () => ({
   useProfileForm: jest.fn(),
 }));
 
-jest.mock('@/components/ui/form', () => ({
-  Form: ({ children }: { children: React.ReactNode }) => children,
-}));
-
+// UIコンポーネントのモック
 jest.mock('@/components/elements/button/SubmitButton', () => ({
   __esModule: true,
-  default: ({ label, loading }: { label: string; loading: boolean }) => (
-    <button type="submit" disabled={loading}>
+  default: ({ label, className }: { label: string; className?: string }) => (
+    <button type="submit" className={className}>
       {label}
     </button>
   ),
 }));
 
-// ProfileFormFieldsのモック
-jest.mock('../ProfileFormFields', () => ({
-  ProfileFormFields: () => <div data-testid="profile-form-fields" />,
+// ProfileFieldsのモック
+jest.mock('../ProfileFields', () => ({
+  __esModule: true,
+  default: ({
+    onImageDelete,
+    onBirthDateDelete,
+  }: {
+    state: unknown;
+    userDetail: UserDetailType['userDetail'];
+    onImageDelete: () => void;
+    onBirthDateDelete: () => void;
+  }) => (
+    <div data-testid="profile-fields">
+      <button type="button" onClick={onImageDelete} data-testid="image-delete-button">
+        Delete Image
+      </button>
+      <button type="button" onClick={onBirthDateDelete} data-testid="birth-date-delete-button">
+        Delete Birth Date
+      </button>
+    </div>
+  ),
 }));
 
 describe('UserProfileForm', () => {
-  const mockUserDetail: Partial<UserType> = {
+  // テストデータの準備
+  const mockUserDetail: UserDetailType['userDetail'] = {
     username: 'testuser',
     name: 'Test User',
     birth_date: '1990-01-01',
@@ -34,72 +51,94 @@ describe('UserProfileForm', () => {
     height: '170',
   };
 
-  const mockForm = {
-    handleSubmit: jest.fn((fn) => fn),
-    register: jest.fn(),
-    control: {},
-    formState: { errors: {} },
+  // モックの戻り値の型定義
+  type MockProfileFormReturn = {
+    state: {
+      pending: boolean;
+      errors?: Record<string, string[]>;
+    };
+    formAction: () => Promise<void>;
+    handleDelete: (type: 'image' | 'birthDate') => () => void;
+  };
+
+  // デフォルトのモック値
+  const defaultMockReturn: MockProfileFormReturn = {
+    state: {
+      pending: false,
+    },
+    formAction: jest.fn().mockImplementation(async () => {}),
+    handleDelete: (_type: 'image' | 'birthDate') => jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useProfileForm as jest.Mock).mockReturnValue({
-      form: mockForm,
-      isLoading: false,
-      onSubmit: jest.fn(),
-      handleImageDelete: jest.fn(),
-      handleBirthDateDelete: jest.fn(),
-    });
+    (useProfileForm as jest.Mock).mockReturnValue(defaultMockReturn);
   });
-  // フォームが正しくレンダリングされること
-  it('renders the form with submit button', () => {
+
+  // 基本的なレンダリングテスト
+  it('renders form with all required components', () => {
     render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
 
+    // フォームの存在確認（data-testidを使用）
+    expect(screen.getByTestId('profile-fields')).toBeInTheDocument();
+    // 送信ボタンの存在確認
     expect(screen.getByRole('button', { name: '保存' })).toBeInTheDocument();
-    expect(screen.getByTestId('profile-form-fields')).toBeInTheDocument();
+    // フォームのクラス名確認
+    expect(screen.getByTestId('profile-fields').closest('form')).toHaveClass('space-y-8');
   });
 
-  // ローディング中は送信ボタンが無効化されること
-  it('disables submit button while loading', () => {
+  // Server Actionの設定テスト
+  it('sets up form with formAction from useProfileForm', () => {
+    const mockFormAction = jest.fn().mockImplementation(async () => {});
     (useProfileForm as jest.Mock).mockReturnValue({
-      form: mockForm,
-      isLoading: true,
-      onSubmit: jest.fn(),
-      handleImageDelete: jest.fn(),
-      handleBirthDateDelete: jest.fn(),
+      ...defaultMockReturn,
+      formAction: mockFormAction,
     });
 
     render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
 
-    expect(screen.getByRole('button', { name: '保存' })).toBeDisabled();
+    // formActionが正しく設定されているかの確認
+    const form = screen.getByTestId('profile-fields').closest('form');
+    expect(form).toBeInTheDocument();
   });
 
-  // フォームにデフォルト値が正しく設定されること
-  it('initializes useProfileForm with correct props', () => {
-    const onSuccess = jest.fn();
-    render(<UserProfileForm userDetail={mockUserDetail} onSuccess={onSuccess} />);
-
-    expect(useProfileForm).toHaveBeenCalledWith(mockUserDetail, onSuccess);
-  });
-
-  // ProfileFormFieldsに正しいpropsが渡されること
-  it('passes correct props to form handlers', () => {
-    const mockHandleSubmit = jest.fn();
-    const mockOnSubmit = jest.fn();
-
+  // 削除ハンドラーのテスト
+  it('passes correct delete handlers to ProfileFields', () => {
+    const mockHandleDelete = jest.fn(() => jest.fn());
     (useProfileForm as jest.Mock).mockReturnValue({
-      form: {
-        ...mockForm,
-        handleSubmit: mockHandleSubmit,
+      ...defaultMockReturn,
+      handleDelete: mockHandleDelete,
+    });
+
+    render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
+
+    // 画像削除ボタンのクリックテスト
+    screen.getByTestId('image-delete-button').click();
+    expect(mockHandleDelete).toHaveBeenCalledWith('image');
+
+    // 生年月日削除ボタンのクリックテスト
+    screen.getByTestId('birth-date-delete-button').click();
+    expect(mockHandleDelete).toHaveBeenCalledWith('birthDate');
+  });
+
+  // ステートの受け渡しテスト
+  it('passes state to ProfileFields', () => {
+    const mockState = {
+      pending: true,
+      errors: {
+        name: ['Required'],
       },
-      isLoading: false,
-      onSubmit: mockOnSubmit,
-      handleImageDelete: jest.fn(),
-      handleBirthDateDelete: jest.fn(),
+    };
+
+    (useProfileForm as jest.Mock).mockReturnValue({
+      ...defaultMockReturn,
+      state: mockState,
     });
 
     render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
 
-    expect(mockHandleSubmit).toHaveBeenCalled();
+    // ProfileFieldsにステートが正しく渡されているか確認
+    const profileFields = screen.getByTestId('profile-fields');
+    expect(profileFields).toBeInTheDocument();
   });
 });

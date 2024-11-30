@@ -1,5 +1,5 @@
 import SignUpPage, { metadata } from '@/app/auth/sign-up/page';
-import type { AuthPageTemplate } from '@/features/auth/types';
+import type { AuthPageTemplateProps } from '@/features/auth/types';
 import type { BaseLinkProps, LabelType, TextType } from '@/types';
 
 import { render, screen, within } from '@testing-library/react';
@@ -53,7 +53,7 @@ jest.mock('@/components/elements/link/LinkWithText', () => ({
 
 jest.mock('@/features/auth/components/layout/AuthPageTemplate', () => ({
   __esModule: true,
-  default: (props: AuthPageTemplate) => {
+  default: (props: AuthPageTemplateProps) => {
     mockComponents.authPageTemplate(props);
     return (
       <div data-testid="auth-page-template">
@@ -66,7 +66,7 @@ jest.mock('@/features/auth/components/layout/AuthPageTemplate', () => ({
   },
 }));
 
-jest.mock('@/features/auth/components/elements/content/LegalTextContent', () => ({
+jest.mock('@/features/auth/components/elements/content/LegalContent', () => ({
   __esModule: true,
   default: () => {
     mockComponents.legalTextContent();

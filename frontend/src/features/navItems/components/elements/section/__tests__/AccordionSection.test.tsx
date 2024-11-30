@@ -1,7 +1,7 @@
 import { ICON_SIZE } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
 import { LuHome } from 'react-icons/lu';
-import { AccordionSection } from '../AccordionSection';
+import AccordionSection from '../AccordionSection';
 
 // Accordionコンポーネントのモック
 jest.mock('@/components/ui/accordion', () => ({

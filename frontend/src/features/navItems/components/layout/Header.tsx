@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import LogoutButton from '@/features/auth/components/elements/button/LogoutButton';
 import ThemeToggleButton from '@/features/navItems/components/elements/button/ThemeToggleButton';
-import { AddFashionContentSheet } from '@/features/navItems/components/elements/sheet/addFashionContentSheet';
 import { HEADER_NAV_ITEMS } from '@/utils/data/navItems';
 import React from 'react';
 import { TbMenuDeep } from 'react-icons/tb';
+import AddFashionContentSheet from '../elements/sheet/addFashionContentSheet';
 
 const Header = () => {
   return (

@@ -8,16 +8,9 @@ import {
 
 import { AiFillDelete, AiOutlinePicture } from 'react-icons/ai';
 import { MdEdit } from 'react-icons/md';
-
-interface ProfileImageActionsProps {
-  onSelectImage: () => void;
-  onDeleteImage: () => void;
-  hasImage: boolean;
-  hasPreview: boolean;
-}
+import type { ProfileImageActionsProps } from '../../types';
 
 const ProfileImageDropdownMenu: React.FC<ProfileImageActionsProps> = ({
-  onSelectImage,
   onDeleteImage,
   hasImage,
   hasPreview,
@@ -35,10 +28,12 @@ const ProfileImageDropdownMenu: React.FC<ProfileImageActionsProps> = ({
       />
     </DropdownMenuTrigger>
     <DropdownMenuContent>
-      <DropdownMenuItem className="px-3" onClick={onSelectImage}>
-        <AiOutlinePicture />
-        <span>カメラロールから選択</span>
-      </DropdownMenuItem>
+      <label htmlFor="image-upload">
+        <DropdownMenuItem className="px-3">
+          <AiOutlinePicture />
+          <span>カメラロールから選択</span>
+        </DropdownMenuItem>
+      </label>
       {(hasPreview || hasImage) && (
         <DropdownMenuItem className="px-3" onClick={onDeleteImage}>
           <AiFillDelete className="text-red-500" />

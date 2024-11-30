@@ -1,7 +1,12 @@
-import { MIN_PASSWORD_LENGTH } from '@/utils/constants';
-import { createPasswordSchema, emailSchema } from '../common-validation';
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, MIN_PASSWORD_LENGTH } from '@/utils/constants';
+import {
+  createPasswordSchema,
+  emailSchema,
+  optionalImageSchema,
+  requiredImageSchema,
+} from '../common-validation';
 
-describe('Authentication Validation Schemas', () => {
+describe('Authentication and Image Validation Schemas', () => {
   /*----------------------------------------------------------------------------
   パスワードバリデーションのテスト
   ----------------------------------------------------------------------------*/
@@ -24,7 +29,7 @@ describe('Authentication Validation Schemas', () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.errors[0].message).toBe(
-          `パスワードは${MIN_PASSWORD_LENGTH}文字以上である必要があります`,
+          `${MIN_PASSWORD_LENGTH}文字以上である必要があります。`,
         );
       }
     });
@@ -39,9 +44,7 @@ describe('Authentication Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe(
-          'パスワードは少なくとも1つの大文字を含む必要があります',
-        );
+        expect(result.error.errors[0].message).toBe('大文字を含む必要があります。');
       }
     });
 
@@ -55,9 +58,7 @@ describe('Authentication Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe(
-          'パスワードは少なくとも1つの小文字を含む必要があります',
-        );
+        expect(result.error.errors[0].message).toBe('小文字を含む必要があります。');
       }
     });
 
@@ -71,9 +72,7 @@ describe('Authentication Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe(
-          'パスワードは少なくとも1つの数字を含む必要があります',
-        );
+        expect(result.error.errors[0].message).toBe('数字を含む必要があります。');
       }
     });
 
@@ -88,11 +87,12 @@ describe('Authentication Validation Schemas', () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.errors[0].message).toBe(
-          'パスワードに3回以上連続する文字を含めることはできません',
+          '3回以上連続する文字を含めることはできません。',
         );
       }
     });
   });
+
   /*----------------------------------------------------------------------------
   メールアドレスバリデーションのテスト
   ----------------------------------------------------------------------------*/
@@ -130,6 +130,85 @@ describe('Authentication Validation Schemas', () => {
         if (!result.success) {
           expect(result.error.errors[0].message).toBe('メールアドレスの形式ではありません');
         }
+      });
+    });
+  });
+
+  /*----------------------------------------------------------------------------
+  画像バリデーションのテスト
+  ----------------------------------------------------------------------------*/
+  describe('Image Validation Schemas', () => {
+    // テスト用のファイルモックを作成するヘルパー関数
+    const createMockFile = (name: string, type: string, size: number): File => {
+      const file = new File([''], name, { type });
+      Object.defineProperty(file, 'size', { value: size });
+      return file;
+    };
+
+    describe('optionalImageSchema', () => {
+      it('有効な画像ファイルを許可する', () => {
+        const validFile = createMockFile('test.jpg', 'image/jpeg', 1024 * 1024); // 1MB
+        const result = optionalImageSchema.safeParse(validFile);
+        expect(result.success).toBe(true);
+      });
+
+      it('nullを許可する', () => {
+        const result = optionalImageSchema.safeParse(null);
+        expect(result.success).toBe(true);
+      });
+
+      it('サポートされていないファイル形式を拒否する', () => {
+        const invalidFile = createMockFile('test.txt', 'text/plain', 1024);
+        const result = optionalImageSchema.safeParse(invalidFile);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe(
+            'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+          );
+        }
+      });
+
+      it('サイズ制限を超える画像を拒否する', () => {
+        const largeFile = createMockFile('large.jpg', 'image/jpeg', MAX_FILE_SIZE + 1);
+        const result = optionalImageSchema.safeParse(largeFile);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe(
+            `画像サイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください。`,
+          );
+        }
+      });
+    });
+
+    describe('requiredImageSchema', () => {
+      it('有効な画像ファイルを許可する', () => {
+        const validFile = createMockFile('test.jpg', 'image/jpeg', 1024 * 1024);
+        const result = requiredImageSchema.safeParse(validFile);
+        expect(result.success).toBe(true);
+      });
+
+      it('nullを拒否する', () => {
+        const result = requiredImageSchema.safeParse(null);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe('画像ファイルは必須です。');
+        }
+      });
+
+      it('undefined を拒否する', () => {
+        const result = requiredImageSchema.safeParse(undefined);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe('画像ファイルは必須です。');
+        }
+      });
+
+      it('ALLOWED_IMAGE_TYPESに含まれる全ての形式を許可する', () => {
+        ALLOWED_IMAGE_TYPES.forEach((type) => {
+          const validFile = createMockFile(`test.${type.split('/')[1]}`, type, 1024 * 1024);
+          const result = requiredImageSchema.safeParse(validFile);
+          expect(result.success).toBe(true);
+        });
       });
     });
   });

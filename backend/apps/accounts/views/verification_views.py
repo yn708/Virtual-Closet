@@ -4,11 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..serializers.verification_serializers import (
-    EmailPasswordVerificationSerializer,
     UserVerificationResponseSerializer,
     VerificationCodeSerializer,
 )
-from ..services.verification_service import EmailPasswordVerificationService, VerificationService
+from ..services.verification_service import VerificationService
 
 
 class VerifyCodeView(APIView):
@@ -49,37 +48,3 @@ class VerifyCodeView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-
-class VerifyEmailPasswordView(APIView):
-    """
-    メールアドレスとパスワードの検証ビュー
-    フロントエンド側のconfirmページで使用
-    Email、passwordの再確認用
-    """
-
-    permission_classes = [AllowAny]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.verification_service = EmailPasswordVerificationService()
-
-    def post(self, request) -> Response:
-        """
-        メールアドレスとパスワードの検証を実行
-
-        Args:
-            request: HTTPリクエスト
-        Returns:
-            Response: API応答
-        """
-        # リクエストデータのバリデーション
-        serializer = EmailPasswordVerificationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # 認証情報の検証
-        self.verification_service.verify_user_credentials(
-            email=serializer.validated_data["email"], password=serializer.validated_data["password"]
-        )
-
-        return Response({"detail": "メールアドレスとパスワードが確認されました。"}, status=status.HTTP_200_OK)

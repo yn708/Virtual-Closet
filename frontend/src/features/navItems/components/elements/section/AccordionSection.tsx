@@ -2,7 +2,7 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/
 import type { AccordionSectionProps } from '@/features/navItems/types';
 import { ICON_SIZE } from '@/utils/constants';
 
-export const AccordionSection = ({ value, Icon, label, children }: AccordionSectionProps) => (
+const AccordionSection = ({ value, Icon, label, children }: AccordionSectionProps) => (
   <AccordionItem value={value}>
     <AccordionTrigger className="flex items-center justify-between">
       <div className="flex items-center gap-2 p-2">
@@ -15,3 +15,4 @@ export const AccordionSection = ({ value, Icon, label, children }: AccordionSect
     </AccordionContent>
   </AccordionItem>
 );
+export default AccordionSection;

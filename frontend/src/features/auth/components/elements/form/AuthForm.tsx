@@ -1,91 +1,57 @@
+'use client';
+
 import SubmitButton from '@/components/elements/button/SubmitButton';
-import FloatingLabelInputFormField from '@/components/elements/form/FloatingLabelInputFormField';
-import { Form } from '@/components/ui/form';
-import type { BaseFormProps } from '@/types';
-import type { FieldValues } from 'react-hook-form';
+import FloatingLabelInput from '@/components/elements/form/input/FloatingLabelInput';
+import type { AuthFormProps } from '@/features/auth/types';
+import type { FloatingLabelInputProps } from '@/types';
 
-export interface AuthFormProps<T extends FieldValues> extends BaseFormProps<T> {
-  submitButtonLabel: string;
-  mode: 'login' | 'signup' | 'email-only' | 'password';
-  passwordLabel?: string;
-}
+type FormFieldConfig = Pick<FloatingLabelInputProps, 'name' | 'label' | 'type'>;
 
-export default function AuthForm<T extends FieldValues>({
-  form,
-  onSubmit,
+const FORM_FIELDS: Record<string, FormFieldConfig[]> = {
+  'email-only': [{ name: 'email', label: 'メールアドレス', type: 'email' }],
+  login: [
+    { name: 'email', label: 'メールアドレス', type: 'email' },
+    { name: 'password', label: 'パスワード', type: 'password' },
+  ],
+  signup: [
+    { name: 'email', label: 'メールアドレス', type: 'email' },
+    { name: 'password', label: 'パスワード', type: 'password' },
+    { name: 'passwordConfirmation', label: 'パスワード（確認）', type: 'password' },
+  ],
+  password: [
+    { name: 'password', label: 'パスワード', type: 'password' },
+    { name: 'passwordConfirmation', label: 'パスワード（確認）', type: 'password' },
+  ],
+};
+
+export default function AuthForm({
+  formAction,
+  state,
   submitButtonLabel,
   mode = 'login',
+  pending,
   passwordLabel = '',
-}: AuthFormProps<T>) {
+}: AuthFormProps) {
+  const fields = FORM_FIELDS[mode];
+
+  if (!fields) {
+    return null;
+  }
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 p-5 ">
-        {mode === 'email-only' && (
-          <FloatingLabelInputFormField
-            form={form}
-            name="email"
-            label="メールアドレス"
-            type="email"
-          />
-        )}
-        {mode === 'login' && (
-          <>
-            <FloatingLabelInputFormField
-              form={form}
-              name="email"
-              label="メールアドレス"
-              type="email"
-            />
-            <FloatingLabelInputFormField
-              form={form}
-              name="password"
-              label="パスワード"
-              type="password"
-            />
-          </>
-        )}
-        {mode === 'signup' && (
-          <>
-            <FloatingLabelInputFormField
-              form={form}
-              name="email"
-              label="メールアドレス"
-              type="email"
-            />
-            <FloatingLabelInputFormField
-              form={form}
-              name="password"
-              label="パスワード"
-              type="password"
-            />
-            <FloatingLabelInputFormField
-              form={form}
-              name="passwordConfirmation"
-              label="パスワード（確認）"
-              type="password"
-            />
-          </>
-        )}
-        {mode === 'password' && (
-          <>
-            <FloatingLabelInputFormField
-              form={form}
-              name="password"
-              label={`${passwordLabel}パスワード`}
-              type="password"
-            />
-            <FloatingLabelInputFormField
-              form={form}
-              name="passwordConfirmation"
-              label={`${passwordLabel}パスワード（確認）`}
-              type="password"
-            />
-          </>
-        )}
-        <div className="pt-8">
-          <SubmitButton loading={form.formState.isSubmitting} label={submitButtonLabel} />
-        </div>
-      </form>
-    </Form>
+    <form action={formAction} className="space-y-5 p-5">
+      {fields.map((field) => (
+        <FloatingLabelInput
+          key={field.name}
+          name={field.name}
+          label={field.name.includes('password') ? `${passwordLabel}${field.label}` : field.label}
+          type={field.type}
+          error={state?.errors?.[field.name]}
+        />
+      ))}
+      <div className="pt-8">
+        <SubmitButton loading={pending} label={submitButtonLabel} />
+      </div>
+    </form>
   );
 }

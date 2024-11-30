@@ -1,96 +1,110 @@
 import { render, screen } from '@testing-library/react';
-
-import { useSignUp } from '@/features/auth/hooks/useSignUp';
-import type { LoginFormData } from '@/features/auth/types';
-import { useToast } from '@/hooks/use-toast';
 import userEvent from '@testing-library/user-event';
-import type { UseFormReturn } from 'react-hook-form';
+
+import type { FormState } from '@/types';
 import EmailSignUpButton from '../EmailSignUpButton';
-interface TestAuthFormProps {
-  form: UseFormReturn;
-  onSubmit: (data: LoginFormData) => Promise<void>;
-  submitButtonLabel: string;
-}
 
-// モックの設定
-jest.mock('@/hooks/use-toast', () => ({
-  useToast: jest.fn(),
+jest.mock('react-dom', () => ({
+  ...jest.requireActual('react-dom'),
+  useFormState: jest.fn((initialState: FormState) => [initialState, jest.fn()]),
 }));
 
-jest.mock('@/features/auth/hooks/useSignUp', () => ({
-  useSignUp: jest.fn(),
+jest.mock('@/lib/actions/auth/signUpAction', () => ({
+  signUpAction: jest.fn(),
 }));
+
 jest.mock('../../form/AuthForm', () => ({
   __esModule: true,
-  default: ({ submitButtonLabel }: TestAuthFormProps) => (
+  default: ({ submitButtonLabel }: { submitButtonLabel: string }) => (
     <form data-testid="auth-form">
-      <input placeholder="メールアドレス" role="text-input" />
-      <input placeholder="パスワード" type="password" role="password-input" />
-      <input placeholder="パスワード（確認）" type="password" role="password-input" />
-      <button type="submit" data-testid="submit-button">
-        {submitButtonLabel}
-      </button>
+      <input placeholder="メールアドレス" />
+      <input placeholder="パスワード" type="password" />
+      <button type="submit">{submitButtonLabel}</button>
     </form>
   ),
 }));
 
-// テスト用のモックデータ
-const mockForm = {
-  register: jest.fn(),
-  handleSubmit: jest.fn((fn) => fn),
-  formState: {
-    isSubmitting: false,
-    errors: {},
-  },
-};
+jest.mock('../../content/ConfirmContent', () => ({
+  __esModule: true,
+  default: ({ email }: { email: string }) => (
+    <div data-testid="confirm-content">確認メール送信先: {email}</div>
+  ),
+}));
 
-const mockToast = {
-  toast: jest.fn(),
-};
+const mockUseFormState = jest.requireMock('react-dom').useFormState;
 
 describe('EmailSignUpButton', () => {
   beforeEach(() => {
-    // モックのリセットと初期設定
     jest.clearAllMocks();
-    (useToast as jest.Mock).mockReturnValue(mockToast);
-    (useSignUp as jest.Mock).mockReturnValue({
-      form: mockForm,
-      onSubmit: jest.fn(),
-    });
+    mockUseFormState.mockImplementation((initialState: FormState) => [initialState, jest.fn()]);
   });
 
-  // 1. 正常にレンダリングされるかのテスト
-  it('renders email signup button correctly', () => {
+  // 初期状態で正しくレンダリングされることを確認
+  it('should render correctly in initial state', () => {
     render(<EmailSignUpButton />);
 
-    // ボタンが存在することを確認
-    const button = screen.getByRole('button', { name: /Emailで登録/i });
-    expect(button).toBeInTheDocument();
+    expect(screen.getByTestId('email-signup-button')).toBeInTheDocument();
+    expect(screen.getByText('Emailで登録')).toBeInTheDocument();
   });
 
-  // 2. ダイアログが開くかのテスト
-  it('opens dialog when button is clicked', async () => {
+  // ボタンクリックでダイアログが開くことを確認
+  it('should open dialog when button is clicked', async () => {
     render(<EmailSignUpButton />);
 
-    // ボタンをクリック
-    const button = screen.getByRole('button', { name: /Emailで登録/i });
+    const button = screen.getByTestId('email-signup-button');
     await userEvent.click(button);
 
-    // ダイアログが表示されることを確認
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-  });
-
-  // 3. ダイアログの内容が正しく表示されるかのテスト
-  it('displays correct dialog content', async () => {
-    render(<EmailSignUpButton />);
-
-    // ダイアログを開く
-    const button = screen.getByRole('button', { name: /Emailで登録/i });
-    await userEvent.click(button);
-
-    // ダイアログの内容を確認
     expect(screen.getByText('メールアドレスで登録')).toBeInTheDocument();
     expect(screen.getByText('必要な情報を入力してください')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'アカウント作成' })).toBeInTheDocument();
+  });
+
+  // 登録成功時に確認画面が表示されることを確認
+  it('should display confirmation screen on successful registration', async () => {
+    mockUseFormState.mockImplementation((initialState: FormState) => [
+      {
+        ...initialState,
+        success: true,
+        email: 'test@example.com',
+      },
+      jest.fn(),
+    ]);
+
+    render(<EmailSignUpButton />);
+
+    await userEvent.click(screen.getByTestId('email-signup-button'));
+
+    expect(screen.getByTestId('confirm-content')).toBeInTheDocument();
+    expect(screen.getByText('確認メール送信先: test@example.com')).toBeInTheDocument();
+  });
+
+  // ダイアログが閉じられることを確認
+  it('should close dialog when close button is clicked', async () => {
+    render(<EmailSignUpButton />);
+
+    await userEvent.click(screen.getByTestId('email-signup-button'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    const closeButton = screen.getByRole('button', { name: 'Close' });
+    await userEvent.click(closeButton);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  // エラー状態が適切に表示されることを確認
+  it('should display error state correctly', async () => {
+    mockUseFormState.mockImplementation((initialState: FormState) => [
+      {
+        ...initialState,
+        error: 'An error occurred',
+      },
+      jest.fn(),
+    ]);
+
+    render(<EmailSignUpButton />);
+
+    await userEvent.click(screen.getByTestId('email-signup-button'));
+
+    expect(screen.getByTestId('auth-form')).toBeInTheDocument();
   });
 });

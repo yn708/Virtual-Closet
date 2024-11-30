@@ -1,113 +1,113 @@
-import { useLogin } from '@/features/auth/hooks/useLogin';
-import type { LoginFormData } from '@/features/auth/types';
-import { SIGN_UP_URL } from '@/utils/constants';
-import { loginFormSchema } from '@/utils/validations/auth-validation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { render, screen } from '@testing-library/react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import LoginPageContent from '../LoginPageContent';
 
-// 各モジュールのモック
 jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
 }));
 
-jest.mock('@/features/auth/hooks/useLogin', () => ({
-  useLogin: jest.fn(),
+jest.mock('react-dom', () => ({
+  ...jest.requireActual('react-dom'),
+  useFormState: jest.fn((initialState) => [initialState, jest.fn()]),
 }));
 
-// Next.jsのuseRouterをモック
+const mockLoginAction = jest.fn();
+jest.mock('@/lib/actions/auth/loginAction', () => ({
+  loginAction: () => mockLoginAction,
+}));
+
+const mockToast = jest.fn();
+jest.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({
+    toast: mockToast,
+  }),
+}));
+
+const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(() => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    refresh: jest.fn(),
-  })),
+  useRouter: () => ({
+    push: mockPush,
+  }),
 }));
 
-// モックフォームを作成する関数
-const useCreateMockForm = () => {
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginFormSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-  return form;
-};
+jest.mock('@/features/auth/components/elements/form/AuthForm', () => ({
+  __esModule: true,
+  default: ({
+    submitButtonLabel,
+    formAction,
+  }: {
+    submitButtonLabel: string;
+    formAction: () => void;
+  }) => (
+    <form
+      data-testid="auth-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        formAction();
+      }}
+    >
+      <button type="submit" data-testid="submit-button">
+        {submitButtonLabel}
+      </button>
+    </form>
+  ),
+}));
 
-// テスト用のラッパーコンポーネント
-const TestWrapper = ({ children }: { children: React.ReactNode }) => {
-  const form = useCreateMockForm();
-  (useLogin as jest.Mock).mockReturnValue({
-    form,
-    onSubmit: jest.fn(),
-  });
-
-  return <FormProvider {...form}>{children}</FormProvider>;
-};
+jest.mock('@/features/auth/components/elements/button/SocialAuthButtons', () => ({
+  __esModule: true,
+  default: ({ text }: { text: string }) => (
+    <div data-testid="social-auth-buttons">
+      <button>Googleで{text}</button>
+    </div>
+  ),
+}));
 
 describe('LoginPageContent', () => {
+  const mockSignIn = jest.requireMock('next-auth/react').signIn;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  /**
-   * 初期表示のテスト
-   * - ソーシャルログインボタンが表示されること
-   * - 各種リンクが表示されること
-   */
-  it('renders all components correctly', () => {
-    render(
-      <TestWrapper>
-        <LoginPageContent />
-      </TestWrapper>,
-    );
+  it('正しくすべてのコンポーネントがレンダリングされること', () => {
+    render(<LoginPageContent />);
 
-    // ソーシャルログインセクション
+    // ソーシャルログインボタンの確認
+    expect(screen.getByTestId('social-auth-buttons')).toBeInTheDocument();
     expect(screen.getByText('または')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Googleでログイン/i })).toBeInTheDocument();
 
-    // リンク要素
+    // 認証フォームの確認
+    expect(screen.getByTestId('auth-form')).toBeInTheDocument();
+    expect(screen.getByTestId('submit-button')).toBeInTheDocument();
+
+    // リンクの確認
     expect(screen.getByText('パスワードをお忘れの方は')).toBeInTheDocument();
     const resetLink = screen.getByText('こちら');
-    expect(resetLink).toBeInTheDocument();
     expect(resetLink).toHaveAttribute('href', '/auth/password/reset');
 
     expect(screen.getByText('まだアカウントをお持ちでない方は')).toBeInTheDocument();
     const signUpLink = screen.getByText('新規登録');
-    expect(signUpLink).toBeInTheDocument();
-    expect(signUpLink).toHaveAttribute('href', SIGN_UP_URL);
+    expect(signUpLink).toHaveAttribute('href', '/auth/sign-up');
   });
 
-  /**
-   * パスワードリセットリンクのテスト
-   * - リンクをクリックするとパスワードリセットページに遷移すること
-   */
-  it('navigates to password reset page', () => {
-    render(
-      <TestWrapper>
-        <LoginPageContent />
-      </TestWrapper>,
-    );
+  it('Server Action失敗時の処理が正しく実行されること', async () => {
+    mockLoginAction.mockResolvedValue({
+      success: false,
+      errors: {
+        email: ['無効なメールアドレスの形式です'],
+      },
+    });
 
-    const resetLink = screen.getByText('こちら');
-    expect(resetLink).toHaveAttribute('href', '/auth/password/reset');
-  });
+    render(<LoginPageContent />);
 
-  /**
-   * 新規登録リンクのテスト
-   * - リンクをクリックすると新規登録ページに遷移すること
-   */
-  it('navigates to sign up page', () => {
-    render(
-      <TestWrapper>
-        <LoginPageContent />
-      </TestWrapper>,
-    );
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
 
-    const signUpLink = screen.getByText('新規登録');
-    expect(signUpLink).toHaveAttribute('href', SIGN_UP_URL);
+    await waitFor(() => {
+      // サインインが呼ばれていないことを確認
+      expect(mockSignIn).not.toHaveBeenCalled();
+      // リダイレクトが発生していないことを確認
+      expect(mockPush).not.toHaveBeenCalled();
+    });
   });
 });

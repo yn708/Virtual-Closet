@@ -13,6 +13,7 @@ pytest-mock==3.14.0
 freezegun==1.5.1
 pillow==11.0.0
 drf-yasg==1.21.8
+rembg==2.0.59
 
 # ソーシャルログイン
 dj-rest-auth==6.0.0
@@ -26,7 +27,4 @@ django-environ==0.11.2
 
 
 # インフラ関係も後々インストール
-
-# 必要な場合にインストール
-# rembg==2.0.59
 

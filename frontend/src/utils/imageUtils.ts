@@ -4,7 +4,7 @@ import { ALLOWED_IMAGE_EXTENSIONS, ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from './
 /* ----------------------------------------------------------------
 HEIC形式をJPEGに変換する関数
 ------------------------------------------------------------------ */
-export const processImage = async (file: File): Promise<File> => {
+export const conversionImage = async (file: File): Promise<File> => {
   // クライアントサイドでのみ実行されるチェック
   if (typeof window === 'undefined') {
     return file; // サーバーサイドの場合は処理せずに元のファイルを返す
@@ -96,4 +96,40 @@ export const compressImage = async (
     console.error('Error compressing image:', error);
     throw error;
   }
+};
+
+/* ----------------------------------------------------------------
+データの加工等が可能なプレビューを作成
+------------------------------------------------------------------ */
+export const createImagePreview = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        resolve(e.target.result as string);
+      } else {
+        reject(new Error('ファイルの読み込みに失敗しました'));
+      }
+    };
+    reader.onerror = () => reject(new Error('ファイルの読み込み中にエラーが発生しました'));
+    reader.readAsDataURL(file);
+  });
+};
+
+/* ----------------------------------------------------------------
+ * Base64データURLをFileオブジェクトに変換する関数
+ * @param dataurl - Base64エンコードされた画像データURL
+ * @param filename - 生成するファイルの名前
+ * @returns 変換されたFileオブジェクト
+------------------------------------------------------------------ */
+export const dataURLtoFile = (dataurl: string, filename: string): File => {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
 };

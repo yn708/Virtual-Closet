@@ -24,7 +24,8 @@ jest.mock('@/components/elements/link/IconLink', () => {
 });
 
 jest.mock('@/features/navItems/components/elements/sheet/addFashionContentSheet', () => ({
-  AddFashionContentSheet: () => <button data-testid="add-fashion-content">Add Content</button>,
+  __esModule: true,
+  default: () => <button data-testid="add-fashion-content">Add Content</button>,
 }));
 
 jest.mock('@/features/auth/components/elements/button/LogoutButton', () => {

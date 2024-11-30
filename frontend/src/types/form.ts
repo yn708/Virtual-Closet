@@ -1,52 +1,37 @@
-import type { HTMLInputTypeAttribute } from 'react';
-import type { FieldValues, Path, SubmitHandler, UseFormReturn } from 'react-hook-form';
-import type { LabelType } from './common';
-
+import type { ClassNameType } from './common';
 /* ----------------------------------------------------------------
 Base
 ------------------------------------------------------------------ */
-export interface BaseFormProps<T extends FieldValues> {
-  form: UseFormReturn<T>;
-  onSubmit: SubmitHandler<T>;
-}
-
-export interface BaseFormFieldProps<T extends FieldValues> {
-  form: UseFormReturn<T>;
-  name: string | Path<T>;
-}
-
-// インプットフォームフィールド
-export interface BaseInputFieldProps extends LabelType {
-  type?: HTMLInputTypeAttribute;
-  placeholder?: string;
-}
-
-// セレクトフォームフィールド
-export interface BaseSelectFieldProps extends LabelType {
-  placeholder?: string;
-  options: Option[];
+// フィールドベース
+export interface BaseFieldProps {
+  name: string;
+  label: string;
+  defaultValue?: string;
+  error?: string[] | undefined;
+  onChange?: (value: string) => void;
 }
 
 /* ----------------------------------------------------------------
-Field
+Input field
 ------------------------------------------------------------------ */
+export interface FloatingLabelInputProps extends BaseFieldProps, ClassNameType {
+  type?: 'text' | 'password' | 'email' | 'number';
+}
+
 export interface FileInputType {
+  name?: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 /* ----------------------------------------------------------------
-関数
+select field
 ------------------------------------------------------------------ */
-// 何か行う場合がある時の型
-export interface OnClickType {
-  onClick?: () => void;
+export interface FloatingLabelSelectProps extends BaseFieldProps, ClassNameType {
+  options: SelectOption[];
 }
 
-/* ----------------------------------------------------------------
-セレクト時のオプション
------------------------------------------------------------------- */
 // 基本的なオプション型の定義
-export interface Option {
-  id: string;
+export interface SelectOption {
+  id: number | string;
   name: string;
 }

@@ -6,11 +6,9 @@ from rest_framework.authtoken.models import Token
 
 from ..constants import CODE_LENGTH, CONFIRMATION_CODE_EXPIRATION_MINUTES
 from ..exceptions import (
-    AuthenticationFailedError,
     ConfirmationCodeError,
     ExpiredVerificationCodeError,
     InvalidVerificationCodeError,
-    UserAlreadyActiveError,
     UserNotFoundError,
 )
 
@@ -81,29 +79,3 @@ class VerificationService:
         user.confirm_email()
         token, created = Token.objects.get_or_create(user=user)
         return token, created
-
-
-class EmailPasswordVerificationService:
-    """メールアドレスとパスワードの検証サービス"""
-
-    @staticmethod
-    def verify_user_credentials(email, password):
-        """
-        ユーザーの認証情報を検証
-        return: User: 検証済みユーザー
-        raise:
-            AuthenticationFailedError: 認証失敗
-            UserAlreadyActiveError: 既に有効化済み
-        """
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist as err:
-            raise AuthenticationFailedError() from err
-
-        if not user.check_password(password):
-            raise AuthenticationFailedError()
-
-        if user.is_active:
-            raise UserAlreadyActiveError()
-
-        return user

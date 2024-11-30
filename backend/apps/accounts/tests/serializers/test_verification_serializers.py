@@ -3,7 +3,6 @@
 import pytest
 
 from apps.accounts.serializers.verification_serializers import (
-    EmailPasswordVerificationSerializer,
     UserVerificationResponseSerializer,
     VerificationCodeSerializer,
 )
@@ -17,7 +16,6 @@ class TestVerificationSerializers(BaseSerializerTest):
         "serializer_class,data_fixture",
         [
             (VerificationCodeSerializer, "verification_data"),
-            (EmailPasswordVerificationSerializer, "user_data"),
         ],
     )
     def test_serializer_validation(self, serializer_class, data_fixture, request):

@@ -1,6 +1,7 @@
 'use client';
 import IconButton from '@/components/elements/button/IconButton';
 import type { TextType } from '@/types';
+import { TOP_URL } from '@/utils/constants';
 import { signIn } from 'next-auth/react';
 import { FaGoogle } from 'react-icons/fa';
 
@@ -12,7 +13,7 @@ const SocialAuthButtons: React.FC<TextType> = ({ text }) => {
   const handleSignIn = async (provider: string) => {
     try {
       await signIn(provider, {
-        callbackUrl: '/top', // レダイレクト先指定
+        callbackUrl: TOP_URL,
       });
     } catch (error) {
       console.error(error);

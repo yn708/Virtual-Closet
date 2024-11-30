@@ -1,14 +1,27 @@
-import { processImage } from '@/utils/imageUtils';
+import { removeBackgroundAPI } from '@/lib/api/imageApi';
+import { compressImage, conversionImage } from '@/utils/imageUtils';
 import { act, render, renderHook, screen } from '@testing-library/react';
 import { ImageProvider, useImage } from '../ImageContext';
 
-// processImageのモック
-jest.mock('@/utils/imageUtils', () => ({
-  processImage: jest.fn(),
+// APIのモック
+jest.mock('@/lib/api/imageApi', () => ({
+  removeBackgroundAPI: jest.fn().mockImplementation((_formData) =>
+    Promise.resolve({
+      status: 'success',
+      image: 'mock-base64-image',
+    }),
+  ),
 }));
 
-// URL.createObjectURLとURL.revokeObjectURLのモック
-const mockCreateObjectURL = jest.fn();
+// ユーティリティ関数のモック
+jest.mock('@/utils/imageUtils', () => ({
+  compressImage: jest.fn().mockImplementation((file) => Promise.resolve(file)),
+  conversionImage: jest.fn().mockImplementation((file) => Promise.resolve(file)),
+  dataURLtoFile: jest.fn().mockImplementation(() => new File([''], 'test.png')),
+}));
+
+// URLユーティリティのモック
+const mockCreateObjectURL = jest.fn().mockReturnValue('mock-url');
 const mockRevokeObjectURL = jest.fn();
 window.URL.createObjectURL = mockCreateObjectURL;
 window.URL.revokeObjectURL = mockRevokeObjectURL;
@@ -16,11 +29,10 @@ window.URL.revokeObjectURL = mockRevokeObjectURL;
 describe('ImageProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateObjectURL.mockReturnValue('mock-url');
   });
 
-  // 基本的なレンダリングテスト
-  it('should provide image context', () => {
+  // 基本的なコンテキスト提供のテスト
+  it('provides default values', () => {
     const TestComponent = () => {
       const { image, preview, isProcessing } = useImage();
       return (
@@ -43,58 +55,68 @@ describe('ImageProvider', () => {
     expect(screen.getByTestId('processing-state')).toHaveTextContent('not-processing');
   });
 
-  // 通常の画像ファイル更新のテスト
-  it('should handle regular image file update', async () => {
+  // 最小限の画像設定テスト
+  it('handles minimumImageSet correctly', async () => {
     const { result } = renderHook(() => useImage(), {
       wrapper: ImageProvider,
     });
 
-    const file = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
 
     await act(async () => {
-      result.current.setImage(file);
+      await result.current.minimumImageSet(testFile);
     });
 
-    expect(result.current.image).toBe(file);
+    expect(result.current.image).toBe(testFile);
     expect(result.current.preview).toBe('mock-url');
-    expect(result.current.isProcessing).toBe(false);
-    expect(mockCreateObjectURL).toHaveBeenCalledWith(file);
+    expect(mockCreateObjectURL).toHaveBeenCalledWith(testFile);
   });
 
-  // HEIC画像ファイル更新のテスト
-  it('should handle HEIC image file update', async () => {
-    const processedFile = new File(['processed'], 'test.jpg', {
-      type: 'image/jpeg',
-    });
-    (processImage as jest.Mock).mockResolvedValue(processedFile);
-
+  // HEIC画像の最適化処理テスト
+  it('handles HEIC image optimization', async () => {
     const { result } = renderHook(() => useImage(), {
       wrapper: ImageProvider,
     });
 
-    const heicFile = new File(['dummy content'], 'test.heic', {
-      type: 'image/heic',
-    });
+    const heicFile = new File(['test'], 'test.heic', { type: 'image/heic' });
 
     await act(async () => {
-      result.current.setImage(heicFile);
+      result.current.optimizationProcess(heicFile);
     });
 
-    expect(processImage).toHaveBeenCalledWith(heicFile);
-    expect(result.current.image).toBe(processedFile);
-    expect(result.current.preview).toBe('mock-url');
+    expect(conversionImage).toHaveBeenCalledWith(heicFile);
+    expect(compressImage).toHaveBeenCalled();
     expect(result.current.isProcessing).toBe(false);
   });
 
-  // 画像クリアのテスト
-  it('should clear image and preview', async () => {
+  // 背景除去処理のテスト
+  it('handles removeBgProcess correctly', async () => {
     const { result } = renderHook(() => useImage(), {
       wrapper: ImageProvider,
     });
 
-    const file = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+
     await act(async () => {
-      result.current.setImage(file);
+      result.current.removeBgProcess(testFile);
+    });
+
+    expect(removeBackgroundAPI).toHaveBeenCalled();
+    expect(result.current.image).toBeTruthy();
+    expect(result.current.preview).toBe('mock-url');
+    expect(result.current.isProcessing).toBe(false);
+  });
+
+  // クリア機能のテスト
+  it('clears image state correctly', async () => {
+    const { result } = renderHook(() => useImage(), {
+      wrapper: ImageProvider,
+    });
+
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+
+    await act(async () => {
+      result.current.minimumImageSet(testFile);
     });
 
     act(() => {
@@ -108,47 +130,35 @@ describe('ImageProvider', () => {
   });
 
   // エラーハンドリングのテスト
-  it('should handle errors during image processing', async () => {
+  it('handles errors in removeBgProcess', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    (processImage as jest.Mock).mockRejectedValue(new Error('Processing failed'));
+    const mockRemoveBackgroundAPI = removeBackgroundAPI as jest.Mock;
+    mockRemoveBackgroundAPI.mockRejectedValueOnce(new Error('API Error'));
 
     const { result } = renderHook(() => useImage(), {
       wrapper: ImageProvider,
     });
 
-    const heicFile = new File(['dummy content'], 'test.heic', {
-      type: 'image/heic',
-    });
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
 
     await act(async () => {
-      result.current.setImage(heicFile);
+      result.current.removeBgProcess(testFile);
     });
 
-    expect(result.current.isProcessing).toBe(false);
     expect(consoleErrorSpy).toHaveBeenCalled();
-    expect(result.current.image).toBeNull();
-    expect(result.current.preview).toBeNull();
+    expect(result.current.isProcessing).toBe(false);
 
     consoleErrorSpy.mockRestore();
   });
 
-  // nullファイルでのクリアテスト
-  it('should clear image when null file is provided', async () => {
-    const { result } = renderHook(() => useImage(), {
-      wrapper: ImageProvider,
-    });
+  // コンテキスト外使用のエラーテスト
+  it('throws error when used outside provider', () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    const file = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
-    await act(async () => {
-      result.current.setImage(file);
-    });
+    expect(() => {
+      renderHook(() => useImage());
+    }).toThrow('useImage must be used within an ImageProvider');
 
-    await act(async () => {
-      result.current.setImage(null);
-    });
-
-    expect(result.current.image).toBeNull();
-    expect(result.current.preview).toBeNull();
-    expect(result.current.isProcessing).toBe(false);
+    consoleError.mockRestore();
   });
 });

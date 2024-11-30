@@ -7,10 +7,9 @@ from django.contrib.auth import get_user_model
 from freezegun import freeze_time
 
 from apps.accounts.exceptions import (
-    AuthenticationFailedError,
     ExpiredVerificationCodeError,
 )
-from apps.accounts.services.verification_service import EmailPasswordVerificationService, VerificationService
+from apps.accounts.services.verification_service import VerificationService
 from apps.accounts.tests.services.base import BaseServiceTest
 
 User = get_user_model()
@@ -34,17 +33,3 @@ class TestVerificationService(BaseServiceTest):
         with patch.object(User, "check_confirmation_code", return_value="expired"):
             with pytest.raises(ExpiredVerificationCodeError):
                 VerificationService.verify_confirmation_code(inactive_user, "123456")
-
-
-class TestEmailPasswordVerificationService(BaseServiceTest):
-    """メール/パスワード検証サービスのテスト"""
-
-    def test_credentials_verification(self, inactive_user, user_data):
-        """認証情報検証のテスト"""
-        verified_user = EmailPasswordVerificationService.verify_user_credentials(
-            user_data["email"], user_data["password"]
-        )
-        assert verified_user.email == inactive_user.email
-
-        with pytest.raises(AuthenticationFailedError):
-            EmailPasswordVerificationService.verify_user_credentials(user_data["email"], "wrongpass")
