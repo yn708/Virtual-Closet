@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/sheet';
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import { IoMdAdd } from 'react-icons/io';
-import { AddItemSection } from '../section/AddItemSection';
-import { CreateOutfitSection } from '../section/CreateOutfitSection';
+import AddItemSection from '../section/AddItemSection';
+import CreateOutfitSection from '../section/CreateOutfitSection';
 
-export const AddFashionContentSheet = () => {
+const AddFashionContentSheet = () => {
   const { isOpen, onClose, onToggle } = useIsOpen();
 
   return (
@@ -47,3 +47,4 @@ export const AddFashionContentSheet = () => {
     </Sheet>
   );
 };
+export default AddFashionContentSheet;

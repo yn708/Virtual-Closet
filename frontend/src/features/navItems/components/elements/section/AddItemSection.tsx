@@ -3,9 +3,9 @@
 import type { UseIsOpenOnCloseType } from '@/types';
 import { ITEM_EDIT_URL } from '@/utils/constants';
 import { IoMdAdd } from 'react-icons/io';
-import { ImageUploadSection } from './ImageUploadSection';
+import ImageUploadSection from './ImageUploadSection';
 
-export const AddItemSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
+const AddItemSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
   return (
     <ImageUploadSection
       value="add-clothing"
@@ -16,3 +16,4 @@ export const AddItemSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
     />
   );
 };
+export default AddItemSection;

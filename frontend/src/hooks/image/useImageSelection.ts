@@ -1,7 +1,7 @@
 'use client';
 import { validateImage } from '@/utils/imageUtils';
 import type React from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useToast } from '../use-toast';
 
 interface ImageSelectionResult {
@@ -9,13 +9,18 @@ interface ImageSelectionResult {
 }
 // カメラロールから画像を選択するためのカスタムフック
 export const useImageSelection = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null); // ファイル入力要素への参照
   const [isLoading, setIsLoading] = useState(false); // ローディング状態
   const { toast } = useToast(); // useToastフックを追加
 
-  // 画像選択inputを開く関数
-  const handleFileInput = () => {
-    fileInputRef.current?.click();
+  /*
+  ファイル選択をOPENする関数
+  htmlFor="image-upload"を設定してButton等でクリックしても開かない場合の要素がある場合に指定
+  */
+  const openFileDialog = () => {
+    const fileInput = document.getElementById('image-upload');
+    if (fileInput) {
+      fileInput.click();
+    }
   };
 
   // ファイル選択時の処理
@@ -54,8 +59,7 @@ export const useImageSelection = () => {
   };
 
   return {
-    fileInputRef,
-    handleFileInput,
+    openFileDialog,
     handleFileChange,
     isLoading,
   };

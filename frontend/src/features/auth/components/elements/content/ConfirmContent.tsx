@@ -1,60 +1,86 @@
 'use client';
-import LoadingElements from '@/components/elements/loading/LoadingElements';
-import CenterTitleLayout from '@/components/layout/CenterTitleLayout';
-import { useEmailPasswordForm } from '@/features/auth/hooks/useEmailPasswordForm';
-import { useEffect, useState } from 'react';
+
+import TitleLayout from '@/components/layout/TitleLayout';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { resendCodeAction } from '@/lib/actions/auth/resendCodeAction';
+import { initialState } from '@/utils/data/initialState';
+import { useState } from 'react';
+import { useFormState } from 'react-dom';
 import AuthCodeInputForm from '../form/AuthCodeInputForm';
 import AuthForm from '../form/AuthForm';
 
-const ConfirmContent = () => {
-  const [storedEmail, setStoredEmail] = useState<string | null | undefined>(undefined);
+const ConfirmContent = ({ email }: { email: string }) => {
+  const [view, setView] = useState<'input' | 'resend'>('input');
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const email = sessionStorage.getItem('email');
-    setStoredEmail(email);
-  }, []);
-
-  const handleEmailVerified = (verifiedEmail: string) => {
-    setStoredEmail(verifiedEmail);
+  // Server Actionに現在のemailを渡す
+  const wrappedResendCodeAction = async (prevState: typeof initialState, formData: FormData) => {
+    const result = await resendCodeAction(email, prevState, formData);
+    if (result.success) {
+      setView('input');
+      toast({
+        title: '認証コードを再送信しました。',
+        description: 'メールアドレスをご確認ください。',
+      });
+    }
+    return result;
   };
-  const { form, onSubmit } = useEmailPasswordForm(handleEmailVerified);
 
-  // 初期ロード時にローディングを表示
-  if (storedEmail === undefined) {
-    return <LoadingElements fullScreen={true} />;
-  }
+  const [state, formAction] = useFormState(wrappedResendCodeAction, initialState);
 
-  // レイアウトの内容を動的に設定
-  const layoutProps = storedEmail
-    ? {
-        // 認証コード送信用
-        title: '認証コード入力',
-        message: `${storedEmail}に認証コードを送信しました。`,
-        subMessage: 'メールに記載された6桁の認証コードを入力してください。',
-        children: <AuthCodeInputForm email={storedEmail} />,
-      }
-    : {
-        // Email確認用
-        title: '',
-        message: 'エラーが発生しました。',
-        subMessage: 'メールアドレスとパスワードを再入力してください。',
-        children: (
-          <div className="max-w-xl -ml-5">
-            <AuthForm form={form} onSubmit={onSubmit} submitButtonLabel="確認" mode="login" />
-          </div>
-        ),
-      };
+  const viewContents = {
+    input: {
+      title: '認証コード入力',
+      description: 'メールアドレス宛に認証コードを送信しました。',
+      subDescription: '記載された認証コードを入力してください。',
+      content: <AuthCodeInputForm email={email} />,
+      buttonLabel: '認証コードを再送信',
+    },
+    resend: {
+      title: '認証コード再送信',
+      description: '',
+      subDescription: '',
+      content: (
+        <AuthForm
+          state={state}
+          submitButtonLabel="認証コードを再送信"
+          mode="login"
+          formAction={formAction}
+        />
+      ),
+      buttonLabel: '戻る',
+    },
+  };
+
+  const currentView = viewContents[view];
+
+  const toggleView = () => {
+    setView(view === 'input' ? 'resend' : 'input');
+  };
 
   return (
-    <>
-      <CenterTitleLayout
-        title={layoutProps.title}
-        description={layoutProps.message}
-        subDescription={layoutProps.subMessage}
-      >
-        {layoutProps.children}
-      </CenterTitleLayout>
-    </>
+    <TitleLayout
+      title={currentView.title}
+      description={currentView.description}
+      subDescription={currentView.subDescription}
+      className="text-center"
+    >
+      {currentView.content}
+      <div className="w-3/4 mx-auto">
+        <div className="w-full text-center mt-4">
+          <Button
+            type="button"
+            variant="link"
+            className="text-sm text-muted-foreground"
+            onClick={toggleView}
+          >
+            {currentView.buttonLabel}
+          </Button>
+        </div>
+      </div>
+    </TitleLayout>
   );
 };
+
 export default ConfirmContent;

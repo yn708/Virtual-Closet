@@ -45,3 +45,8 @@ export interface SizeType {
 export interface OnSuccessType {
   onSuccess?: () => void;
 }
+
+// 何か行う場合がある時の型（クリック時等）
+export interface OnClickType {
+  onClick?: () => void;
+}

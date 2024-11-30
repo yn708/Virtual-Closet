@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { AddFashionContentSheet } from '../addFashionContentSheet';
+import AddFashionContentSheet from '../addFashionContentSheet';
 
 // IconButtonのモック
 jest.mock('@/components/elements/button/IconButton', () => {
@@ -30,17 +30,17 @@ jest.mock('@/components/elements/button/IconButton', () => {
   });
 });
 
-// セクションコンポーネントのモック
 jest.mock('../../section/AddItemSection', () => ({
-  AddItemSection: ({ onClose }: { onClose: () => void }) => (
+  __esModule: true,
+  default: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="add-item-section">
       <button onClick={onClose}>Close Add Item</button>
     </div>
   ),
 }));
-
 jest.mock('../../section/CreateOutfitSection', () => ({
-  CreateOutfitSection: ({ onClose }: { onClose: () => void }) => (
+  __esModule: true,
+  default: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="create-outfit-section">
       <button onClick={onClose}>Close Create Outfit</button>
     </div>

@@ -7,7 +7,6 @@ import {
   resendCodeAPI,
   sendPasswordResetAPI,
   signUpAPI,
-  verifyEmailPasswordAPI,
 } from '@/lib/api/authApi';
 import { baseFetchAPI } from '@/lib/api/baseApi';
 import {
@@ -16,7 +15,6 @@ import {
   SEND_AUTH_CODE_ENDPOINT,
   SEND_PASSWORD_RESET_ENDPOINT,
   VERIFY_CODE_ENDPOINT,
-  VERIFY_EMAIL_PASSWORD_ENDPOINT,
 } from '@/utils/constants';
 
 // baseFetchAPIのモック
@@ -127,36 +125,6 @@ describe('Authentication APIs', () => {
       // 正しいエンドポイントとデータでAPIが呼ばれたか確認
       expect(baseFetchAPI).toHaveBeenCalledWith(
         RESEND_AUTH_CODE_ENDPOINT,
-        expect.objectContaining({
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(mockLoginData),
-        }),
-      );
-    });
-  });
-
-  /**
-   * メールアドレス・パスワード検証のテスト
-   */
-  describe('verifyEmailPasswordAPI', () => {
-    const mockLoginData = {
-      email: 'test@example.com',
-      password: 'TESTpass123',
-    };
-
-    it('正常な認証情報検証リクエストを送信する', async () => {
-      // モックの戻り値を設定
-      (baseFetchAPI as jest.Mock).mockResolvedValueOnce({ success: true });
-
-      // API呼び出し
-      await verifyEmailPasswordAPI(mockLoginData);
-
-      // 正しいエンドポイントとデータでAPIが呼ばれたか確認
-      expect(baseFetchAPI).toHaveBeenCalledWith(
-        VERIFY_EMAIL_PASSWORD_ENDPOINT,
         expect.objectContaining({
           method: 'POST',
           headers: {

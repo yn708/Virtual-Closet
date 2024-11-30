@@ -1,10 +1,7 @@
-/*
-ユーザーがアプリケーション内で画像を選択、管理を行うためのもの
-単一枚用
-*/
 'use client';
+import { removeBackgroundAPI } from '@/lib/api/imageApi';
 import type { UseImageType } from '@/types';
-import { processImage } from '@/utils/imageUtils';
+import { compressImage, conversionImage, dataURLtoFile } from '@/utils/imageUtils';
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState } from 'react';
 
@@ -12,38 +9,13 @@ import React, { createContext, useContext, useState } from 'react';
 const ImageContext = createContext<UseImageType | undefined>(undefined);
 
 export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [image, setImage] = useState<File | null>(null); // 現在の画像
+  const [preview, setPreview] = useState<string | null>(null); // プレビュー（URL）
+  const [isProcessing, setIsProcessing] = useState(false); // 処理中の状態
 
-  // 画像の置き換え
-  const updateImage = async (file: File | null) => {
-    if (!file) {
-      clearImage();
-      return;
-    }
-    setIsProcessing(true);
-    try {
-      // HEIC形式の場合、先に変換を行う
-      const processedFile =
-        file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')
-          ? await processImage(file)
-          : file;
-
-      // 変換後のファイルでプレビューを作成
-      const newPreview = URL.createObjectURL(processedFile);
-
-      setImage(processedFile);
-      setPreview(newPreview);
-    } catch (error) {
-      console.error('Error processing image:', error);
-      // エラーハンドリング（必要に応じてトースト通知など）
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // すべての画像をクリアする関数
+  /*----------------------------------------------------------------------------
+  すべての画像をクリアする関数
+  ----------------------------------------------------------------------------*/
   const clearImage = () => {
     if (preview) {
       URL.revokeObjectURL(preview);
@@ -53,9 +25,112 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIsProcessing(false);
   };
 
+  /*----------------------------------------------------------------------------
+  最小限のImageセット
+  1. clearImage（既存の画像を削除）
+  2. プレビューを作成
+  3. setImage・setPreviewで画像・プレビューを最新化
+  ----------------------------------------------------------------------------*/
+  const minimumImageSet = async (file: File) => {
+    clearImage();
+    const newPreview = URL.createObjectURL(file);
+    setImage(file);
+    setPreview(newPreview);
+  };
+
+  /*----------------------------------------------------------------------------
+  画像の最適化
+  1. clearImage（既存の画像を削除）
+  2. HEIC形式の場合、変換
+  3. 画像圧縮
+  4. プレビューを作成
+  5. setImage・setPreviewで画像・プレビューを最新化
+  ----------------------------------------------------------------------------*/
+  const optimizationProcess = async (file: File) => {
+    // 1. clearImage（既存の画像を削除）
+    clearImage();
+    setIsProcessing(true);
+    try {
+      // 2. HEIC形式の場合、変換
+      const convertedFile =
+        file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
+          ? await conversionImage(file)
+          : file;
+
+      // 3. 画像の圧縮
+      const compressedImage = await compressImage(convertedFile);
+
+      // 4. プレビューを作成
+      const newPreview = URL.createObjectURL(compressedImage);
+      // 5. setImage・setPreviewで画像・プレビューを最新化
+      setImage(compressedImage);
+      setPreview(newPreview);
+    } catch (error) {
+      console.error('Error processing image:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  /*----------------------------------------------------------------------------
+  背景除去する場合
+  1. clearImage（既存の画像を削除）
+  2. HEIC形式の場合、変換
+  3. 画像の圧縮
+  4. 背景除去
+  5 .プレビューを作成
+  6. setImage・setPreviewで画像・プレビューを最新化
+  ----------------------------------------------------------------------------*/
+  const removeBgProcess = async (file: File) => {
+    // 1. clearImage（既存の画像を削除）
+    clearImage();
+    setIsProcessing(true);
+    try {
+      // 2. HEIC形式の場合、変換
+      const convertedFile =
+        file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
+          ? await conversionImage(file)
+          : file;
+
+      // 3. 画像の圧縮
+      const compressedImage = await compressImage(convertedFile);
+
+      // 4. 背景除去
+      // FormDataオブジェクトを作成し、API通信
+      const formData = new FormData();
+      formData.append('image', compressedImage);
+      const result = await removeBackgroundAPI(formData);
+
+      // もし成功した場合
+      if (result.status === 'success' && result.image) {
+        const removedBgFileName = `${file.name.replace(/\.[^/.]+$/, '')}_removed_bg.png`;
+        const removedBg = dataURLtoFile(`data:image/png;base64,${result.image}`, removedBgFileName); // Base64画像データをFileオブジェクトに変換
+        // 5. プレビューを作成
+        const newPreview = URL.createObjectURL(removedBg);
+        // 6. setImage・setPreviewで画像・プレビューを最新化
+        setPreview(newPreview);
+        setImage(removedBg);
+      } else {
+        throw new Error(result.message || '被写体抽出に失敗しました');
+      }
+    } catch (error) {
+      console.error('Error processing image:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <ImageContext.Provider
-      value={{ image, setImage: updateImage, preview, clearImage, isProcessing }}
+      value={{
+        image,
+        minimumImageSet,
+        optimizationProcess,
+        removeBgProcess,
+        preview,
+        isProcessing,
+        clearImage,
+      }}
     >
       {children}
     </ImageContext.Provider>

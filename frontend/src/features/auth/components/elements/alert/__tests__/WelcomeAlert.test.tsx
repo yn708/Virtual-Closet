@@ -106,13 +106,6 @@ describe('WelcomeAlert', () => {
       expect(closeButton).toHaveAttribute('aria-label', 'Close welcome message');
     });
 
-    it('maintains proper heading structure', () => {
-      render(<WelcomeAlert />);
-
-      const alert = screen.getByRole('alert');
-      expect(alert).toBeInTheDocument();
-    });
-
     it('has proper link text', () => {
       render(<WelcomeAlert />);
 

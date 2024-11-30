@@ -1,12 +1,7 @@
 import { Button } from '@/components/ui/button';
-import type { BaseButtonProps, BaseIconProps, LabelType } from '@/types';
+import type { IconButtonProps } from '@/types';
 import { ICON_SIZE } from '@/utils/constants';
 import { forwardRef } from 'react';
-
-export interface IconButtonProps extends BaseIconProps, BaseButtonProps, LabelType {
-  showText?: boolean;
-  rounded?: boolean;
-}
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (

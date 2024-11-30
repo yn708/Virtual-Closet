@@ -3,10 +3,12 @@ useImage
 ------------------------------------------------------------------ */
 export interface UseImageType {
   image: File | null;
-  setImage: (file: File | null) => void;
+  minimumImageSet: (file: File) => void;
+  optimizationProcess: (file: File) => void;
+  removeBgProcess: (file: File) => void;
   preview: string | null;
-  clearImage: () => void;
   isProcessing: boolean;
+  clearImage: () => void;
 }
 
 /* ----------------------------------------------------------------

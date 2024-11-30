@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     # 作成app
     "apps.accounts",
+    "apps.image_processing",
 ]
 
 

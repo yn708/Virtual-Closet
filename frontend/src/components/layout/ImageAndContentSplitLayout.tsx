@@ -2,15 +2,7 @@
 // 内容：画面２分割。デフォルトでは右に写真。
 // */
 
-import type { ReactNode } from 'react';
-
-interface ImageAndContentSplitLayoutProps {
-  leftContent: ReactNode;
-  rightContent?: ReactNode;
-  rightBackgroundImage?: string;
-  rightOverlayClassName?: string;
-  isReversed?: boolean; // コンテンツ反転
-}
+import type { ImageAndContentSplitLayoutProps } from '@/features/auth/types';
 
 const ImageAndContentSplitLayout: React.FC<ImageAndContentSplitLayoutProps> = ({
   leftContent,
@@ -21,7 +13,7 @@ const ImageAndContentSplitLayout: React.FC<ImageAndContentSplitLayoutProps> = ({
 }) => {
   // コンテンツコンポーネント
   const TextContent = (
-    <div className="max-h-screen w-full md:w-1/2 flex items-center justify-center bg-white order-first md:order-none">
+    <div className="min-h-screen w-full md:w-1/2 flex items-center justify-center bg-white order-first md:order-none">
       {leftContent}
     </div>
   );

@@ -1,4 +1,4 @@
-import PasswordResetConfirmPageContent from '@/features/auth/components/elements/content/PasswordResetConfirmPageContent';
+import PasswordResetContent from '@/features/auth/components/elements/content/PasswordResetContent';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -10,5 +10,5 @@ export default function PasswordResetConfirmPage({
 }: {
   params: { uid: string; token: string };
 }) {
-  return <PasswordResetConfirmPageContent uid={params.uid} token={params.token} />;
+  return <PasswordResetContent mode="confirm" uid={params.uid} token={params.token} />;
 }

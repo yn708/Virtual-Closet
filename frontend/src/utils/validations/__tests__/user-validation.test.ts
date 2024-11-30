@@ -1,9 +1,9 @@
-import { ProfileUpdateFormSchema } from '../user-validation';
+import { profileUpdateFormSchema } from '../user-validation';
 
 /*----------------------------------------------------------------------------
 プロフィールアップデートフォームのテスト
 ----------------------------------------------------------------------------*/
-describe('ProfileUpdateFormSchema', () => {
+describe('profileUpdateFormSchema', () => {
   // 有効なフォームデータ
   const validFormData = {
     username: 'test user',
@@ -17,20 +17,20 @@ describe('ProfileUpdateFormSchema', () => {
   };
 
   it('有効なデータを許可する', () => {
-    const result = ProfileUpdateFormSchema.safeParse(validFormData);
+    const result = profileUpdateFormSchema.safeParse(validFormData);
     expect(result.success).toBe(true);
   });
 
   it('ユーザー名のバリデーション', () => {
     // 5文字未満
-    const tooShort = ProfileUpdateFormSchema.safeParse({
+    const tooShort = profileUpdateFormSchema.safeParse({
       ...validFormData,
       username: 'user',
     });
     expect(tooShort.success).toBe(false);
 
     // 30文字超過
-    const tooLong = ProfileUpdateFormSchema.safeParse({
+    const tooLong = profileUpdateFormSchema.safeParse({
       ...validFormData,
       username: 'a'.repeat(31),
     });
@@ -39,14 +39,14 @@ describe('ProfileUpdateFormSchema', () => {
 
   it('名前のバリデーション', () => {
     // null許容
-    const nullName = ProfileUpdateFormSchema.safeParse({
+    const nullName = profileUpdateFormSchema.safeParse({
       ...validFormData,
       name: null,
     });
     expect(nullName.success).toBe(true);
 
     // 30文字超過
-    const tooLong = ProfileUpdateFormSchema.safeParse({
+    const tooLong = profileUpdateFormSchema.safeParse({
       ...validFormData,
       name: 'あ'.repeat(31),
     });
@@ -55,7 +55,7 @@ describe('ProfileUpdateFormSchema', () => {
 
   it('生年月日のバリデーション', () => {
     // すべてnull
-    const allNull = ProfileUpdateFormSchema.safeParse({
+    const allNull = profileUpdateFormSchema.safeParse({
       ...validFormData,
       birth_year: null,
       birth_month: null,
@@ -64,7 +64,7 @@ describe('ProfileUpdateFormSchema', () => {
     expect(allNull.success).toBe(true);
 
     // 部分的に入力
-    const partial = ProfileUpdateFormSchema.safeParse({
+    const partial = profileUpdateFormSchema.safeParse({
       ...validFormData,
       birth_month: null,
     });
@@ -73,14 +73,14 @@ describe('ProfileUpdateFormSchema', () => {
 
   it('性別のバリデーション', () => {
     ['male', 'female', 'other', 'unanswered', ''].forEach((gender) => {
-      const result = ProfileUpdateFormSchema.safeParse({
+      const result = profileUpdateFormSchema.safeParse({
         ...validFormData,
         gender,
       });
       expect(result.success).toBe(true);
     });
 
-    const invalid = ProfileUpdateFormSchema.safeParse({
+    const invalid = profileUpdateFormSchema.safeParse({
       ...validFormData,
       gender: 'invalid',
     });
@@ -90,7 +90,7 @@ describe('ProfileUpdateFormSchema', () => {
   it('身長のバリデーション', () => {
     // 有効なケース
     ['170', '180.5', '', null].forEach((height) => {
-      const result = ProfileUpdateFormSchema.safeParse({
+      const result = profileUpdateFormSchema.safeParse({
         ...validFormData,
         height,
       });
@@ -99,7 +99,7 @@ describe('ProfileUpdateFormSchema', () => {
 
     // 無効なケース
     ['0', '300', 'abc', '-1'].forEach((height) => {
-      const result = ProfileUpdateFormSchema.safeParse({
+      const result = profileUpdateFormSchema.safeParse({
         ...validFormData,
         height,
       });

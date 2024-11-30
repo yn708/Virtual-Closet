@@ -11,7 +11,6 @@ import {
   SEND_AUTH_CODE_ENDPOINT,
   SEND_PASSWORD_RESET_ENDPOINT,
   VERIFY_CODE_ENDPOINT,
-  VERIFY_EMAIL_PASSWORD_ENDPOINT,
 } from '@/utils/constants';
 import { baseFetchAPI } from './baseApi';
 
@@ -50,19 +49,6 @@ sign-up（認証コード再送信）
 ------------------------------------------------------------------ */
 export async function resendCodeAPI(data: LoginFormData) {
   return baseFetchAPI(RESEND_AUTH_CODE_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-}
-
-/* ----------------------------------------------------------------
-メールアドレスパスワードが一致するかの確認
------------------------------------------------------------------- */
-export async function verifyEmailPasswordAPI(data: LoginFormData) {
-  return baseFetchAPI(VERIFY_EMAIL_PASSWORD_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

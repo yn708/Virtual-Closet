@@ -1,9 +1,9 @@
-import PasswordResetContent from '@/features/auth/components/elements/content/PasswordResetConfirmPageContent';
+import PasswordResetContent from '@/features/auth/components/elements/content/PasswordResetContent';
 import { render, screen } from '@testing-library/react';
 import NewPasswordPage, { metadata } from '../../auth/password/reset/[uid]/[token]/page';
 
 // PasswordResetContentコンポーネントをモック
-jest.mock('@/features/auth/components/elements/content/PasswordResetConfirmPageContent', () => {
+jest.mock('@/features/auth/components/elements/content/PasswordResetContent', () => {
   return jest.fn(({ uid, token }) => (
     <div data-testid="mocked-password-reset-content">
       <div data-testid="uid">{uid}</div>
@@ -42,6 +42,7 @@ describe('NewPasswordPage', () => {
     // PasswordResetContentが正しいpropsで呼び出されたことを確認
     expect(PasswordResetContent).toHaveBeenCalledWith(
       {
+        mode: 'confirm',
         uid: mockParams.uid,
         token: mockParams.token,
       },

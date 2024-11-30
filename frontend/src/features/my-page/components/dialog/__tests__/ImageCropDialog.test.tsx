@@ -1,16 +1,20 @@
-// ImageCropDialog.test.tsx
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useImageCrop } from '@/features/my-page/hooks/useImageCrop';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImageCropDialog from '../ImageCropDialog';
 
-// Dialogコンポーネントのモック
+// カスタムフックのモック
+jest.mock('../../../hooks/useImageCrop', () => ({
+  useImageCrop: jest.fn(),
+}));
+
+// UIコンポーネントのモック
 jest.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div role="dialog">{children}</div> : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-// Sliderコンポーネントのモック
 jest.mock('@/components/ui/slider', () => ({
   Slider: ({
     value,
@@ -26,11 +30,12 @@ jest.mock('@/components/ui/slider', () => ({
       min={1}
       max={3}
       step={0.05}
+      aria-label="Zoom control"
     />
   ),
 }));
 
-// react-easy-cropのモック
+// クロップライブラリのモック
 jest.mock('react-easy-crop', () => {
   return jest.fn(({ onCropChange, onZoomChange, onCropComplete }) => (
     <div data-testid="mock-cropper">
@@ -56,6 +61,24 @@ jest.mock('react-easy-crop', () => {
 });
 
 describe('ImageCropDialog', () => {
+  const mockSetCrop = jest.fn();
+  const mockSetZoom = jest.fn();
+  const mockCreateCroppedImage = jest.fn();
+  const mockOnCropCompleteCallback = jest.fn();
+
+  const mockHookReturn = {
+    crop: { x: 0, y: 0 },
+    setCrop: mockSetCrop,
+    zoom: 1,
+    setZoom: mockSetZoom,
+    onCropCompleteCallback: mockOnCropCompleteCallback,
+    createCroppedImage: mockCreateCroppedImage,
+  };
+
+  beforeEach(() => {
+    (useImageCrop as jest.Mock).mockReturnValue(mockHookReturn);
+  });
+
   const mockProps = {
     open: true,
     onClose: jest.fn(),
@@ -63,59 +86,65 @@ describe('ImageCropDialog', () => {
     onCropComplete: jest.fn(),
   };
 
-  // 基本的なレンダリングテスト
-  it('renders dialog when open is true', () => {
+  // 基本的なコンポーネントのレンダリングテスト
+  it('renders the component with all necessary elements', () => {
     render(<ImageCropDialog {...mockProps} />);
+
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByTestId('mock-cropper')).toBeInTheDocument();
+    expect(screen.getByRole('slider')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '完了' })).toBeInTheDocument();
   });
 
-  // ダイアログが閉じている場合のテスト
-  it('does not render dialog when open is false', () => {
+  // 各種インタラクションのテスト
+  it('calls hook functions when interactions occur', async () => {
+    const user = userEvent.setup();
+    render(<ImageCropDialog {...mockProps} />);
+
+    // クロップ位置変更のテスト
+    const cropChangeButton = screen.getByTestId('mock-crop-change');
+    await user.click(cropChangeButton);
+    expect(mockSetCrop).toHaveBeenCalledWith({ x: 10, y: 10 });
+
+    // ズーム変更のテスト
+    const zoomChangeButton = screen.getByTestId('mock-zoom-change');
+    await user.click(zoomChangeButton);
+    expect(mockSetZoom).toHaveBeenCalledWith(2);
+
+    // クロップ完了のテスト
+    const cropCompleteButton = screen.getByTestId('mock-crop-complete');
+    await user.click(cropCompleteButton);
+    expect(mockOnCropCompleteCallback).toHaveBeenCalledWith(
+      { x: 0, y: 0, width: 100, height: 100 },
+      { x: 0, y: 0, width: 100, height: 100 },
+    );
+  });
+
+  // 完了ボタンクリック時の処理テスト
+  it('calls createCroppedImage when complete button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<ImageCropDialog {...mockProps} />);
+
+    const completeButton = screen.getByRole('button', { name: '完了' });
+    await user.click(completeButton);
+
+    expect(mockCreateCroppedImage).toHaveBeenCalled();
+  });
+
+  // ダイアログの非表示テスト
+  it('does not render when open is false', () => {
     render(<ImageCropDialog {...mockProps} open={false} />);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  // スライダーの動作テスト
-  it('updates zoom when slider value changes', async () => {
+  // ズームスライダーの操作テスト
+  it('handles zoom slider changes', async () => {
     const user = userEvent.setup();
     render(<ImageCropDialog {...mockProps} />);
 
     const slider = screen.getByRole('slider');
-    await user.click(slider);
+    await user.type(slider, '2');
 
-    await waitFor(() => {
-      expect(slider).toHaveValue('1');
-    });
-  });
-
-  // クロップ位置の更新テスト
-  it('updates crop position', () => {
-    render(<ImageCropDialog {...mockProps} />);
-
-    const cropChangeButton = screen.getByTestId('mock-crop-change');
-    fireEvent.click(cropChangeButton);
-
-    const completeButton = screen.getByRole('button', { name: '完了' });
-    expect(completeButton).toBeInTheDocument();
-  });
-
-  // アクセシビリティテスト
-  describe('accessibility', () => {
-    it('has proper slider controls', () => {
-      render(<ImageCropDialog {...mockProps} />);
-
-      const slider = screen.getByRole('slider');
-      expect(slider).toHaveAttribute('min', '1');
-      expect(slider).toHaveAttribute('max', '3');
-      expect(slider).toHaveAttribute('step', '0.05');
-    });
-
-    it('has accessible buttons', () => {
-      render(<ImageCropDialog {...mockProps} />);
-
-      const completeButton = screen.getByRole('button', { name: '完了' });
-      expect(completeButton).toBeInTheDocument();
-    });
+    expect(mockSetZoom).toHaveBeenCalled();
   });
 });

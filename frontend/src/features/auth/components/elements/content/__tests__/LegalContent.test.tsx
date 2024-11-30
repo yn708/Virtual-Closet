@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import LegalTextContent from '../LegalTextContent';
+import LegalContent from '../LegalContent';
 
 // モックコンポーネントの作成
 jest.mock('../../dialog/LegalDialog', () => ({
@@ -11,7 +11,7 @@ jest.mock('../../dialog/LegalDialog', () => ({
 describe('LegalTextContent', () => {
   // 各テストの前にコンポーネントを描画
   beforeEach(() => {
-    render(<LegalTextContent />);
+    render(<LegalContent />);
   });
 
   // テキストの存在確認

@@ -24,9 +24,9 @@ const ProfileEditButton = ({ userDetail }: UserDetailType) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[800px]">
-        <DialogHeader className="hidden">
-          <DialogTitle>プロフィール編集</DialogTitle>
-          <DialogDescription>下記のフォームに詳細内容を入力してください。</DialogDescription>
+        <DialogHeader>
+          <DialogTitle />
+          <DialogDescription />
         </DialogHeader>
         <UserProfileForm userDetail={userDetail} onSuccess={onClose} />
       </DialogContent>

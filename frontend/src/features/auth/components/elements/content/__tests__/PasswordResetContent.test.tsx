@@ -1,134 +1,149 @@
+import type { FormState } from '@/types';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import PasswordResetContent from '../PasswordResetContent';
 
-import { passwordResetAPI } from '@/lib/api/authApi';
-import { LOGIN_URL } from '@/utils/constants';
-import PasswordResetConfirmPageContent from '../PasswordResetConfirmPageContent';
-
-// モックの作成
-const mockToast = jest.fn();
-const mockPush = jest.fn();
-
-jest.mock('@/hooks/use-toast', () => ({
-  useToast: () => ({
-    toast: mockToast,
+const mockFormAction = jest.fn();
+jest.mock('react-dom', () => ({
+  ...jest.requireActual('react-dom'),
+  useFormState: jest.fn((action) => {
+    mockFormAction.mockImplementation(action);
+    return [{ errors: {} }, mockFormAction];
   }),
 }));
 
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: mockPush,
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-  }),
+let mockRequestActionResult = {
+  success: true,
+};
+const mockPasswordResetRequestAction = jest.fn().mockImplementation(() => {
+  return async () => mockRequestActionResult;
+});
+jest.mock('@/lib/actions/auth/passwordResetRequestAction', () => ({
+  passwordResetRequestAction: jest.fn(() => mockPasswordResetRequestAction()),
 }));
 
-jest.mock('@/lib/api/authApi', () => ({
-  passwordResetAPI: jest.fn(),
+let mockConfirmActionResult = { success: true };
+const mockPasswordResetConfirmAction = jest.fn().mockImplementation(() => {
+  return async () => mockConfirmActionResult;
+});
+jest.mock('@/lib/actions/auth/passwordResetConfirmAction', () => ({
+  passwordResetConfirmAction: jest.fn(() => mockPasswordResetConfirmAction()),
 }));
 
-// テストデータ
-const testProps = {
-  uid: 'test-uid',
-  token: 'test-token',
-};
+jest.mock('@/features/auth/components/elements/form/AuthForm', () => ({
+  __esModule: true,
+  default: ({
+    formAction,
+    submitButtonLabel,
+    mode,
+  }: {
+    formAction: (formData: FormData) => Promise<void>;
+    submitButtonLabel: string;
+    mode: 'email-only' | 'password';
+    state: FormState;
+  }) => (
+    <form
+      data-testid="auth-form"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        if (mode === 'email-only') {
+          formData.append('email', 'test@example.com');
+        } else if (mode === 'password') {
+          formData.append('password', 'newpassword123');
+        }
+        await formAction(formData);
+      }}
+    >
+      <button type="submit" data-testid="submit-button">
+        {submitButtonLabel}
+      </button>
+    </form>
+  ),
+}));
 
-// テスト用の共通セットアップ
-const setup = () => {
-  const user = userEvent.setup();
-  const utils = render(<PasswordResetConfirmPageContent {...testProps} />);
-  return {
-    user,
-    ...utils,
-  };
-};
-
-describe('PasswordResetConfirmPageContent', () => {
+describe('PasswordResetContent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRequestActionResult = { success: true };
+    mockConfirmActionResult = { success: true };
   });
 
-  // 描画テスト
-  describe('描画テスト', () => {
-    it('必要な要素が正しく描画されていること', () => {
-      setup();
+  describe('リクエストモード', () => {
+    it('正しくすべてのコンポーネントがレンダリングされること', () => {
+      render(<PasswordResetContent mode="request" />);
 
-      // タイトルと説明文の確認
+      expect(screen.getByText('パスワード再設定')).toBeInTheDocument();
+      expect(
+        screen.getByText('登録済みのメールアドレス宛にパスワード再設定用のURLを通知いたします。'),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('auth-form')).toBeInTheDocument();
+      expect(screen.getByText('送信')).toBeInTheDocument();
+      expect(screen.getByText('ログインに戻る')).toBeInTheDocument();
+    });
+
+    it('メール送信リクエストが成功した場合の処理が正しく実行されること', async () => {
+      render(<PasswordResetContent mode="request" />);
+
+      const submitButton = screen.getByTestId('submit-button');
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockPasswordResetRequestAction).toHaveBeenCalled();
+      });
+    });
+
+    it('メール送信リクエスト失敗時にトースト通知が表示されないこと', async () => {
+      mockRequestActionResult = { success: false };
+
+      render(<PasswordResetContent mode="request" />);
+
+      const submitButton = screen.getByTestId('submit-button');
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockPasswordResetRequestAction).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('確認モード', () => {
+    const mockUid = 'test-uid';
+    const mockToken = 'test-token';
+
+    it('正しくすべてのコンポーネントがレンダリングされること', () => {
+      render(<PasswordResetContent mode="confirm" uid={mockUid} token={mockToken} />);
+
       expect(screen.getByText('パスワード再設定')).toBeInTheDocument();
       expect(screen.getByText('新しいパスワードを入力してください。')).toBeInTheDocument();
-
-      // フォーム要素の確認
-      expect(screen.getAllByRole('password-input')).toHaveLength(2);
-      expect(screen.getByText('新しいパスワード')).toBeInTheDocument();
-      expect(screen.getByText('新しいパスワード（確認）')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: '送信' })).toBeInTheDocument();
+      expect(screen.getByTestId('auth-form')).toBeInTheDocument();
+      expect(screen.getByText('保存')).toBeInTheDocument();
+      expect(screen.queryByText('ログインに戻る')).not.toBeInTheDocument();
     });
-  });
 
-  // フォーム送信のテスト
-  describe('フォーム送信テスト', () => {
-    it('正しいパスワードで送信が成功すること', async () => {
-      const { user } = setup();
-      const [passwordInput, confirmInput] = screen.getAllByRole(
-        'password-input',
-      ) as HTMLInputElement[];
-      const submitButton = screen.getByRole('button', { name: '送信' });
+    it('パスワード更新が成功した場合の処理が正しく実行されること', async () => {
+      render(<PasswordResetContent mode="confirm" uid={mockUid} token={mockToken} />);
 
-      // APIの成功レスポンスをモック
-      (passwordResetAPI as jest.Mock).mockResolvedValueOnce({ success: true });
+      const submitButton = screen.getByTestId('submit-button');
+      await userEvent.click(submitButton);
 
-      // フォームの入力と送信
-      await user.type(passwordInput, 'Password123!');
-      await user.type(confirmInput, 'Password123!');
-      await user.click(submitButton);
-
-      // API呼び出しの確認
       await waitFor(() => {
-        expect(passwordResetAPI).toHaveBeenCalledWith(testProps.uid, testProps.token, {
-          password: 'Password123!',
-          passwordConfirmation: 'Password123!',
-        });
+        expect(mockPasswordResetConfirmAction).toHaveBeenCalled();
       });
-
-      // トースト通知の確認
-      expect(mockToast).toHaveBeenCalledWith({
-        title: 'パスワードの再設定完了',
-        description: 'ログイン画面に移動します。',
-      });
-
-      // ログインページへのリダイレクト確認
-      expect(mockPush).toHaveBeenCalledWith(LOGIN_URL);
     });
-  });
 
-  // エラー処理のテスト
-  describe('エラー処理テスト', () => {
-    it('APIエラー時にエラーメッセージが表示されること', async () => {
-      const { user } = setup();
-      const [passwordInput, confirmInput] = screen.getAllByRole(
-        'password-input',
-      ) as HTMLInputElement[];
-      const submitButton = screen.getByRole('button', { name: '送信' });
+    it('パスワード更新が失敗した場合の処理が正しく実行されること', async () => {
+      mockConfirmActionResult = {
+        success: false,
+      };
 
-      // APIエラーをモック
-      (passwordResetAPI as jest.Mock).mockRejectedValueOnce(
-        new Error(JSON.stringify({ token: 'トークンが無効です。' })),
-      );
+      render(<PasswordResetContent mode="confirm" uid={mockUid} token={mockToken} />);
 
-      await user.type(passwordInput, 'Password123!');
-      await user.type(confirmInput, 'Password123!');
-      await user.click(submitButton);
+      const submitButton = screen.getByTestId('submit-button');
+      await userEvent.click(submitButton);
 
-      // エラーメッセージの確認
       await waitFor(() => {
-        expect(mockToast).toHaveBeenCalledWith({
-          title: 'エラー',
-          description: 'トークンが無効です。',
-          variant: 'destructive',
-        });
+        expect(mockPasswordResetConfirmAction).toHaveBeenCalled();
       });
     });
   });

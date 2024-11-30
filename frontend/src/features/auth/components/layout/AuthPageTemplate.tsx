@@ -1,8 +1,8 @@
-import CenterTitleLayout from '@/components/layout/CenterTitleLayout';
 import ImageAndContentSplitLayout from '@/components/layout/ImageAndContentSplitLayout';
-import type { AuthPageTemplate } from '../../types';
+import TitleLayout from '@/components/layout/TitleLayout';
+import type { AuthPageTemplateProps } from '../../types';
 
-const AuthPageTemplate: React.FC<AuthPageTemplate> = ({
+const AuthPageTemplate: React.FC<AuthPageTemplateProps> = ({
   title,
   description,
   subDescription,
@@ -13,14 +13,14 @@ const AuthPageTemplate: React.FC<AuthPageTemplate> = ({
     <ImageAndContentSplitLayout
       isReversed={isReversed}
       leftContent={
-        <CenterTitleLayout
+        <TitleLayout
           title={title}
           description={description}
           subDescription={subDescription}
           className="text-center"
         >
           <div className="space-y-5 mx-auto max-w-md">{children}</div>
-        </CenterTitleLayout>
+        </TitleLayout>
       }
       rightContent={
         <div className="text-center py-10">

@@ -10,7 +10,6 @@ class TestVerificationUrls(BaseUrlTest):
         ("send_verification_code", "/api/auth/verification/send/"),
         ("resend_verification_code", "/api/auth/verification/resend/"),
         ("verify_code", "/api/auth/verification/verify/"),
-        ("verify_email_password", "/api/auth/verification/verify-email-password/"),
     ]
 
     @pytest.mark.django_db

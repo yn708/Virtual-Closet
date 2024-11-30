@@ -3,16 +3,21 @@ import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_EDIT_URL } from '@/utils/const
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BiCloset } from 'react-icons/bi';
 import { MdOutlineSwipe } from 'react-icons/md';
-import { CreateOutfitSection } from '../CreateOutfitSection';
-import { ImageUploadSection } from '../ImageUploadSection';
+import CreateOutfitSection from '../CreateOutfitSection';
+import ImageUploadSection from '../ImageUploadSection';
 
-// ImageUploadSectionのモック
+// モックの設定
 jest.mock('../ImageUploadSection', () => ({
-  ImageUploadSection: jest.fn(({ children, value, label, Icon, redirectUrl, onClose }) => (
+  __esModule: true,
+  default: jest.fn(({ children, value, label, Icon, redirectUrl, onClose }) => (
     <div data-testid="image-upload-section">
       <div data-testid="value">{value}</div>
       <div data-testid="label">{label}</div>
-      <div data-testid="icon">{Icon ? <Icon data-testid="icon-component" /> : null}</div>
+      {Icon && (
+        <div data-testid="icon">
+          <Icon data-testid="icon-component" />
+        </div>
+      )}
       <div data-testid="redirect-url">{redirectUrl}</div>
       <button data-testid="close-button" onClick={onClose}>
         Close
@@ -22,7 +27,6 @@ jest.mock('../ImageUploadSection', () => ({
   )),
 }));
 
-// IconLinkのモック
 jest.mock('@/components/elements/link/IconLink', () => ({
   __esModule: true,
   default: jest.fn(({ href, Icon, label, onClick }) => (
@@ -41,102 +45,87 @@ jest.mock('@/components/elements/link/IconLink', () => ({
 }));
 
 describe('CreateOutfitSection', () => {
+  // モック関数：閉じる操作をシミュレート
   const mockOnClose = jest.fn();
 
   beforeEach(() => {
+    // 各テストの前にモックをリセット
     jest.clearAllMocks();
   });
 
-  // 基本的なレンダリングテスト
-  it('renders ImageUploadSection with correct props', () => {
+  it('renders with correct props and structure', () => {
+    // コンポーネントをレンダリング
     render(<CreateOutfitSection onClose={mockOnClose} />);
 
-    // ImageUploadSectionのプロパティを検証
-    expect(screen.getByTestId('value')).toHaveTextContent('create-outfit');
-    expect(screen.getByTestId('label')).toHaveTextContent('コーディネート作成');
-    expect(screen.getByTestId('icon-component')).toBeInTheDocument();
-    expect(screen.getByTestId('redirect-url')).toHaveTextContent(COORDINATE_EDIT_URL);
-  });
+    // ImageUploadSectionのプロパティ確認
+    expect(screen.getByTestId('value')).toHaveTextContent('create-outfit'); // セクションの値
+    expect(screen.getByTestId('label')).toHaveTextContent('コーディネート作成'); // セクションのラベル
+    expect(screen.getByTestId('icon-component')).toBeInTheDocument(); // アイコンが存在するか
+    expect(screen.getByTestId('redirect-url')).toHaveTextContent(COORDINATE_EDIT_URL); // リダイレクト先URL
 
-  // IconLinkの検証
-  it('renders IconLink with correct props', () => {
-    render(<CreateOutfitSection onClose={mockOnClose} />);
-
+    // IconLinkの確認
     const iconLink = screen.getByTestId('icon-link');
-    expect(iconLink).toBeInTheDocument();
-    expect(iconLink).toHaveAttribute('href', COORDINATE_CREATE_CANVAS_URL);
-    expect(screen.getByText('登録済みアイテムから作成')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-link-icon')).toBeInTheDocument();
+    expect(iconLink).toBeInTheDocument(); // アイコンリンクが存在するか
+    expect(iconLink).toHaveAttribute('href', COORDINATE_CREATE_CANVAS_URL); // href属性が正しいか
+    expect(screen.getByText('登録済みアイテムから作成')).toBeInTheDocument(); // リンクラベルが正しいか
+    expect(screen.getByTestId('icon-link-icon')).toBeInTheDocument(); // リンクアイコンが存在するか
   });
 
-  // ImageUploadSectionにpropsが正しく渡されているか検証
-  it('passes correct props to ImageUploadSection', () => {
+  it('calls onClose callback appropriately', () => {
+    // コンポーネントをレンダリング
     render(<CreateOutfitSection onClose={mockOnClose} />);
 
+    // ImageUploadSection内の閉じるボタンのクリックをシミュレート
+    fireEvent.click(screen.getByTestId('close-button'));
+    expect(mockOnClose).toHaveBeenCalledTimes(1); // 閉じるコールバックが1回呼び出されているか
+
+    // IconLink内のクリックをシミュレート
+    fireEvent.click(screen.getByTestId('icon-link'));
+    expect(mockOnClose).toHaveBeenCalledTimes(2); // 合計2回呼び出されているか
+  });
+
+  it('passes correct props to child components', () => {
+    // コンポーネントをレンダリング
+    render(<CreateOutfitSection onClose={mockOnClose} />);
+
+    // ImageUploadSectionへのプロパティ確認
     expect(ImageUploadSection).toHaveBeenCalledWith(
       {
-        value: 'create-outfit',
-        label: 'コーディネート作成',
-        Icon: BiCloset,
-        redirectUrl: COORDINATE_EDIT_URL,
-        onClose: mockOnClose,
-        children: expect.any(Object),
+        value: 'create-outfit', // セクションの値
+        label: 'コーディネート作成', // セクションのラベル
+        Icon: BiCloset, // セクションのアイコン
+        redirectUrl: COORDINATE_EDIT_URL, // リダイレクトURL
+        onClose: mockOnClose, // 閉じるコールバック
+        children: expect.any(Object), // 子コンポーネント
       },
       expect.any(Object),
     );
-  });
 
-  // IconLinkにpropsが正しく渡されているか検証
-  it('passes correct props to IconLink', () => {
-    render(<CreateOutfitSection onClose={mockOnClose} />);
-
+    // IconLinkへのプロパティ確認
     expect(IconLink).toHaveBeenCalledWith(
       {
-        href: COORDINATE_CREATE_CANVAS_URL,
-        Icon: MdOutlineSwipe,
-        size: 'sm',
-        label: '登録済みアイテムから作成',
-        rounded: true,
-        className: 'border font-medium',
-        onClick: mockOnClose,
+        href: COORDINATE_CREATE_CANVAS_URL, // リンクのURL
+        Icon: MdOutlineSwipe, // リンクのアイコン
+        size: 'sm', // サイズ設定
+        label: '登録済みアイテムから作成', // リンクのラベル
+        rounded: true, // スタイル設定
+        className: 'border font-medium', // クラス名
+        onClick: mockOnClose, // 閉じるコールバック
       },
       expect.any(Object),
     );
   });
 
-  // onClose関数の動作検証
-  it('calls onClose when ImageUploadSection close button is clicked', () => {
+  it('maintains correct component hierarchy', () => {
+    // コンポーネントをレンダリング
     render(<CreateOutfitSection onClose={mockOnClose} />);
 
-    const closeButton = screen.getByTestId('close-button');
-    fireEvent.click(closeButton);
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
-  });
-
-  // IconLinkのクリック時の動作検証
-  it('calls onClose when IconLink is clicked', () => {
-    render(<CreateOutfitSection onClose={mockOnClose} />);
-
-    const iconLink = screen.getByTestId('icon-link');
-    fireEvent.click(iconLink);
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
-  });
-
-  // 子要素のレンダリング検証
-  it('renders children inside ImageUploadSection', () => {
-    render(<CreateOutfitSection onClose={mockOnClose} />);
-
-    const childrenContent = screen.getByTestId('children-content');
-    expect(childrenContent).toBeInTheDocument();
-    expect(childrenContent.querySelector('[data-testid="icon-link"]')).toBeInTheDocument();
-  });
-
-  // コンポーネントの構造検証
-  it('maintains proper component structure', () => {
-    render(<CreateOutfitSection onClose={mockOnClose} />);
-
+    // 各要素が正しい階層関係にあることを確認
     const imageUploadSection = screen.getByTestId('image-upload-section');
-    expect(imageUploadSection).toContainElement(screen.getByTestId('children-content'));
-    expect(imageUploadSection).toContainElement(screen.getByTestId('icon-component'));
+    const childrenContent = screen.getByTestId('children-content');
+    const iconLink = screen.getByTestId('icon-link');
+
+    expect(imageUploadSection).toContainElement(childrenContent); // ImageUploadSectionが子要素を含む
+    expect(childrenContent).toContainElement(iconLink); // 子要素がIconLinkを含む
   });
 });

@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { imageSchema } from './common-validation';
+import { optionalImageSchema } from './common-validation';
 
 /* ----------------------------------------------------------------
 プロフィールアップデート用
 ------------------------------------------------------------------ */
-export const ProfileUpdateFormSchema = z
+export const profileUpdateFormSchema = z
   .object({
     username: z
       .string()
@@ -18,13 +18,11 @@ export const ProfileUpdateFormSchema = z
     birth_year: z.string().optional().nullable(),
     birth_month: z.string().optional().nullable(),
     birth_day: z.string().optional().nullable(),
-
     gender: z
       .union([z.enum(['male', 'female', 'other', 'unanswered']), z.literal('')])
       .optional()
       .nullable(),
-
-    profile_image: imageSchema.optional().nullable(),
+    profile_image: optionalImageSchema,
     height: z
       .string()
       .refine(
@@ -38,16 +36,27 @@ export const ProfileUpdateFormSchema = z
       .optional()
       .nullable(),
   })
-  .refine(
-    (data) => {
-      const { birth_year, birth_month, birth_day } = data;
-      // すべてnullの場合は有効
-      if (!birth_year && !birth_month && !birth_day) return true;
-      // 一部でも値がある場合は、すべての値が必要
-      return !!birth_year && !!birth_month && !!birth_day;
-    },
-    {
-      message: '生年月日は年、月、日のすべてを入力してください。',
-      path: ['birth_year'],
-    },
-  );
+  .superRefine((data, ctx) => {
+    // いずれかの値が入力されている場合は全ての値が必要
+    if (data.birth_year || data.birth_month || data.birth_day) {
+      if (!data.birth_year || !data.birth_month || !data.birth_day) {
+        // birth_yearにはメッセージ付きでエラーを追加
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '設定する場合は年・月・日すべての入力が必要です',
+          path: ['birth_year'],
+        });
+        // birth_month, birth_dayには空メッセージでエラーを追加
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '',
+          path: ['birth_month'],
+        });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '',
+          path: ['birth_day'],
+        });
+      }
+    }
+  });
