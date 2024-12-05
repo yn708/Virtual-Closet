@@ -16,11 +16,15 @@ export function useFloatingLabel({
   onChange,
 }: UseFloatingLabelProps) {
   // 内部状態で値を管理
-  const [internalValue, setInternalValue] = useState(defaultValue);
+  // valueがnullの場合は空文字に変換
+  const safeValue = value ?? '';
+  const safeDefaultValue = defaultValue ?? '';
+  const [internalValue, setInternalValue] = useState(safeDefaultValue);
   const [isFocused, setIsFocused] = useState(false);
 
   // 実際の値として使用する値
-  const currentValue = onChange ? value : internalValue;
+  const currentValue = onChange ? safeValue : internalValue;
+
   const hasValue = !!currentValue;
 
   const handleValueChange = (newValue: string | React.ChangeEvent<HTMLInputElement>) => {

@@ -1,0 +1,154 @@
+[
+  {
+    "model": "fashion_items.color",
+    "pk": "white",
+    "fields": {
+      "color_name": "ホワイト",
+      "color_code": "#FFFFFF"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "black",
+    "fields": {
+      "color_name": "ブラック",
+      "color_code": "#000000"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "gray",
+    "fields": {
+      "color_name": "グレー",
+      "color_code": "#7d7d7d"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "brown",
+    "fields": {
+      "color_name": "ブラウン",
+      "color_code": "#8f6552"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "beige",
+    "fields": {
+      "color_name": "ベージュ",
+      "color_code": "#F5F5DC"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "green",
+    "fields": {
+      "color_name": "グリーン",
+      "color_code": "#00a960"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "khaki",
+    "fields": {
+      "color_name": "カーキ",
+      "color_code": "#c5a05a"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "olive_green",
+    "fields": {
+      "color_name": "オリーブグリーン",
+      "color_code": "#5f6527"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "navy",
+    "fields": {
+      "color_name": "ネイビー",
+      "color_code": "#202f55"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "blue",
+    "fields": {
+      "color_name": "ブルー",
+      "color_code": "#0000ff"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "purple",
+    "fields": {
+      "color_name": "パープル",
+      "color_code": "#9E76B4"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "yellow",
+    "fields": {
+      "color_name": "イエロー",
+      "color_code": "#FFC20E"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "pink",
+    "fields": {
+      "color_name": "ピンク",
+      "color_code": "#F067A6"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "red",
+    "fields": {
+      "color_name": "レッド",
+      "color_code": "#ED1A3D"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "bordeaux",
+    "fields": {
+      "color_name": "ボルドー",
+      "color_code": "#6c272d"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "orange",
+    "fields": {
+      "color_name": "オレンジ",
+      "color_code": "#ee7800"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "silver",
+    "fields": {
+      "color_name": "シルバー",
+      "color_code": "#c0c0c0"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "gold",
+    "fields": {
+      "color_name": "ゴールド",
+      "color_code": "#ffd700"
+    }
+  },
+  {
+    "model": "fashion_items.color",
+    "pk": "other",
+    "fields": {
+      "color_name": "その他",
+      "color_code": "#FFFFFF"
+    }
+  }
+]

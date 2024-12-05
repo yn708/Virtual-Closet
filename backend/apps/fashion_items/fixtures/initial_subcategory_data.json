@@ -1,0 +1,866 @@
+[
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tshirt",
+    "fields": {
+      "subcategory_name": "Tシャツ/カットソー",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tank",
+    "fields": {
+      "subcategory_name": "タンクトップ",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "shirt",
+    "fields": {
+      "subcategory_name": "シャツ",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "polo",
+    "fields": {
+      "subcategory_name": "ポロシャツ",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "sweat",
+    "fields": {
+      "subcategory_name": "スウェット",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "hoodie",
+    "fields": {
+      "subcategory_name": "パーカー",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "pullover",
+    "fields": {
+      "subcategory_name": "プルオーバー",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "knit",
+    "fields": {
+      "subcategory_name": "ニット/セーター",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "blouse",
+    "fields": {
+      "subcategory_name": "ブラウス",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "inner",
+    "fields": {
+      "subcategory_name": "インナー",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_tops",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "tops"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "short_pants",
+    "fields": {
+      "subcategory_name": "ショートパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "half_pants",
+    "fields": {
+      "subcategory_name": "ハーフパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "skinny",
+    "fields": {
+      "subcategory_name": "スキニーパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "denim",
+    "fields": {
+      "subcategory_name": "デニムパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "slacks",
+    "fields": {
+      "subcategory_name": "スラックス",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tapered",
+    "fields": {
+      "subcategory_name": "テーパードパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "jogger",
+    "fields": {
+      "subcategory_name": "ジョガーパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "wide",
+    "fields": {
+      "subcategory_name": "ワイドパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "knit_pants",
+    "fields": {
+      "subcategory_name": "ニットパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "chino",
+    "fields": {
+      "subcategory_name": "チノパン",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "cargo",
+    "fields": {
+      "subcategory_name": "カーゴパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "sweat_pants",
+    "fields": {
+      "subcategory_name": "スウェットパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "skirt",
+    "fields": {
+      "subcategory_name": "スカート",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "flare",
+    "fields": {
+      "subcategory_name": "フレアパンツ",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_bottoms",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "bottoms"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "dress",
+    "fields": {
+      "subcategory_name": "ワンピース",
+      "category": "dress"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "overall",
+    "fields": {
+      "subcategory_name": "オーバーオール",
+      "category": "dress"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_dress",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "dress"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "suit",
+    "fields": {
+      "subcategory_name": "スーツ",
+      "category": "setup"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "setup",
+    "fields": {
+      "subcategory_name": "セットアップ",
+      "category": "setup"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_setup",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "setup"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "cardigan",
+    "fields": {
+      "subcategory_name": "カーディガン",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "vest",
+    "fields": {
+      "subcategory_name": "ベスト",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "down_vest",
+    "fields": {
+      "subcategory_name": "ダウンベスト",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tailored_jacket",
+    "fields": {
+      "subcategory_name": "テーラードジャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "no_collar_jacket",
+    "fields": {
+      "subcategory_name": "ノーカラージャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "riders_jacket",
+    "fields": {
+      "subcategory_name": "ライダースジャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "leather_jacket",
+    "fields": {
+      "subcategory_name": "レザージャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "military_jacket",
+    "fields": {
+      "subcategory_name": "ミリタリージャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "quilted_jacket",
+    "fields": {
+      "subcategory_name": "キルティングジャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "denim_jacket",
+    "fields": {
+      "subcategory_name": "デニムジャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "down_jacket",
+    "fields": {
+      "subcategory_name": "ダウンジャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "boa_jacket",
+    "fields": {
+      "subcategory_name": "ボアジャケット",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "blouson",
+    "fields": {
+      "subcategory_name": "ブルゾン/MA-1",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "stadium_jumper",
+    "fields": {
+      "subcategory_name": "スタジャン",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "mountain_parka",
+    "fields": {
+      "subcategory_name": "マウンテンパーカー",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "chester_coat",
+    "fields": {
+      "subcategory_name": "チェスターコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "no_collar_coat",
+    "fields": {
+      "subcategory_name": "ノーカラーコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "trench_coat",
+    "fields": {
+      "subcategory_name": "トレンチコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "pea_coat",
+    "fields": {
+      "subcategory_name": "Pコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "duffle_coat",
+    "fields": {
+      "subcategory_name": "ダッフルコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "quilted_coat",
+    "fields": {
+      "subcategory_name": "キルティングコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "down_coat",
+    "fields": {
+      "subcategory_name": "ダウンコート",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_outer",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "outer"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "sneakers",
+    "fields": {
+      "subcategory_name": "スニーカー",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "sandals",
+    "fields": {
+      "subcategory_name": "サンダル",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "loafers",
+    "fields": {
+      "subcategory_name": "ローファー",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "pumps",
+    "fields": {
+      "subcategory_name": "パンプス",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "dress_shoes",
+    "fields": {
+      "subcategory_name": "ドレスシューズ",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "boots",
+    "fields": {
+      "subcategory_name": "ブーツ",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "slip_ons",
+    "fields": {
+      "subcategory_name": "スリッポン",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_shoes",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "shoes"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "clutch",
+    "fields": {
+      "subcategory_name": "クラッチバッグ",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "handbag",
+    "fields": {
+      "subcategory_name": "ハンドバッグ",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "shoulder_bag",
+    "fields": {
+      "subcategory_name": "ショルダーバッグ",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tote_bag",
+    "fields": {
+      "subcategory_name": "トートバッグ",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "boston_bag",
+    "fields": {
+      "subcategory_name": "ボストンバッグ",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "backpack",
+    "fields": {
+      "subcategory_name": "リュック",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_bag",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "bag"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "socks",
+    "fields": {
+      "subcategory_name": "ソックス",
+      "category": "legwear"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_legwear",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "legwear"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "glasses",
+    "fields": {
+      "subcategory_name": "メガネ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "sunglasses",
+    "fields": {
+      "subcategory_name": "サングラス",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "watch",
+    "fields": {
+      "subcategory_name": "腕時計",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "belt",
+    "fields": {
+      "subcategory_name": "ベルト",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tie",
+    "fields": {
+      "subcategory_name": "ネクタイ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "stole",
+    "fields": {
+      "subcategory_name": "ストール",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "scarf",
+    "fields": {
+      "subcategory_name": "スカーフ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "muffler",
+    "fields": {
+      "subcategory_name": "マフラー",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "cap",
+    "fields": {
+      "subcategory_name": "キャップ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "hat",
+    "fields": {
+      "subcategory_name": "ハット",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_fashion_goods",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "glasses",
+    "fields": {
+      "subcategory_name": "メガネ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "sunglasses",
+    "fields": {
+      "subcategory_name": "サングラス",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "watch",
+    "fields": {
+      "subcategory_name": "腕時計",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "belt",
+    "fields": {
+      "subcategory_name": "ベルト",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "tie",
+    "fields": {
+      "subcategory_name": "ネクタイ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "stole",
+    "fields": {
+      "subcategory_name": "ストール",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "scarf",
+    "fields": {
+      "subcategory_name": "スカーフ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "muffler",
+    "fields": {
+      "subcategory_name": "マフラー",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "cap",
+    "fields": {
+      "subcategory_name": "キャップ",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "hat",
+    "fields": {
+      "subcategory_name": "ハット",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "knit_cap",
+    "fields": {
+      "subcategory_name": "ニット帽",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "beret",
+    "fields": {
+      "subcategory_name": "ベレー帽",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "hunting_cap",
+    "fields": {
+      "subcategory_name": "ハンチング",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_fashion_goods",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "fashion_goods"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "earrings",
+    "fields": {
+      "subcategory_name": "ピアス/イヤリング",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "ring",
+    "fields": {
+      "subcategory_name": "リング",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "bracelet",
+    "fields": {
+      "subcategory_name": "ブレスレット",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "bangle",
+    "fields": {
+      "subcategory_name": "バングル",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "necklace",
+    "fields": {
+      "subcategory_name": "ネックレス",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "anklet",
+    "fields": {
+      "subcategory_name": "アンクレット",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "brooch",
+    "fields": {
+      "subcategory_name": "ブローチ",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "hair_accessory",
+    "fields": {
+      "subcategory_name": "ヘアアクセサリー",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_accessory",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "accessory"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "kimono",
+    "fields": {
+      "subcategory_name": "着物/浴衣",
+      "category": "other"
+    }
+  },
+  {
+    "model": "fashion_items.subcategory",
+    "pk": "other_other",
+    "fields": {
+      "subcategory_name": "その他",
+      "category": "other"
+    }
+  }
+]

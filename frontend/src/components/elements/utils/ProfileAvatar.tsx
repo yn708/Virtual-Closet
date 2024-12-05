@@ -8,8 +8,16 @@ const ProfileAvatar: React.FC<ImageDisplayProps & SizeType> = ({ src, alt, size 
   return (
     <Avatar className={`rounded-full ${AVATAR_ICON_SIZE[size]}`} data-testid="avatar-container">
       <AvatarImage src={src || DEFAULT_USER_IMAGE} alt={alt} />
-      <AvatarFallback>
-        <Image src={DEFAULT_USER_IMAGE} alt="User Avatar" layout="fill" objectFit="cover" />
+      <AvatarFallback className="relative">
+        <div className="relative size-full">
+          <Image
+            src={DEFAULT_USER_IMAGE}
+            alt="User Avatar"
+            fill
+            className="rounded-full"
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
       </AvatarFallback>
     </Avatar>
   );

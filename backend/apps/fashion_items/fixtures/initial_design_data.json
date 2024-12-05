@@ -1,0 +1,72 @@
+[
+  {
+    "model": "fashion_items.design",
+    "pk": "plain",
+    "fields": {
+      "design_pattern": "無地"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "onePoint",
+    "fields": {
+      "design_pattern": "ワンポイント"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "backPrint",
+    "fields": {
+      "design_pattern": "バックプリント"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "border",
+    "fields": {
+      "design_pattern": "ボーダー"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "stripe",
+    "fields": {
+      "design_pattern": "ストライプ"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "check",
+    "fields": {
+      "design_pattern": "チェック"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "floral",
+    "fields": {
+      "design_pattern": "花柄"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "animal",
+    "fields": {
+      "design_pattern": "アニマル柄"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "graphic",
+    "fields": {
+      "design_pattern": "グラフィック柄"
+    }
+  },
+  {
+    "model": "fashion_items.design",
+    "pk": "other",
+    "fields": {
+      "design_pattern": "その他"
+    }
+  }
+]

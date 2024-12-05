@@ -15,12 +15,14 @@ services:
     command: bun run dev -p 4000
     ports:
       - '4000:4000'
-    # deploy:
-    #   resources:
-    #     limits:
-    #       memory: 2G
-    #     reservations:
-    #       memory: 512M
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+        reservations:
+          memory: 1G
+    depends_on:
+      - backend
 
   #バックエンド（Django）
   backend:

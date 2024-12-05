@@ -11,7 +11,7 @@ export interface ClassNameType {
 }
 
 export interface LabelType {
-  label: string;
+  label?: string;
 }
 
 export interface TextType {
@@ -36,6 +36,10 @@ export interface LoadingType {
 
 export interface SizeType {
   size?: 'sm' | 'md' | 'lg';
+}
+
+export interface IdType {
+  id: string;
 }
 
 /* ----------------------------------------------------------------

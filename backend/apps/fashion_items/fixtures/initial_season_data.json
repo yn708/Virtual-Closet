@@ -1,0 +1,30 @@
+[
+  {
+    "model": "fashion_items.season",
+    "pk": "spring",
+    "fields": {
+      "season_name": "春"
+    }
+  },
+  {
+    "model": "fashion_items.season",
+    "pk": "summer",
+    "fields": {
+      "season_name": "夏"
+    }
+  },
+  {
+    "model": "fashion_items.season",
+    "pk": "autumn",
+    "fields": {
+      "season_name": "秋"
+    }
+  },
+  {
+    "model": "fashion_items.season",
+    "pk": "winter",
+    "fields": {
+      "season_name": "冬"
+    }
+  }
+]

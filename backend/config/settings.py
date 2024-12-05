@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # 作成app
     "apps.accounts",
     "apps.image_processing",
+    "apps.fashion_items",
 ]
 
 
