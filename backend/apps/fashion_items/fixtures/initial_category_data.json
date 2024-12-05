@@ -1,0 +1,79 @@
+[
+  {
+    "model": "fashion_items.category",
+    "pk": "tops",
+    "fields": {
+      "category_name": "トップス"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "bottoms",
+    "fields": {
+      "category_name": "ボトムス"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "dress",
+    "fields": {
+      "category_name": "ワンピース"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "setup",
+    "fields": {
+      "category_name": "セットアップ"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "outer",
+    "fields": {
+      "category_name": "アウター"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "shoes",
+    "fields": {
+      "category_name": "シューズ"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "bag",
+    "fields": {
+      "category_name": "バッグ"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "legwear",
+    "fields": {
+      "category_name": "レッグウェア"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "fashion_goods",
+    "fields": {
+      "category_name": "ファッション雑貨"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "accessory",
+    "fields": {
+      "category_name": "アクセサリー"
+    }
+  },
+  {
+    "model": "fashion_items.category",
+    "pk": "other",
+    "fields": {
+      "category_name": "その他"
+    }
+  }
+]

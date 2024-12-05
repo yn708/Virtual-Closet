@@ -34,6 +34,8 @@ API_ENDPOINT
 // ベース
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export const BASE_AUTH_ENDPOINT = '/api/auth';
+export const BASE_FASHION_ITEMS_ENDPOINT = '/api/fashion-items';
+
 export const BASE_LOGIN_ENDPOINT = `${BASE_AUTH_ENDPOINT}/login`;
 export const BASE_SIGNUP_ENDPOINT = `${BASE_AUTH_ENDPOINT}/verification`;
 export const BASE_USER_ENDPOINT = `${BASE_AUTH_ENDPOINT}/user`;
@@ -54,6 +56,10 @@ export const BASE_USER_UPDATE_ENDPOINT = `${BASE_USER_ENDPOINT}/update/`;
 
 // 画像
 export const IMAGE_REMOVE_BG_ENDPOINT = `/api/image/remove-bg/`;
+
+// ファッションアイテム関連
+export const FASHION_ITEM_METADATA_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}/metadata/`;
+export const FASHION_ITEM_REGISTER_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}/register/`;
 
 /* ----------------------------------------------------------------
 URL
@@ -95,3 +101,9 @@ export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'ima
 export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.heic'];
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export const DEFAULT_USER_IMAGE = '/images/default.png';
+
+/* ----------------------------------------------------------------
+SEARCH
+------------------------------------------------------------------ */
+export const MIN_SEARCH_LENGTH = 2;
+export const CACHE_DURATION = 5 * 60 * 1000; // 5分

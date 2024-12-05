@@ -1,20 +1,34 @@
+import type { InputHTMLAttributes } from 'react';
 import type { ClassNameType } from './common';
 /* ----------------------------------------------------------------
 Base
 ------------------------------------------------------------------ */
-// フィールドベース
 export interface BaseFieldProps {
   name: string;
   label: string;
-  defaultValue?: string;
   error?: string[] | undefined;
+}
+
+export interface ExtensionBaseFieldProps extends BaseFieldProps, ClassNameType {
+  defaultValue?: string;
   onChange?: (value: string) => void;
 }
 
+export interface FieldValueProps {
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export interface BaseOption {
+  id: string;
+  name: string;
+  [key: string]: string | number;
+}
 /* ----------------------------------------------------------------
 Input field
 ------------------------------------------------------------------ */
-export interface FloatingLabelInputProps extends BaseFieldProps, ClassNameType {
+
+export interface FloatingLabelInputProps extends ExtensionBaseFieldProps {
   type?: 'text' | 'password' | 'email' | 'number';
 }
 
@@ -23,15 +37,56 @@ export interface FileInputType {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  value: string; // 検索入力値
+  onChange: (value: string) => void; // 入力値変更時のコールバック
+  containerClassName?: string; // 入力フィールドのコンテナに適用するクラス
+  onClear?: () => void; // onClearがある場合、クリアボタンを表示
+}
+
 /* ----------------------------------------------------------------
 select field
 ------------------------------------------------------------------ */
-export interface FloatingLabelSelectProps extends BaseFieldProps, ClassNameType {
-  options: SelectOption[];
+
+export interface FloatingLabelSelectProps extends ExtensionBaseFieldProps {
+  options: BaseOption[];
 }
 
-// 基本的なオプション型の定義
-export interface SelectOption {
-  id: number | string;
-  name: string;
+export interface BaseSheetSelectFieldProps extends BaseFieldProps {
+  value?: string;
+  trigger: (value: string | undefined) => React.ReactNode;
+  children: (props: { value?: string; onChange: (value: string) => void }) => React.ReactNode;
+}
+
+export interface SheetSelectFieldProps<T extends BaseOption>
+  extends BaseFieldProps,
+    FieldValueProps {
+  options: T[];
+  labelKey: keyof T;
+}
+
+/* ----------------------------------------------------------------
+Checkbox field
+------------------------------------------------------------------ */
+export interface CheckboxProps extends BaseFieldProps {
+  defaultChecked?: boolean;
+}
+
+/* ----------------------------------------------------------------
+ToggleGroup field
+------------------------------------------------------------------ */
+export interface ToggleGroupFieldProps<T extends BaseOption> extends BaseFieldProps {
+  options: T[];
+  labelKey: keyof T;
+  defaultValue?: string[];
+}
+
+/* ----------------------------------------------------------------
+ToggleGroup field
+------------------------------------------------------------------ */
+
+export interface ImageFieldProps {
+  preview?: string | null;
+  isProcessing?: boolean;
+  error?: string[] | undefined;
 }
