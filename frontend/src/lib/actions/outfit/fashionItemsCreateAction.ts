@@ -1,6 +1,6 @@
 'use server';
 
-import { registerFashionItem } from '@/lib/api/fashionItemsApi';
+import { registerFashionItemAPI } from '@/lib/api/fashionItemsApi';
 import type { FormState } from '@/types';
 import { TOP_URL } from '@/utils/constants';
 import { fashionItemCreateFormSchema } from '@/utils/validations/fashion-item-validation';
@@ -54,7 +54,7 @@ export async function fashionItemsCreateAction(
     }
   });
 
-  await registerFashionItem(apiFormData);
+  await registerFashionItemAPI(apiFormData);
   revalidatePath(TOP_URL);
   redirect(TOP_URL);
 }

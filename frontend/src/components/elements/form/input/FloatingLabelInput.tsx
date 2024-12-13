@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { useFloatingLabel } from '@/hooks/form/useFloatingLabel';
 import { cn } from '@/lib/utils';
-import { floatingLabelStyles as styles } from '@/styles/form/floating-label';
+import { floatingLabelStyles as styles } from '@/styles/form/floatingLabel';
 import type { FloatingLabelInputProps } from '@/types';
 import { useState } from 'react';
 import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';

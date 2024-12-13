@@ -31,36 +31,40 @@ export const AUTH_CODE_LENGTH = 6;
 /* ----------------------------------------------------------------
 API_ENDPOINT
 ------------------------------------------------------------------ */
-// ベース
+// バックエンド
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-export const BASE_AUTH_ENDPOINT = '/api/auth';
-export const BASE_FASHION_ITEMS_ENDPOINT = '/api/fashion-items';
-
-export const BASE_LOGIN_ENDPOINT = `${BASE_AUTH_ENDPOINT}/login`;
-export const BASE_SIGNUP_ENDPOINT = `${BASE_AUTH_ENDPOINT}/verification`;
-export const BASE_USER_ENDPOINT = `${BASE_AUTH_ENDPOINT}/user`;
 
 // 認証系
-export const LOGIN_GOOGLE_ENDPOINT = `${BASE_LOGIN_ENDPOINT}/google/`;
-export const LOGIN_EMAIL_ENDPOINT = `${BASE_LOGIN_ENDPOINT}/email/`;
-export const LOGIN_AFTER_VERIFICATION_ENDPOINT = `${BASE_LOGIN_ENDPOINT}/after-verification/`;
-export const SEND_AUTH_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/send/`;
-export const RESEND_AUTH_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/resend/`;
-export const VERIFY_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}/verify/`;
-export const SEND_PASSWORD_RESET_ENDPOINT = `${BASE_AUTH_ENDPOINT}/password/reset/`;
-export const PASSWORD_RESET_CONFIRM_ENDPOINT = `${BASE_AUTH_ENDPOINT}/password/reset/confirm/`;
-export const TOKEN_REFRESH_ENDPOINT = `${BASE_AUTH_ENDPOINT}/token-refresh/`;
+export const BASE_AUTH_ENDPOINT = '/api/auth/';
+export const BASE_LOGIN_ENDPOINT = `${BASE_AUTH_ENDPOINT}login/`;
+export const BASE_SIGNUP_ENDPOINT = `${BASE_AUTH_ENDPOINT}verification/`;
+
+export const LOGIN_GOOGLE_ENDPOINT = `${BASE_LOGIN_ENDPOINT}google/`;
+export const LOGIN_EMAIL_ENDPOINT = `${BASE_LOGIN_ENDPOINT}email/`;
+export const LOGIN_AFTER_VERIFICATION_ENDPOINT = `${BASE_LOGIN_ENDPOINT}after-verification/`;
+export const SEND_AUTH_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}send/`;
+export const RESEND_AUTH_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}resend/`;
+export const VERIFY_CODE_ENDPOINT = `${BASE_SIGNUP_ENDPOINT}verify/`;
+export const SEND_PASSWORD_RESET_ENDPOINT = `${BASE_AUTH_ENDPOINT}password/reset/`;
+export const PASSWORD_RESET_CONFIRM_ENDPOINT = `${BASE_AUTH_ENDPOINT}password/reset/confirm/`;
+export const TOKEN_REFRESH_ENDPOINT = `${BASE_AUTH_ENDPOINT}token-refresh/`;
+
 // User関連（情報、更新等）
-export const BASE_USER_DETAIL_ENDPOINT = `${BASE_USER_ENDPOINT}/detail/`;
-export const BASE_USER_UPDATE_ENDPOINT = `${BASE_USER_ENDPOINT}/update/`;
+export const BASE_USER_ENDPOINT = `${BASE_AUTH_ENDPOINT}user/`;
+
+export const USER_DETAIL_ENDPOINT = `${BASE_USER_ENDPOINT}detail/`;
+export const USER_UPDATE_ENDPOINT = `${BASE_USER_ENDPOINT}update/`;
 
 // 画像
 export const IMAGE_REMOVE_BG_ENDPOINT = `/api/image/remove-bg/`;
 
 // ファッションアイテム関連
-export const FASHION_ITEM_METADATA_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}/metadata/`;
-export const FASHION_ITEM_REGISTER_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}/register/`;
+export const BASE_FASHION_ITEMS_ENDPOINT = '/api/fashion-items/';
 
+export const BRAND_SEARCH_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}brands/search/`;
+export const FASHION_ITEM_METADATA_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}metadata/`;
+export const FASHION_ITEMS_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}items/`;
+export const FASHION_ITEMS_BY_CATEGORY_ENDPOINT = `${FASHION_ITEMS_ENDPOINT}by_category/?category_id=`;
 /* ----------------------------------------------------------------
 URL
 ------------------------------------------------------------------ */

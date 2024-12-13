@@ -1,5 +1,6 @@
 import BaseSheetSelectFormField from '@/components/elements/form/select/BaseSheetSelectFormField';
 import type { BrandSelectFieldProps } from '@/features/fashion-items/types';
+import type { Brand } from '@/types';
 import { useState } from 'react';
 import BrandContent from '../../content/BrandContent';
 
@@ -11,23 +12,23 @@ const BrandSelectFormField = ({
   options,
   onChange,
 }: BrandSelectFieldProps) => {
-  const [selectedValue, setSelectedValue] = useState(initialValue);
+  const [selectedValue, setSelectedValue] = useState<Brand | undefined>(initialValue);
+  const fieldValue = selectedValue?.id;
 
   return (
     <BaseSheetSelectFormField
       name={name}
       label={label}
-      value={selectedValue}
+      value={fieldValue}
       error={error}
-      trigger={(currentValue) => {
-        const selected = options.find((o) => o.id.toString() === currentValue);
+      trigger={() => {
         return (
           <>
-            {selected && (
+            {selectedValue && (
               <>
-                <span className="mr-2 font-medium">{selected.brand_name}</span>
+                <span className="mr-2 font-medium">{selectedValue.brand_name}</span>
                 <span className="text-[10px] text-gray-500 opacity-70">
-                  {selected.brand_name_kana}
+                  {selectedValue.brand_name_kana}
                 </span>
               </>
             )}
@@ -39,8 +40,8 @@ const BrandSelectFormField = ({
         <BrandContent
           selectedValue={value}
           onValueChange={(newValue) => {
-            setSelectedValue(newValue);
-            fieldOnChange(newValue);
+            setSelectedValue(newValue as Brand);
+            fieldOnChange(newValue as string);
             onChange?.(newValue);
           }}
           initialOptions={options}

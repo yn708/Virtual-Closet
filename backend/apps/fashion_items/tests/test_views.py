@@ -74,20 +74,17 @@ class TestBrandSearchView:
 
 
 @pytest.mark.django_db
-class TestRegisterFashionItemView:
-    """RegisterFashionItemViewのテストクラス"""
+class TestFashionItemViewSet:
+    """FashionItemViewSetのテストクラス"""
 
     def test_unauthenticated_access(self, api_client):
         """未認証アクセスのテスト"""
-        url = reverse("fashion_item_register")
-        response = api_client.post(url)
+        url = reverse("fashionitem-list")
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_register_fashion_item(
-        self, auth_client, subcategory, brand, season, design, color, price_range, test_image
-    ):
-        """ファッションアイテム登録テスト"""
-
+    def test_create_fashion_item(self, auth_client, subcategory, brand, season, design, color, price_range, test_image):
+        """アイテム作成のテスト"""
         data = {
             "sub_category": subcategory.id,
             "brand": brand.id,
@@ -99,43 +96,64 @@ class TestRegisterFashionItemView:
             "is_owned": True,
         }
 
-        url = reverse("fashion_item_register")
+        url = reverse("fashionitem-list")
         response = auth_client.post(url, data=data, format="multipart")
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data["status"] == "success"
-        assert "message" in response.data
-        assert "data" in response.data
+        assert FashionItem.objects.filter(sub_category=subcategory).exists()
 
-        # 新しく作成されたアイテムを取得
-        fashion_item = FashionItem.objects.latest("id")  # または作成日時でソート
-        assert fashion_item.sub_category == subcategory
-        assert fashion_item.brand == brand
-        assert list(fashion_item.seasons.all()) == [season]
+    def test_get_item_list(self, auth_client, fashion_item):
+        """アイテム一覧取得テスト"""
+        url = reverse("fashionitem-list")
+        response = auth_client.get(url)
 
-    def test_register_fashion_item_missing_required(self, auth_client, subcategory):
-        """必須フィールド欠如時のテスト"""
-        data = {"sub_category": subcategory.id, "is_owned": True}
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) >= 1
 
-        url = reverse("fashion_item_register")
-        response = auth_client.post(url, data=data, format="multipart")
+    def test_get_by_category(self, auth_client, fashion_item, category):
+        """カテゴリー別アイテム取得テスト"""
+        url = reverse("fashionitem-by-category")
+        response = auth_client.get(f"{url}?category_id={category.id}")
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "image" in response.data
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) >= 1
 
-    def test_register_fashion_item_optional_fields(self, auth_client, subcategory, test_image):
-        """任意フィールドなしでの登録テスト"""
-        data = {"sub_category": subcategory.id, "image": test_image, "is_owned": True}
+    def test_get_recent_items(self, auth_client, fashion_item):
+        """最近のアイテム取得テスト"""
+        url = reverse("fashionitem-by-category")
+        response = auth_client.get(f"{url}?category_id=recent")
 
-        url = reverse("fashion_item_register")
-        response = auth_client.post(url, data=data, format="multipart")
+        assert response.status_code == status.HTTP_200_OK
 
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data["status"] == "success"
+    def test_update_fashion_item(self, auth_client, fashion_item, season, test_image):
+        """アイテム更新テスト"""
+        url = reverse("fashionitem-detail", args=[fashion_item.id])
 
-        fashion_item = FashionItem.objects.latest("id")
-        assert fashion_item.brand is None
-        assert fashion_item.design is None
-        assert fashion_item.main_color is None
-        assert fashion_item.price_range is None
-        assert fashion_item.seasons.count() == 0
+        update_data = {"is_owned": False, "is_old_clothes": True, "seasons": [season.id], "image": test_image}
+
+        response = auth_client.patch(url, data=update_data, format="multipart")
+        assert response.status_code == status.HTTP_200_OK
+
+        # 更新されたアイテムを取得して検証
+        fashion_item.refresh_from_db()
+        assert not fashion_item.is_owned
+        assert fashion_item.is_old_clothes
+        assert list(fashion_item.seasons.values_list("id", flat=True)) == [season.id]
+
+    def test_delete_fashion_item(self, auth_client, fashion_item):
+        """アイテム削除テスト"""
+        url = reverse("fashionitem-detail", args=[fashion_item.id])
+        response = auth_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not FashionItem.objects.filter(id=fashion_item.id).exists()
+
+    def test_clear_seasons(self, auth_client, fashion_item):
+        """シーズンクリアテスト"""
+        assert fashion_item.seasons.exists()
+
+        url = reverse("fashionitem-detail", args=[fashion_item.id])
+        response = auth_client.patch(url, data={"seasons": []}, format="multipart")
+
+        assert response.status_code == status.HTTP_200_OK
+        fashion_item.refresh_from_db()
+        assert not fashion_item.seasons.exists()

@@ -17,6 +17,11 @@ export async function baseFetchAPI(endpoint: string, options: RequestInit = {}) 
     },
   });
 
+  // 204 No Content の場合は空オブジェクトを返す
+  if (response.status === 204) {
+    return {};
+  }
+
   // レスポンスが成功でない場合、エラーをスロー
   if (!response.ok) {
     const errorData = await response.json();

@@ -32,7 +32,7 @@ export default function BrandList({
                 'flex flex-col justify-center items-start h-auto',
                 selectedValue === brand.id.toString() && 'border-2 border-primary bg-primary/5',
               )}
-              onClick={() => onValueChange(brand.id.toString())}
+              onClick={() => onValueChange(brand)}
             >
               <span className="font-medium">{brand.brand_name}</span>
               <span className="text-[10px] text-gray-500 opacity-70">{brand.brand_name_kana}</span>

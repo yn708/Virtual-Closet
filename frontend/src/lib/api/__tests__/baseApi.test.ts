@@ -48,6 +48,22 @@ describe('API Utilities', () => {
       expect(result).toEqual(mockResponse);
     });
 
+    it('204 No Contentレスポンスを空オブジェクトとして処理する', async () => {
+      // 204レスポンスのモック
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 204,
+        json: () => Promise.resolve({}),
+      });
+
+      // テスト実行
+      const result = await baseFetchAPI('/test');
+
+      // 空オブジェクトが返されることを確認
+      expect(result).toEqual({});
+      expect(global.fetch).toHaveBeenCalledWith(`${BASE_URL}/test`, expect.any(Object));
+    });
+
     it('エラーレスポンスを適切に処理する', async () => {
       // エラーレスポンスのモック
       const errorResponse = { message: 'API Error' };

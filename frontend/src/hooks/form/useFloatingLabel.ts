@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { floatingLabelStyles as styles } from '@/styles/form/floating-label';
+import { floatingLabelStyles as styles } from '@/styles/form/floatingLabel';
 import { useState } from 'react';
 
 interface UseFloatingLabelProps {

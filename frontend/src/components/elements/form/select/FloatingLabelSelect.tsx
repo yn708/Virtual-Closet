@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import { useFloatingLabel } from '@/hooks/form/useFloatingLabel';
 import { cn } from '@/lib/utils';
-import { floatingLabelStyles as styles } from '@/styles/form/floating-label';
+import { floatingLabelStyles as styles } from '@/styles/form/floatingLabel';
 import type { FloatingLabelSelectProps } from '@/types';
 import ErrorMessageList from '../../error/ErrorMessageList';
 

@@ -3,7 +3,7 @@
  */
 import { baseFetchAuthAPI } from '@/lib/api/baseApi';
 import { fetchUserDataAPI, updateUserProfileAPI } from '@/lib/api/userApi';
-import { BASE_USER_DETAIL_ENDPOINT, BASE_USER_UPDATE_ENDPOINT } from '@/utils/constants';
+import { USER_DETAIL_ENDPOINT, USER_UPDATE_ENDPOINT } from '@/utils/constants';
 
 // baseFetchAuthAPIのモック
 jest.mock('@/lib/api/baseApi', () => ({
@@ -41,7 +41,7 @@ describe('User APIs', () => {
       const result = await fetchUserDataAPI();
 
       // 正しいエンドポイントでAPIが呼ばれたか確認
-      expect(baseFetchAuthAPI).toHaveBeenCalledWith(BASE_USER_DETAIL_ENDPOINT);
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(USER_DETAIL_ENDPOINT);
       expect(result).toEqual(mockUserData);
     });
 
@@ -80,7 +80,7 @@ describe('User APIs', () => {
 
       // 正しいエンドポイントとデータでAPIが呼ばれたか確認
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(
-        BASE_USER_UPDATE_ENDPOINT,
+        USER_UPDATE_ENDPOINT,
         expect.objectContaining({
           method: 'PUT',
           body: mockFormData,
@@ -101,7 +101,7 @@ describe('User APIs', () => {
 
       // 正しいエンドポイントとデータでAPIが呼ばれたか確認
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(
-        BASE_USER_UPDATE_ENDPOINT,
+        USER_UPDATE_ENDPOINT,
         expect.objectContaining({
           method: 'PUT',
           body: mockFormData,
@@ -125,7 +125,7 @@ describe('User APIs', () => {
 
       // 正しいエンドポイントとデータでAPIが呼ばれたか確認
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(
-        BASE_USER_UPDATE_ENDPOINT,
+        USER_UPDATE_ENDPOINT,
         expect.objectContaining({
           method: 'PUT',
           body: mockFormData,
