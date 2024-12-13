@@ -3,6 +3,8 @@ services:
   # フロントエンド（React/Next.js）
   frontend:
     container_name: VC_frontend
+    restart: unless-stopped
+
     build:
       context: ./frontend
       dockerfile: Dockerfile

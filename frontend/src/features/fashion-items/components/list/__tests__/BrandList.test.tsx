@@ -76,7 +76,7 @@ describe('BrandList', () => {
     render(<BrandList {...defaultProps} onValueChange={onValueChange} />);
 
     fireEvent.click(screen.getByText('Nike'));
-    expect(onValueChange).toHaveBeenCalledWith('1');
+    expect(onValueChange).toHaveBeenCalledWith(mockBrands[0]);
   });
 
   it('未選択ボタンをクリックしたときに空文字が渡されること', () => {

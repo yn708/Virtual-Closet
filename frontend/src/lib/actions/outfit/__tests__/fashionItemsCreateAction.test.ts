@@ -1,16 +1,16 @@
 /**
  * @jest-environment node
  */
-import { registerFashionItem } from '@/lib/api/fashionItemsApi';
 import type { FormState } from '@/types';
 import { TOP_URL } from '@/utils/constants';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { fashionItemsCreateAction } from '../fashionItemsCreateAction';
+import { registerFashionItemAPI } from '@/lib/api/fashionItemsApi';
 
 // 外部依存のモック
 jest.mock('@/lib/api/fashionItemsApi', () => ({
-  registerFashionItem: jest.fn(),
+  registerFashionItemAPI: jest.fn(),
 }));
 
 jest.mock('next/cache', () => ({
@@ -43,7 +43,7 @@ describe('fashionItemsCreateAction', () => {
     mockFormData.append('image', mockFile);
 
     // APIレスポンスのモック
-    (registerFashionItem as jest.Mock).mockResolvedValueOnce({ success: true });
+    (registerFashionItemAPI as jest.Mock).mockResolvedValueOnce({ success: true });
 
     // リダイレクトをテスト
     await expect(fashionItemsCreateAction({} as FormState, mockFormData)).rejects.toThrow(
@@ -51,7 +51,7 @@ describe('fashionItemsCreateAction', () => {
     );
 
     // API呼び出しとリダイレクトを検証
-    expect(registerFashionItem).toHaveBeenCalled();
+    expect(registerFashionItemAPI).toHaveBeenCalled();
     expect(revalidatePath).toHaveBeenCalledWith(TOP_URL);
     expect(redirect).toHaveBeenCalledWith(TOP_URL);
   });
@@ -69,7 +69,7 @@ describe('fashionItemsCreateAction', () => {
       errors: expect.any(Object),
       success: false,
     });
-    expect(registerFashionItem).not.toHaveBeenCalled();
+    expect(registerFashionItemAPI).not.toHaveBeenCalled();
   });
 
   it('APIエラーを適切に処理する', async () => {
@@ -84,13 +84,13 @@ describe('fashionItemsCreateAction', () => {
     mockFormData.append('image', mockFile);
 
     const errorMessage = '予期せぬエラーが発生しました';
-    (registerFashionItem as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+    (registerFashionItemAPI as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
 
     await expect(fashionItemsCreateAction({} as FormState, mockFormData)).rejects.toThrow(
       errorMessage,
     );
 
-    expect(registerFashionItem).toHaveBeenCalled();
+    expect(registerFashionItemAPI).toHaveBeenCalled();
   });
 
   it('シーズンの複数選択を正しく処理する', async () => {
@@ -106,7 +106,7 @@ describe('fashionItemsCreateAction', () => {
     mockFormData.append('is_old_clothes', 'false');
     mockFormData.append('image', mockFile);
 
-    (registerFashionItem as jest.Mock).mockImplementationOnce(async (formData: FormData) => {
+    (registerFashionItemAPI as jest.Mock).mockImplementationOnce(async (formData: FormData) => {
       expect(formData.getAll('seasons')).toEqual(['spring', 'summer', 'autumn', 'winter']);
       return { success: true };
     });
@@ -127,7 +127,7 @@ describe('fashionItemsCreateAction', () => {
     mockFormData.append('is_old_clothes', 'false');
     mockFormData.append('image', mockFile);
 
-    (registerFashionItem as jest.Mock).mockImplementationOnce(async (formData: FormData) => {
+    (registerFashionItemAPI as jest.Mock).mockImplementationOnce(async (formData: FormData) => {
       expect(formData.get('is_owned')).toBe('true');
       expect(formData.get('is_old_clothes')).toBe('false');
       return { success: true };

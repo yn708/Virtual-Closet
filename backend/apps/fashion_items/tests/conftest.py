@@ -1,12 +1,31 @@
+import io
+import shutil
 import uuid
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import CustomUser
 from apps.fashion_items.models import Brand, Category, Color, Design, FashionItem, PriceRange, Season, SubCategory
+
+
+@pytest.fixture(autouse=True)
+def media_storage(settings, tmp_path):
+    """
+    テスト用のメディアルートを一時ディレクトリに設定し、
+    テスト終了後にクリーンアップを行う
+    """
+    settings.MEDIA_ROOT = tmp_path / "media"
+    settings.MEDIA_URL = "/media/"
+    settings.MEDIA_ROOT.mkdir()
+
+    yield  # テストを実行
+
+    # テスト終了後にメディアディレクトリを削除
+    shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
 
 
 def generate_unique_id():
@@ -80,12 +99,6 @@ def price_range():
 
 
 @pytest.fixture
-def sample_image():
-    """テスト用画像を作成"""
-    return SimpleUploadedFile(name="test_image.jpg", content=b"file_content", content_type="image/jpeg")
-
-
-@pytest.fixture
 def fashion_item(user, subcategory, brand, season, design, color, price_range, sample_image):
     """テスト用ファッションアイテムを作成"""
     item = FashionItem.objects.create(
@@ -126,9 +139,19 @@ def auth_client(api_client, auth_token):
 
 
 @pytest.fixture
-def test_image():
-    """テスト用画像ファイル"""
-    content = (
-        b"GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00ccc,\x00" b"\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
-    )
-    return SimpleUploadedFile("test.gif", content, content_type="image/gif")
+def test_image(media_storage):
+    """
+    PIL を使用して実際の画像ファイルを作成
+    """
+    file = io.BytesIO()
+    image = Image.new("RGB", (100, 100), "white")
+    image.save(file, "jpeg")
+    file.name = "test.jpg"
+    file.seek(0)
+    return SimpleUploadedFile(name=file.name, content=file.read(), content_type="image/jpeg")
+
+
+@pytest.fixture
+def sample_image(media_storage):
+    """テスト用画像を作成"""
+    return SimpleUploadedFile(name="test_image.jpg", content=b"file_content", content_type="image/jpeg")

@@ -3,6 +3,7 @@
  */
 import { updateUserProfileAPI } from '@/lib/api/userApi';
 import type { FormStateWithChange, UserType } from '@/types';
+import { MY_PAGE_URL } from '@/utils/constants';
 import { revalidatePath } from 'next/cache';
 import { profileUpdateAction } from '../profileUpdateAction';
 
@@ -73,7 +74,7 @@ describe('profileUpdateAction', () => {
       success: true,
       hasChanges: true,
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/');
+    expect(revalidatePath).toHaveBeenCalledWith(MY_PAGE_URL, 'layout');
   });
 
   it('プロフィール画像の削除を正しく処理する', async () => {
@@ -97,6 +98,7 @@ describe('profileUpdateAction', () => {
     expect(apiFormDataCalls.get('delete_profile_image')).toBe('true');
     expect(result.success).toBe(true);
     expect(result.hasChanges).toBe(true);
+    expect(revalidatePath).toHaveBeenCalledWith(MY_PAGE_URL, 'layout');
   });
 
   it('生年月日の削除を正しく処理する', async () => {
@@ -120,6 +122,7 @@ describe('profileUpdateAction', () => {
     expect(apiFormDataCalls.get('delete_birth_date')).toBe('true');
     expect(result.success).toBe(true);
     expect(result.hasChanges).toBe(true);
+    expect(revalidatePath).toHaveBeenCalledWith(MY_PAGE_URL, 'layout');
   });
 
   it('新しいプロフィール画像のアップロードを正しく処理する', async () => {
@@ -143,6 +146,7 @@ describe('profileUpdateAction', () => {
     expect(apiFormDataCalls.get('profile_image')).toBeInstanceOf(File);
     expect(result.success).toBe(true);
     expect(result.hasChanges).toBe(true);
+    expect(revalidatePath).toHaveBeenCalledWith(MY_PAGE_URL, 'layout');
   });
 
   it('変更がない場合は API を呼び出さない', async () => {
@@ -219,6 +223,7 @@ describe('profileUpdateAction', () => {
     expect(apiFormDataCalls.get('height')).toBe('165');
     expect(result.success).toBe(true);
     expect(result.hasChanges).toBe(true);
+    expect(revalidatePath).toHaveBeenCalledWith(MY_PAGE_URL, 'layout');
   });
 
   it('API エラーを適切に処理する', async () => {
@@ -227,8 +232,9 @@ describe('profileUpdateAction', () => {
       name: 'New Name',
     });
 
-    const errorMessage = '予期せぬエラーが発生しました';
-    (updateUserProfileAPI as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+    (updateUserProfileAPI as jest.Mock).mockRejectedValueOnce(
+      new Error('予期せぬエラーが発生しました'),
+    );
 
     const result = await profileUpdateAction(
       {} as FormStateWithChange,
@@ -238,7 +244,7 @@ describe('profileUpdateAction', () => {
     );
 
     expect(result).toEqual({
-      message: errorMessage,
+      message: '予期せぬエラーが発生しました',
       errors: null,
       success: false,
     });

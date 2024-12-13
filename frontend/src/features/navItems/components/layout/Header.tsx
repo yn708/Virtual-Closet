@@ -13,7 +13,7 @@ import ThemeToggleButton from '@/features/navItems/components/elements/button/Th
 import { HEADER_NAV_ITEMS } from '@/utils/data/navItems';
 import React from 'react';
 import { TbMenuDeep } from 'react-icons/tb';
-import AddFashionContentSheet from '../elements/sheet/addFashionContentSheet';
+import AddFashionContentDrawer from '../elements/drawer/AddFashionContentDrawer';
 
 const Header = () => {
   return (
@@ -29,7 +29,7 @@ const Header = () => {
             showText={false}
           />
           {/* 追加ボタン（真ん中に配置） */}
-          {index === 1 && <AddFashionContentSheet />}
+          {index === 1 && <AddFashionContentDrawer />}
         </React.Fragment>
       ))}
       {/* その他のメニュー */}

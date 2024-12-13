@@ -1,5 +1,8 @@
+import os
+
 import pytest
 from conftest import generate_unique_id
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 
 from apps.fashion_items.models import Brand, Category, Color, Design, FashionItem, PriceRange, Season, SubCategory
@@ -174,3 +177,28 @@ class TestFashionItem:
         fashion_item.save()
         updated_item = FashionItem.objects.get(pk=fashion_item.id)
         assert updated_item.is_old_clothes is True
+
+    def test_delete_with_image(self, fashion_item, media_storage):
+        """画像ファイル削除のテスト"""
+        # テスト用の画像ファイルを作成
+        image_content = b"test image content"
+        image = SimpleUploadedFile("test_delete.jpg", image_content, content_type="image/jpeg")
+
+        # 新しいファッションアイテムを作成
+        item = FashionItem.objects.create(user=fashion_item.user, sub_category=fashion_item.sub_category, image=image)
+
+        image_path = item.image.path
+        assert os.path.exists(image_path)
+        item.delete()
+        assert not os.path.exists(image_path)
+
+    def test_delete_without_image(self, fashion_item):
+        """画像なしでの削除テスト"""
+        # 画像なしのアイテムを作成
+        item = FashionItem.objects.create(user=fashion_item.user, sub_category=fashion_item.sub_category, image=None)
+
+        # エラーが発生しないことを確認
+        try:
+            item.delete()
+        except Exception as e:
+            pytest.fail(f"Unexpected error occurred: {e}")

@@ -2,6 +2,7 @@
 
 import { updateUserProfileAPI } from '@/lib/api/userApi';
 import type { FormStateWithChange, UserType } from '@/types';
+import { MY_PAGE_URL } from '@/utils/constants';
 import { profileUpdateFormSchema } from '@/utils/validations/user-validation';
 import { revalidatePath } from 'next/cache';
 
@@ -99,7 +100,7 @@ export async function profileUpdateAction(
     // 変更がある場合のみ送信実行
     if (hasChanges) {
       await updateUserProfileAPI(apiFormData);
-      revalidatePath('/');
+      revalidatePath(MY_PAGE_URL, 'layout');
       return {
         message: '更新が完了しました',
         errors: null,

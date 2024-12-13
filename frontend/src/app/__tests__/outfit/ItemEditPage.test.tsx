@@ -2,11 +2,11 @@
  * @jest-environment node
  */
 import ItemEditPage from '@/app/(protected)/outfit/item/edit/page';
-import { fetchFashionItemMetaDataAPI } from '@/lib/api/fashionItemsApi';
+import { fetchFashionMetaDataAPI } from '@/lib/api/fashionItemsApi';
 
 // モックの設定
 jest.mock('@/lib/api/fashionItemsApi', () => ({
-  fetchFashionItemMetaDataAPI: jest.fn(),
+  fetchFashionMetaDataAPI: jest.fn(),
 }));
 
 jest.mock('@/features/fashion-items/components/form/ItemEditorForm', () => ({
@@ -36,7 +36,7 @@ describe('ItemEditPage', () => {
 
   it('メタデータを取得してフォームコンポーネントを表示する', async () => {
     // APIモックの戻り値を設定
-    (fetchFashionItemMetaDataAPI as jest.Mock).mockResolvedValue(mockMetaData);
+    (fetchFashionMetaDataAPI as jest.Mock).mockResolvedValue(mockMetaData);
 
     // ページコンポーネントをレンダリング
     const page = await ItemEditPage();
@@ -48,7 +48,7 @@ describe('ItemEditPage', () => {
   it('APIエラー時に適切に処理する', async () => {
     // APIエラーをモック
     const error = new Error('Failed to fetch meta data');
-    (fetchFashionItemMetaDataAPI as jest.Mock).mockRejectedValue(error);
+    (fetchFashionMetaDataAPI as jest.Mock).mockRejectedValue(error);
 
     // エラーがスローされることを確認
     await expect(ItemEditPage()).rejects.toThrow('Failed to fetch meta data');
@@ -56,7 +56,7 @@ describe('ItemEditPage', () => {
 
   it('正しいレイアウトでレンダリングされる', async () => {
     // APIモックの戻り値を設定
-    (fetchFashionItemMetaDataAPI as jest.Mock).mockResolvedValue(mockMetaData);
+    (fetchFashionMetaDataAPI as jest.Mock).mockResolvedValue(mockMetaData);
 
     // ページコンポーネントをレンダリング
     const page = await ItemEditPage();

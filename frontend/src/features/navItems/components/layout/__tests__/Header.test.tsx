@@ -23,7 +23,7 @@ jest.mock('@/components/elements/link/IconLink', () => {
   };
 });
 
-jest.mock('@/features/navItems/components/elements/sheet/addFashionContentSheet', () => ({
+jest.mock('@/features/navItems/components/elements/drawer/AddFashionContentDrawer', () => ({
   __esModule: true,
   default: () => <button data-testid="add-fashion-content">Add Content</button>,
 }));

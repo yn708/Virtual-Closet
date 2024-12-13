@@ -17,7 +17,7 @@ export interface Category extends IdType {
 export interface Brand extends IdType {
   brand_name: string;
   brand_name_kana: string;
-  is_popular: boolean;
+  is_popular?: boolean;
 }
 
 export interface Season extends BaseOption, IdType {
@@ -37,10 +37,6 @@ export interface PriceRange extends BaseOption, IdType {
   price_range: string;
 }
 
-/* ----------------------------------------------------------------
-ファッションアイテム
------------------------------------------------------------------- */
-
 export interface MetaDataType {
   categories: Category[];
   seasons: Season[];
@@ -48,4 +44,22 @@ export interface MetaDataType {
   colors: Color[];
   price_ranges: PriceRange[];
   popular_brands: Brand[];
+}
+/* ----------------------------------------------------------------
+ファッションアイテム
+------------------------------------------------------------------ */
+// 詳細取得（必要なデータのみ取得）
+export interface FashionItem {
+  id: string;
+  image: string;
+  sub_category: { id: string; subcategory_name: string };
+  brand: { id: string; brand_name: string; brand_name_kana: string } | null;
+  seasons: [{ id: string; season_name: string }];
+  price_range: { id: string; price_range: string } | null;
+  design: { id: string; design_pattern: string } | null;
+  main_color: { id: string; color_name: string; color_code: string } | null;
+  is_owned: boolean;
+  is_old_clothes: boolean;
+  created_at: Date;
+  updated_at: Date;
 }

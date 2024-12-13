@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 
 from apps.accounts.models import CustomUser
@@ -95,3 +97,10 @@ class FashionItem(models.Model):
         sub_category_name = self.sub_category.subcategory_name if self.sub_category else "No Subcategory"
         ownership = "Owned" if self.is_owned else "Not Owned"
         return f"{brand_name} - {sub_category_name} ({ownership})"
+
+    def delete(self, *args, **kwargs):
+        # 画像ファイルを削除
+        if self.image:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+        super().delete(*args, **kwargs)
