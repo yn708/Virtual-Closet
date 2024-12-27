@@ -6,7 +6,7 @@ import type { FormState } from '@/types';
 import { COORDINATE_CREATE_URL, TOP_URL } from '@/utils/constants';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { photoCoordinateCreateAction } from '../PhotoCoordinateCreateAction';
+import { photoCoordinateCreateAction } from '../photoCoordinateCreateAction';
 
 // 外部依存のモック
 jest.mock('@/lib/api/coordinateApi', () => ({
