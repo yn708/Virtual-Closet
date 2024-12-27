@@ -2,13 +2,16 @@
 
 <!-- 初期データファイル（JSON）作成 -->
 
-python scripts/generate_brand_fixtures.py
-python scripts/generate_category_fixtures.py
-python scripts/generate_color_fixtures.py
-python scripts/generate_design_fixtures.py
-python scripts/generate_pricerange_fixtures.py
-python scripts/generate_season_fixtures.py
-python scripts/generate_subcategory_fixtures.py
+python scripts/fashion_items/generate_brand_fixtures.py
+python scripts/fashion_items/generate_category_fixtures.py
+python scripts/fashion_items/generate_color_fixtures.py
+python scripts/fashion_items/generate_design_fixtures.py
+python scripts/fashion_items/generate_pricerange_fixtures.py
+python scripts/fashion_items/generate_season_fixtures.py
+python scripts/fashion_items/generate_subcategory_fixtures.py
+
+python scripts/coordinate/generate_scene_fixtures.py
+python scripts/coordinate/generate_taste_fixtures.py
 
 <!-- データがクリアされるので注意 -->
 <!-- 投入コマンド -->
@@ -21,3 +24,6 @@ python manage.py loaddata initial_design_data.json
 python manage.py loaddata initial_pricerange_data.json
 python manage.py loaddata initial_color_data.json
 python manage.py loaddata initial_season_data.json
+
+python manage.py loaddata initial_scene_data.json
+python manage.py loaddata initial_taste_data.json

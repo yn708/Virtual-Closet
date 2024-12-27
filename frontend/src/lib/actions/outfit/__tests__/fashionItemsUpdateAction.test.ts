@@ -33,7 +33,7 @@ describe('fashionItemsUpdateAction', () => {
   const mockInitialData: FashionItem = {
     id: '1',
     image: 'test-image.jpg',
-    sub_category: { id: '1', subcategory_name: 'Tシャツ' },
+    sub_category: { id: '1', subcategory_name: 'Tシャツ', category: 'tops' },
     brand: { id: '1', brand_name: 'ブランドA', brand_name_kana: 'ブランドエー' },
     seasons: [{ id: 'spring', season_name: '春' }], // IDを修正
     price_range: { id: '1', price_range: '1000-3000' },

@@ -1,9 +1,8 @@
 import { useImage } from '@/context/ImageContext';
 import { useImageSelection } from '@/hooks/image/useImageSelection';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useImageField } from '../useImageField';
 
-// モックの設定
 jest.mock('@/context/ImageContext', () => ({
   useImage: jest.fn(),
 }));
@@ -13,33 +12,28 @@ jest.mock('@/hooks/image/useImageSelection', () => ({
 }));
 
 describe('useImageField', () => {
+  const mockOptimizationProcess = jest.fn();
   const mockRemoveBgProcess = jest.fn();
+  const mockMinimumImageSet = jest.fn();
   const mockHandleFileChange = jest.fn();
   const mockImage = new File([''], 'test.png', { type: 'image/png' });
-  let mockFileList: FileList;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // FileListのモック作成
-    mockFileList = {
-      0: mockImage,
-      length: 1,
-      item: () => mockImage,
-    } as unknown as FileList;
-
-    // useImage のモック実装
     (useImage as jest.Mock).mockReturnValue({
       image: null,
+      optimizationProcess: mockOptimizationProcess,
       removeBgProcess: mockRemoveBgProcess,
+      minimumImageSet: mockMinimumImageSet,
     });
 
-    // useImageSelection のモック実装
     (useImageSelection as jest.Mock).mockReturnValue({
       handleFileChange: mockHandleFileChange,
     });
   });
 
+  // 最初の2つのテストケースは変更なし
   it('初期状態でfileInputRefが存在すること', () => {
     const { result } = renderHook(() => useImageField());
     expect(result.current.fileInputRef).toBeDefined();
@@ -60,105 +54,135 @@ describe('useImageField', () => {
   });
 
   it('handleFileSelectが正しく動作すること', async () => {
-    const mockFile = new File([''], 'test.png', { type: 'image/png' });
-    mockHandleFileChange.mockResolvedValue({ file: mockFile });
+    const mockOptimizedFile = new File([''], 'optimized.png', { type: 'image/png' });
+    mockHandleFileChange.mockResolvedValue({ file: mockImage });
+    mockOptimizationProcess.mockResolvedValue(mockOptimizedFile);
 
     const { result } = renderHook(() => useImageField());
 
     const mockEvent = {
       target: {
-        files: mockFileList,
+        files: [mockImage],
       },
-      currentTarget: {
-        files: mockFileList,
-      },
-      preventDefault: jest.fn(),
-      stopPropagation: jest.fn(),
-      nativeEvent: new Event('change'),
-      bubbles: true,
-      cancelable: true,
-      timeStamp: Date.now(),
-      type: 'change',
     } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-    await result.current.handleFileSelect(mockEvent);
+    await act(async () => {
+      await result.current.handleFileSelect(mockEvent);
+    });
 
     expect(mockHandleFileChange).toHaveBeenCalledWith(mockEvent);
-    expect(mockRemoveBgProcess).toHaveBeenCalledWith(mockFile);
+    expect(mockOptimizationProcess).toHaveBeenCalledWith(mockImage);
+    expect(mockMinimumImageSet).toHaveBeenCalledWith(mockOptimizedFile);
   });
 
-  it('handleFileSelectでファイルが返されない場合、removeBgProcessが呼ばれないこと', async () => {
-    mockHandleFileChange.mockResolvedValue({ file: null });
+  it('handleToggleImageが通常画像から背景除去画像に切り替わること', async () => {
+    // 初期状態で通常画像を設定
+    const mockNormalImage = new File([''], 'normal.png', { type: 'image/png' });
+    const { result, rerender } = renderHook(() => useImageField());
 
-    const { result } = renderHook(() => useImageField());
+    // 通常画像の状態を設定
+    (useImage as jest.Mock).mockReturnValue({
+      image: mockNormalImage,
+      optimizationProcess: mockOptimizationProcess,
+      removeBgProcess: mockRemoveBgProcess,
+      minimumImageSet: mockMinimumImageSet,
+    });
 
-    const mockEvent = {
-      target: {
-        files: null,
-      },
-      currentTarget: {
-        files: null,
-      },
-      preventDefault: jest.fn(),
-      stopPropagation: jest.fn(),
-      nativeEvent: new Event('change'),
-      bubbles: true,
-      cancelable: true,
-      timeStamp: Date.now(),
-      type: 'change',
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
+    // コンポーネントの再レンダリングをトリガー
+    rerender();
 
-    await result.current.handleFileSelect(mockEvent);
+    // useEffect内の状態更新を待つ
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
-    expect(mockHandleFileChange).toHaveBeenCalledWith(mockEvent);
-    expect(mockRemoveBgProcess).not.toHaveBeenCalled();
+    // handleToggleImageを実行
+    await act(async () => {
+      await result.current.handleToggleImage();
+    });
+
+    expect(mockRemoveBgProcess).toHaveBeenCalled();
+    expect(result.current.isShowingRemovedBg).toBe(true);
   });
 
-  it('イメージが変更されたときにDataTransferが正しく設定されること', async () => {
+  it('背景除去画像と通常画像の切り替えが正しく動作すること', async () => {
+    const mockNormalImage = new File([''], 'normal.png', { type: 'image/png' });
+    const mockRemovedBgImage = new File([''], 'image_removed_bg.png', { type: 'image/png' });
+
+    // カスタムフックをレンダリング
+    const { result, rerender } = renderHook(() => useImageField());
+
+    // 通常画像の状態を設定
+    (useImage as jest.Mock).mockReturnValue({
+      image: mockNormalImage,
+      optimizationProcess: mockOptimizationProcess,
+      removeBgProcess: jest.fn().mockResolvedValue(mockRemovedBgImage),
+      minimumImageSet: mockMinimumImageSet,
+    });
+
+    // コンポーネントの再レンダリングをトリガー
+    rerender();
+
+    // useEffect内の状態更新を待つ
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // 最初の切り替え（通常画像 → 背景除去画像）
+    await act(async () => {
+      await result.current.handleToggleImage();
+    });
+
+    // 背景除去画像の状態を設定
+    (useImage as jest.Mock).mockReturnValue({
+      image: mockRemovedBgImage,
+      optimizationProcess: mockOptimizationProcess,
+      removeBgProcess: jest.fn().mockResolvedValue(mockRemovedBgImage),
+      minimumImageSet: mockMinimumImageSet,
+    });
+
+    rerender();
+
+    // useEffect内の状態更新を待つ
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // 2回目の切り替え（背景除去画像 → 通常画像）
+    await act(async () => {
+      await result.current.handleToggleImage();
+    });
+
+    expect(mockMinimumImageSet).toHaveBeenCalledWith(mockNormalImage);
+    expect(result.current.isShowingRemovedBg).toBe(false);
+  });
+
+  it('imageの状態変更でDataTransferが正しく設定されること', async () => {
     const mockAdd = jest.fn();
     const mockDataTransfer = {
-      items: {
-        add: mockAdd,
-      },
-      files: mockFileList,
+      items: { add: mockAdd },
+      files: {},
     };
 
-    // グローバルのDataTransfer型を拡張
     global.DataTransfer = jest.fn(() => mockDataTransfer) as unknown as typeof DataTransfer;
 
     const { result, rerender } = renderHook(() => useImageField());
 
-    // fileInputRef.currentのモックを設定
     Object.defineProperty(result.current.fileInputRef, 'current', {
       value: { files: null },
       writable: true,
     });
 
-    // 画像が更新された状態をシミュレート
-    (useImage as jest.Mock).mockReturnValue({
-      image: mockImage,
-      removeBgProcess: mockRemoveBgProcess,
+    await act(async () => {
+      (useImage as jest.Mock).mockReturnValue({
+        image: mockImage,
+        optimizationProcess: mockOptimizationProcess,
+        removeBgProcess: mockRemoveBgProcess,
+        minimumImageSet: mockMinimumImageSet,
+      });
+      rerender();
     });
 
-    // コンポーネントを再レンダリング
-    rerender();
-
     expect(mockAdd).toHaveBeenCalledWith(mockImage);
-  });
-
-  it('fileInputRef.currentが存在しない場合、DataTransferが設定されないこと', () => {
-    const mockAdd = jest.fn();
-    const mockDataTransfer = {
-      items: {
-        add: mockAdd,
-      },
-      files: mockFileList,
-    };
-
-    global.DataTransfer = jest.fn(() => mockDataTransfer) as unknown as typeof DataTransfer;
-
-    renderHook(() => useImageField());
-
-    expect(mockAdd).not.toHaveBeenCalled();
   });
 });

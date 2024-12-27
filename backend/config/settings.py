@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # 追加
+    "corsheaders",
     # 認証系
     "django.contrib.sites",
     "rest_framework",
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.image_processing",
     "apps.fashion_items",
+    "apps.coordinate",
 ]
 
 
@@ -105,6 +107,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -136,6 +139,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+CORS_ALLOW_ALL_ORIGINS = True  # 開発時のみ。本番環境では具体的なオリジンを指定してください。
 
 
 DATABASES = {

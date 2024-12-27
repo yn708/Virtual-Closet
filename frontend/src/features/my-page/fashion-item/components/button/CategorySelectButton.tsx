@@ -20,7 +20,10 @@ const CategorySelectButton = ({
         const isSelected = category.id === selectedId;
 
         const buttonBaseStyles = 'h-auto flex items-center justify-start transition-all';
-        const buttonSizeStyles = size === 'small' ? 'gap-3 py-3 px-4' : 'gap-4 py-6 md:py-10';
+        const buttonSizeStyles =
+          size === 'small'
+            ? 'gap-3 py-3 pl-5 md:pl-10'
+            : 'gap-2 md:gap-4 pl-5 md:pl-10 py-6 md:py-10';
 
         const selectedStyles = isSelected
           ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-500 hover:text-white'
@@ -40,7 +43,7 @@ const CategorySelectButton = ({
             {CategoryIcon && (
               <CategoryIcon
                 className={`
-                  ${size === 'small' ? 'size-4' : 'size-5'}
+                  ${size === 'small' ? 'size-3 md:size-4' : 'size-4 md:size-5'}
                   transition-opacity
                   ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}
                 `}
@@ -48,7 +51,7 @@ const CategorySelectButton = ({
             )}
             <span
               className={`
-              text-sm font-medium
+              text-xs md:text-sm font-medium text-wrap
               ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}
               transition-colors duration-200
             `}

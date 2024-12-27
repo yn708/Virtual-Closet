@@ -17,7 +17,7 @@ jest.mock('@/lib/api/imageApi', () => ({
 jest.mock('@/utils/imageUtils', () => ({
   compressImage: jest.fn().mockImplementation((file) => Promise.resolve(file)),
   conversionImage: jest.fn().mockImplementation((file) => Promise.resolve(file)),
-  dataURLtoFile: jest.fn().mockImplementation(() => new File([''], 'test.png')),
+  dataURLtoFile: jest.fn().mockImplementation(() => new File([''], 'test_removed_bg.png')),
 }));
 
 // URLユーティリティのモック
@@ -72,6 +72,24 @@ describe('ImageProvider', () => {
     expect(mockCreateObjectURL).toHaveBeenCalledWith(testFile);
   });
 
+  // 画像の最適化処理テスト
+  it('handles image optimization correctly', async () => {
+    const { result } = renderHook(() => useImage(), {
+      wrapper: ImageProvider,
+    });
+
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+
+    await act(async () => {
+      await result.current.optimizationProcess(testFile);
+    });
+
+    expect(compressImage).toHaveBeenCalled();
+    expect(result.current.isProcessing).toBe(false);
+    expect(result.current.image).toBeTruthy();
+    expect(result.current.preview).toBe('mock-url');
+  });
+
   // HEIC画像の最適化処理テスト
   it('handles HEIC image optimization', async () => {
     const { result } = renderHook(() => useImage(), {
@@ -81,7 +99,7 @@ describe('ImageProvider', () => {
     const heicFile = new File(['test'], 'test.heic', { type: 'image/heic' });
 
     await act(async () => {
-      result.current.optimizationProcess(heicFile);
+      await result.current.optimizationProcess(heicFile);
     });
 
     expect(conversionImage).toHaveBeenCalledWith(heicFile);
@@ -90,21 +108,41 @@ describe('ImageProvider', () => {
   });
 
   // 背景除去処理のテスト
-  it('handles removeBgProcess correctly', async () => {
-    const { result } = renderHook(() => useImage(), {
-      wrapper: ImageProvider,
+  describe('removeBgProcess', () => {
+    it('handles new image correctly', async () => {
+      const { result } = renderHook(() => useImage(), {
+        wrapper: ImageProvider,
+      });
+
+      const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+
+      await act(async () => {
+        await result.current.removeBgProcess(testFile);
+      });
+
+      expect(removeBackgroundAPI).toHaveBeenCalled();
+      expect(result.current.image).toBeTruthy();
+      expect(result.current.preview).toBe('mock-url');
+      expect(result.current.isProcessing).toBe(false);
     });
 
-    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+    it('handles already processed image correctly', async () => {
+      const { result } = renderHook(() => useImage(), {
+        wrapper: ImageProvider,
+      });
 
-    await act(async () => {
-      result.current.removeBgProcess(testFile);
+      const processedFile = new File(['test'], 'test_removed_bg.png', { type: 'image/png' });
+
+      await act(async () => {
+        await result.current.removeBgProcess(processedFile);
+      });
+
+      expect(removeBackgroundAPI).not.toHaveBeenCalled();
+      expect(compressImage).toHaveBeenCalled();
+      expect(result.current.image).toBeTruthy();
+      expect(result.current.preview).toBe('mock-url');
+      expect(result.current.isProcessing).toBe(false);
     });
-
-    expect(removeBackgroundAPI).toHaveBeenCalled();
-    expect(result.current.image).toBeTruthy();
-    expect(result.current.preview).toBe('mock-url');
-    expect(result.current.isProcessing).toBe(false);
   });
 
   // クリア機能のテスト
@@ -116,7 +154,7 @@ describe('ImageProvider', () => {
     const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
 
     await act(async () => {
-      result.current.minimumImageSet(testFile);
+      await result.current.minimumImageSet(testFile);
     });
 
     act(() => {
@@ -142,7 +180,8 @@ describe('ImageProvider', () => {
     const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
 
     await act(async () => {
-      result.current.removeBgProcess(testFile);
+      const resultFile = await result.current.removeBgProcess(testFile);
+      expect(resultFile).toBeNull();
     });
 
     expect(consoleErrorSpy).toHaveBeenCalled();

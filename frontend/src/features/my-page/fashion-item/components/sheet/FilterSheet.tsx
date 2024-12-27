@@ -47,7 +47,7 @@ const FilterSheet = ({
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-full max-w-full sm:max-w-[400px]">
+      <SheetContent side="left" className="w-full max-w-full sm:max-w-[500px]">
         <SheetHeader>
           <SheetTitle>絞り込み</SheetTitle>
           <SheetDescription>項目を選び、適応ボタンを押してください。</SheetDescription>
@@ -86,7 +86,11 @@ const FilterSheet = ({
             <Button variant="outline" type="button" onClick={handleReset} className="flex-1">
               リセット
             </Button>
-            <Button onClick={handleApplyFilters} type="button" className="flex-1 bg-gray-800">
+            <Button
+              onClick={handleApplyFilters}
+              type="button"
+              className="flex-1 bg-gray-800 dark:bg-gray-200"
+            >
               適用
             </Button>
           </div>

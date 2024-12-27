@@ -11,7 +11,7 @@ const ImageContext = createContext<UseImageType | undefined>(undefined);
 export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [image, setImage] = useState<File | null>(null); // 現在の画像
   const [preview, setPreview] = useState<string | null>(null); // プレビュー（URL）
-  const [isProcessing, setIsProcessing] = useState(false); // 処理中の状態
+  const [isProcessing, setIsProcessing] = useState<boolean>(false); // 処理中の状態
 
   /*----------------------------------------------------------------------------
   すべての画像をクリアする関数
@@ -31,11 +31,12 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   2. プレビューを作成
   3. setImage・setPreviewで画像・プレビューを最新化
   ----------------------------------------------------------------------------*/
-  const minimumImageSet = async (file: File) => {
+  const minimumImageSet = async (file: File): Promise<File> => {
     clearImage();
     const newPreview = URL.createObjectURL(file);
     setImage(file);
     setPreview(newPreview);
+    return file;
   };
 
   /*----------------------------------------------------------------------------
@@ -46,7 +47,7 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   4. プレビューを作成
   5. setImage・setPreviewで画像・プレビューを最新化
   ----------------------------------------------------------------------------*/
-  const optimizationProcess = async (file: File) => {
+  const optimizationProcess = async (file: File): Promise<File | null> => {
     // 1. clearImage（既存の画像を削除）
     clearImage();
     setIsProcessing(true);
@@ -65,8 +66,10 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // 5. setImage・setPreviewで画像・プレビューを最新化
       setImage(compressedImage);
       setPreview(newPreview);
+      return compressedImage;
     } catch (error) {
       console.error('Error processing image:', error);
+      return null;
     } finally {
       setIsProcessing(false);
     }
@@ -81,7 +84,33 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   5 .プレビューを作成
   6. setImage・setPreviewで画像・プレビューを最新化
   ----------------------------------------------------------------------------*/
-  const removeBgProcess = async (file: File) => {
+  const removeBgProcess = async (file: File): Promise<File | null> => {
+    // ファイル名から背景除去済みかどうかをチェック
+    const isAlreadyProcessed = file.name.includes('_removed_bg');
+
+    // すでに背景除去済みの場合は最適化のみを行う
+    if (isAlreadyProcessed) {
+      setIsProcessing(true);
+      try {
+        // HEIC変換と圧縮のみ実行
+        const convertedFile =
+          file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
+            ? await conversionImage(file)
+            : file;
+
+        const compressedImage = await compressImage(convertedFile);
+        const newPreview = URL.createObjectURL(compressedImage);
+
+        setImage(compressedImage);
+        setPreview(newPreview);
+        return compressedImage;
+      } catch (error) {
+        console.error('Error processing already removed background image:', error);
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+
     // 1. clearImage（既存の画像を削除）
     clearImage();
     setIsProcessing(true);
@@ -110,11 +139,13 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         // 6. setImage・setPreviewで画像・プレビューを最新化
         setPreview(newPreview);
         setImage(removedBg);
+        return removedBg;
       } else {
         throw new Error(result.message || '被写体抽出に失敗しました');
       }
     } catch (error) {
       console.error('Error processing image:', error);
+      return null;
     } finally {
       setIsProcessing(false);
     }

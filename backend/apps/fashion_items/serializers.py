@@ -67,12 +67,6 @@ class BrandSerializer(ModelSerializer):
 """
 
 
-class MinimumSubCategorySerializer(ModelSerializer):
-    class Meta:
-        model = SubCategory
-        fields = ["id", "subcategory_name"]
-
-
 class MinimumBrandSerializer(ModelSerializer):
     class Meta:
         model = Brand
@@ -91,7 +85,7 @@ class MetaDataSerializer(Serializer):
 
 # 詳細を含めて返すためのシリアライザー
 class DetailedFashionItemSerializer(ModelSerializer):
-    sub_category = MinimumSubCategorySerializer(read_only=True)
+    sub_category = SubCategorySerializer(read_only=True)
     brand = MinimumBrandSerializer(read_only=True)
     seasons = SeasonSerializer(many=True, read_only=True)
     price_range = PriceRangeSerializer(read_only=True)

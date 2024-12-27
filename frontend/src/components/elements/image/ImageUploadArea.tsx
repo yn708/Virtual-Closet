@@ -6,7 +6,7 @@ const ImageUploadArea = () => {
   return (
     <label
       htmlFor="image-upload"
-      className="relative group flex flex-col items-center justify-center rounded-xl cursor-pointer bg-gray-100 min-h-28 md:min-h-64 w-full transition-all duration-300 hover:bg-gray-50"
+      className="relative group flex flex-col items-center justify-center rounded-xl cursor-pointer bg-gray-100 dark:bg-gray-900 min-h-28 md:min-h-64 w-full transition-all duration-300 hover:bg-gray-50"
     >
       <div className="absolute inset-0 border-2 border-dashed border-gray-300 rounded-xl m-2 md:m-4 transition-all duration-300 group-hover:scale-[0.98]" />
       <div className="flex flex-col items-center justify-center p-4 md:p-6 z-10 w-full">

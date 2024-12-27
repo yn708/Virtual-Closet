@@ -15,7 +15,7 @@ const ItemActions = ({ item, onDelete, onUpdate }: ItemImageDrawerProps) => {
           size="sm"
           variant="default"
           type="button"
-          className="w-full bg-gray-700 dark:bg-gray-200"
+          className="w-full"
         />
       </EditItemDialog>
 

@@ -1,4 +1,5 @@
 import imageCompression from 'browser-image-compression';
+import html2canvas from 'html2canvas';
 import { ALLOWED_IMAGE_EXTENSIONS, ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from './constants';
 
 /* ----------------------------------------------------------------
@@ -132,4 +133,96 @@ export const dataURLtoFile = (dataurl: string, filename: string): File => {
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new File([u8arr], filename, { type: mime });
+};
+
+/* ----------------------------------------------------------------
+ * html2canvasを使用した画像作成
+------------------------------------------------------------------ */
+export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
+  if (!canvasRef) return null;
+
+  try {
+    // キャンバス要素のサイズを取得
+    const canvasRect = canvasRef.getBoundingClientRect();
+
+    // デバイスのピクセル比を取得
+    const pixelRatio = window.devicePixelRatio || 1;
+
+    // スケールを2倍に設定（または必要に応じてピクセル比に基づいて調整）
+    const scale = Math.max(2, pixelRatio);
+
+    const canvas = await html2canvas(canvasRef, {
+      scale, // スケールを高く設定
+      width: canvasRect.width, // キャンバスの実際の幅を指定
+      height: canvasRect.height, // キャンバスの実際の高さを指定
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#F9FAFB',
+      logging: false,
+      imageTimeout: 0, // 画像読み込みのタイムアウトを無効化
+      onclone: (clonedDoc) => {
+        // クローンされた要素のスタイルを調整
+        const clonedCanvas = clonedDoc.querySelector('.coordinate-canvas') as HTMLElement;
+        if (clonedCanvas) {
+          // キャンバスのサイズを明示的に設定
+          clonedCanvas.style.width = `${canvasRect.width}px`;
+          clonedCanvas.style.height = `${canvasRect.height}px`;
+
+          // 画像要素の画質を向上
+          const images = clonedCanvas.getElementsByTagName('img');
+          Array.from(images).forEach((img) => {
+            img.style.imageRendering = 'high-quality';
+          });
+
+          // 操作用UIを非表示にする
+          const operationUIs = clonedCanvas.querySelectorAll('.operation-ui');
+          operationUIs.forEach((ui) => {
+            (ui as HTMLElement).style.display = 'none';
+          });
+        }
+
+        // 画像の読み込み完了を待機
+        const images = clonedDoc.getElementsByTagName('img');
+        const imageLoadPromises = Array.from(images).map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        });
+
+        return Promise.all(imageLoadPromises);
+      },
+    });
+
+    // Blobの生成時にサイズを維持
+    const blob = await new Promise<Blob>((resolve) => {
+      canvas.toBlob(
+        (blob) => {
+          resolve(blob as Blob);
+        },
+        'image/png',
+        1.0, // 最高品質で出力
+      );
+    });
+
+    // プレビューURLの生成
+    const previewUrl = URL.createObjectURL(blob);
+
+    // FormDataにファイルを追加
+    const previewFile = new File([blob], 'coordinate_preview.png', { type: 'image/png' });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(previewFile);
+
+    // hidden input要素にファイルを設定
+    const fileInput = document.querySelector('input[name="preview_image"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+    }
+
+    return previewUrl;
+  } catch (error) {
+    console.error('Preview generation failed:', error);
+    return null;
+  }
 };

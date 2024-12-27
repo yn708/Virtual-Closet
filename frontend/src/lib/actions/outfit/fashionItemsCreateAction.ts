@@ -2,7 +2,7 @@
 
 import { registerFashionItemAPI } from '@/lib/api/fashionItemsApi';
 import type { FormState } from '@/types';
-import { TOP_URL } from '@/utils/constants';
+import { ITEM_CREATE_URL, TOP_URL } from '@/utils/constants';
 import { fashionItemCreateFormSchema } from '@/utils/validations/fashion-item-validation';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -55,6 +55,6 @@ export async function fashionItemsCreateAction(
   });
 
   await registerFashionItemAPI(apiFormData);
-  revalidatePath(TOP_URL);
+  revalidatePath(ITEM_CREATE_URL);
   redirect(TOP_URL);
 }

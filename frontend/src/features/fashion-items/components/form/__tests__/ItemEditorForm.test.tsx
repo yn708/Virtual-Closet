@@ -33,7 +33,7 @@ describe('ItemEditorForm', () => {
   const mockInitialData = {
     id: '1',
     image: 'http://backend:8000/media/items/test.jpg',
-    sub_category: { id: '1', subcategory_name: 'Test Category' },
+    sub_category: { id: '1', subcategory_name: 'Test Category', category: 'Test Category' },
     brand: { id: '1', brand_name: 'Nike', brand_name_kana: 'ナイキ' },
     seasons: [{ id: '1', season_name: 'Spring' }] as [{ id: string; season_name: string }],
     price_range: { id: '1', price_range: '1000-2000' },

@@ -1,0 +1,142 @@
+[
+  {
+    "model": "coordinate.scene",
+    "pk": 1,
+    "fields": {
+      "scene": "休日"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 2,
+    "fields": {
+      "scene": "散歩"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 3,
+    "fields": {
+      "scene": "アウトドア"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 4,
+    "fields": {
+      "scene": "買い物"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 5,
+    "fields": {
+      "scene": "ランチ"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 6,
+    "fields": {
+      "scene": "ディナー"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 7,
+    "fields": {
+      "scene": "カフェ"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 8,
+    "fields": {
+      "scene": "飲み会"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 9,
+    "fields": {
+      "scene": "おでかけ"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 10,
+    "fields": {
+      "scene": "デート"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 11,
+    "fields": {
+      "scene": "旅行"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 12,
+    "fields": {
+      "scene": "イベント"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 13,
+    "fields": {
+      "scene": "パーティー"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 14,
+    "fields": {
+      "scene": "スポーツ観戦"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 15,
+    "fields": {
+      "scene": "結婚式"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 16,
+    "fields": {
+      "scene": "通勤"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 17,
+    "fields": {
+      "scene": "オフィスカジュアル"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 18,
+    "fields": {
+      "scene": "学校"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 19,
+    "fields": {
+      "scene": "ドライブ"
+    }
+  },
+  {
+    "model": "coordinate.scene",
+    "pk": 20,
+    "fields": {
+      "scene": "その他"
+    }
+  }
+]

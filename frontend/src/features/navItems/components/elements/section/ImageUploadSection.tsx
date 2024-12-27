@@ -17,14 +17,14 @@ const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
   onClose,
   children,
 }) => {
-  const { removeBgProcess } = useImage();
+  const { optimizationProcess } = useImage();
   const router = useRouter();
   const { openFileDialog, handleFileChange, isLoading } = useImageSelection();
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const result = await handleFileChange(e);
     if (result.file) {
-      removeBgProcess(result.file);
+      optimizationProcess(result.file);
       router.push(redirectUrl);
       onClose();
     }
