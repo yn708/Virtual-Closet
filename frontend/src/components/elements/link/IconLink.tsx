@@ -5,6 +5,7 @@ import Link from 'next/link';
 export interface IconLinkProps extends BaseIconProps, BaseLinkProps, LabelType, OnClickType {
   showText?: boolean;
   rounded?: boolean;
+  iconClassName?: string;
 }
 
 const IconLink = ({
@@ -16,6 +17,7 @@ const IconLink = ({
   rounded = false,
   size = 'md',
   onClick,
+  iconClassName,
 }: IconLinkProps) => {
   return (
     <Link
@@ -23,7 +25,7 @@ const IconLink = ({
       className={`${rounded ? 'rounded-full' : ''} flex items-center justify-center p-2 transition-colors hover:bg-muted gap-2 ${className}`}
       onClick={onClick}
     >
-      <Icon className={`text-muted-foreground ${ICON_SIZE[size]}`} />
+      <Icon className={`text-muted-foreground ${ICON_SIZE[size]} ${iconClassName}`} />
       <span className={`${showText ? '' : 'sr-only'}`}>{label}</span>
     </Link>
   );

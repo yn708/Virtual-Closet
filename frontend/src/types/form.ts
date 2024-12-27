@@ -47,7 +47,6 @@ export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElem
 /* ----------------------------------------------------------------
 select field
 ------------------------------------------------------------------ */
-
 export interface FloatingLabelSelectProps extends ExtensionBaseFieldProps {
   options: BaseOption[];
 }
@@ -81,10 +80,29 @@ export interface ToggleGroupFieldProps<T extends BaseOption> extends BaseFieldPr
   defaultValue?: string[];
 }
 
-/* ----------------------------------------------------------------
-ToggleGroup field
------------------------------------------------------------------- */
+// AccordionToggleGroupField
+export interface SelectionGroup {
+  name: string;
+  label: string;
+  options: BaseOption[];
+  labelKey: string;
+  maxSelections?: number;
+  error?: string[];
+}
 
+export interface AccordionToggleGroupFieldProps {
+  groups: SelectionGroup[];
+}
+
+export interface AccordionToggleGroupLabel {
+  selections: string[] | null;
+  message: string | null;
+  count: string | null;
+}
+
+/* ----------------------------------------------------------------
+Image field
+------------------------------------------------------------------ */
 export interface ImageFieldProps {
   preview?: string | null;
   isProcessing?: boolean;

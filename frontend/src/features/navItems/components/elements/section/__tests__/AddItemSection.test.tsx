@@ -1,8 +1,8 @@
-import { ITEM_EDIT_URL } from '@/utils/constants';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { IoMdAdd } from 'react-icons/io';
 import AddItemSection from '../AddItemSection';
 import ImageUploadSection from '../ImageUploadSection';
+import { ITEM_CREATE_URL } from '@/utils/constants';
 
 // ImageUploadSectionのモック
 jest.mock('../ImageUploadSection', () => ({
@@ -38,7 +38,7 @@ describe('AddItemSection', () => {
     expect(screen.getByTestId('value')).toHaveTextContent('add-clothing');
     expect(screen.getByTestId('label')).toHaveTextContent('アイテム追加');
     expect(screen.getByTestId('icon-component')).toBeInTheDocument();
-    expect(screen.getByTestId('redirect-url')).toHaveTextContent(ITEM_EDIT_URL);
+    expect(screen.getByTestId('redirect-url')).toHaveTextContent(ITEM_CREATE_URL);
 
     // ImageUploadSectionに渡されるpropsの検証
     expect(ImageUploadSection).toHaveBeenCalledWith(
@@ -46,7 +46,7 @@ describe('AddItemSection', () => {
         value: 'add-clothing',
         label: 'アイテム追加',
         Icon: IoMdAdd,
-        redirectUrl: ITEM_EDIT_URL,
+        redirectUrl: ITEM_CREATE_URL,
         onClose: mockOnClose,
       },
       expect.any(Object),

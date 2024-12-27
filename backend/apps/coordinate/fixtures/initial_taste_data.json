@@ -1,0 +1,93 @@
+[
+  {
+    "model": "coordinate.taste",
+    "pk": 1,
+    "fields": {
+      "taste": "古着Mix/ヴィンテージ"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 2,
+    "fields": {
+      "taste": "きれいめ"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 3,
+    "fields": {
+      "taste": "カジュアル"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 4,
+    "fields": {
+      "taste": "シンプル"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 5,
+    "fields": {
+      "taste": "ナチュラル/リラックス"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 6,
+    "fields": {
+      "taste": "ストリート"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 7,
+    "fields": {
+      "taste": "スポーティー"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 8,
+    "fields": {
+      "taste": "モード"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 9,
+    "fields": {
+      "taste": "ガーリー/フェミニン"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 10,
+    "fields": {
+      "taste": "ロック"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 11,
+    "fields": {
+      "taste": "ミリタリー"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 12,
+    "fields": {
+      "taste": "セレブティ"
+    }
+  },
+  {
+    "model": "coordinate.taste",
+    "pk": 13,
+    "fields": {
+      "taste": "その他"
+    }
+  }
+]

@@ -10,7 +10,7 @@ export const useIsOpen = (initialState: boolean = false) => {
   const onClose = useCallback(() => setIsOpen(false), []);
   const onToggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
-  return { isOpen, onClose, onToggle };
+  return { isOpen, setIsOpen, onClose, onToggle };
 };
 
 // 使用例

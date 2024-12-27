@@ -1,7 +1,7 @@
 
 # oven/bun:latest を使用すると
 # jest実行でエラーになるため、nodeを使用してそこにbunをインストールして使用
-FROM node:21.7.3
+FROM node:22.12
 
 WORKDIR /frontend
 

@@ -43,3 +43,26 @@ export const SEASON_OPTIONS = [
   { id: 'autumn', label: '秋' },
   { id: 'winter', label: '冬' },
 ] as const;
+
+/* ----------------------------------------------------------------
+カラー
+------------------------------------------------------------------ */
+// 背景色選択
+export const BG_COLOR = [
+  { value: 'bg-white' },
+  { value: 'bg-slate-100' },
+  { value: 'bg-red-100' },
+  { value: 'bg-orange-100' },
+  { value: 'bg-yellow-100' },
+  { value: 'bg-green-100' },
+  { value: 'bg-sky-100' },
+  { value: 'bg-indigo-100' },
+  { value: 'bg-pink-100' },
+  { value: 'bg-slate-600' },
+  { value: 'bg-red-600' },
+  { value: 'bg-orange-700' },
+  { value: 'bg-yellow-700' },
+  { value: 'bg-green-700' },
+  { value: 'bg-sky-700' },
+  { value: 'bg-indigo-700' },
+];

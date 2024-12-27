@@ -2,7 +2,7 @@
 
 import IconLink from '@/components/elements/link/IconLink';
 import type { UseIsOpenOnCloseType } from '@/types';
-import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_EDIT_URL } from '@/utils/constants';
+import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_CREATE_URL } from '@/utils/constants';
 import { BiCloset } from 'react-icons/bi';
 import { MdOutlineSwipe } from 'react-icons/md';
 import ImageUploadSection from './ImageUploadSection';
@@ -13,7 +13,7 @@ const CreateOutfitSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
       value="create-outfit"
       label="コーディネート作成"
       Icon={BiCloset}
-      redirectUrl={COORDINATE_EDIT_URL}
+      redirectUrl={COORDINATE_CREATE_URL}
       onClose={onClose}
     >
       <IconLink

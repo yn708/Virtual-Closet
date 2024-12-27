@@ -1,4 +1,5 @@
 import { useImage } from '@/context/ImageContext';
+import type { ImageUploadSectionProps } from '@/features/navItems/types';
 import { useImageSelection } from '@/hooks/image/useImageSelection';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
@@ -18,7 +19,7 @@ jest.mock('@/hooks/image/useImageSelection', () => ({
   useImageSelection: jest.fn(),
 }));
 
-// AccordionSectionコンポーネントのモック設定
+// AccordionSectionコンポーネントのモック
 jest.mock('../AccordionSection', () => ({
   __esModule: true,
   default: ({
@@ -45,7 +46,7 @@ jest.mock('../AccordionSection', () => ({
   ),
 }));
 
-// IconButtonコンポーネントのモック設定
+// IconButtonコンポーネントのモック
 jest.mock('@/components/elements/button/IconButton', () => ({
   __esModule: true,
   default: ({
@@ -53,20 +54,26 @@ jest.mock('@/components/elements/button/IconButton', () => ({
     label,
     onClick,
     disabled,
+    type,
+    size: _size,
+    rounded: _rounded,
   }: {
     Icon?: React.ComponentType;
     label: string;
     onClick?: () => void;
     disabled?: boolean;
+    type: 'button' | 'submit';
+    size: 'sm' | 'md' | 'lg';
+    rounded?: boolean;
   }) => (
-    <button data-testid="icon-button" onClick={onClick} disabled={disabled}>
+    <button data-testid="icon-button" onClick={onClick} disabled={disabled} type={type}>
       {Icon && <Icon data-testid="button-icon" />}
       <span>{label}</span>
     </button>
   ),
 }));
 
-// HiddenFileInputコンポーネントのモック設定
+// HiddenFileInputコンポーネントのモック
 jest.mock('@/components/elements/form/input/HiddenFileInput', () => ({
   __esModule: true,
   default: ({ onChange }: { onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => (
@@ -76,7 +83,7 @@ jest.mock('@/components/elements/form/input/HiddenFileInput', () => ({
 
 describe('ImageUploadSection', () => {
   // デフォルトのテストプロパティ
-  const defaultProps = {
+  const defaultProps: ImageUploadSectionProps = {
     value: 'test-section',
     label: 'Test Section',
     Icon: BiCamera,
@@ -93,10 +100,10 @@ describe('ImageUploadSection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // 必要なモックフックを設定
+    // モックフックの設定
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     (useImage as jest.Mock).mockReturnValue({
-      removeBgProcess: jest.fn(),
+      optimizationProcess: jest.fn(),
     });
     (useImageSelection as jest.Mock).mockReturnValue({
       openFileDialog: jest.fn(),
@@ -105,11 +112,9 @@ describe('ImageUploadSection', () => {
     });
   });
 
-  it('renders correctly with all props', () => {
-    // コンポーネントがすべてのプロパティとともに正しく描画されるかを確認
+  it('正しくレンダリングされること', () => {
     render(<ImageUploadSection {...defaultProps} />);
 
-    // 基本的なUI要素の存在を確認
     expect(screen.getByTestId('accordion-section')).toBeInTheDocument();
     expect(screen.getByTestId('value')).toHaveTextContent('test-section');
     expect(screen.getByTestId('label')).toHaveTextContent('Test Section');
@@ -119,13 +124,11 @@ describe('ImageUploadSection', () => {
     expect(screen.getByTestId('icon-button')).toBeInTheDocument();
   });
 
-  it('shows correct icon button label and state based on loading', () => {
-    // isLoadingがfalseの状態でのラベルと状態を確認
+  it('ローディング状態に応じてボタンの表示が変更されること', () => {
     const { rerender } = render(<ImageUploadSection {...defaultProps} />);
     expect(screen.getByTestId('icon-button')).toHaveTextContent('カメラロールから選択');
     expect(screen.getByTestId('icon-button')).not.toBeDisabled();
 
-    // isLoadingがtrueの場合のラベルと状態を確認
     (useImageSelection as jest.Mock).mockReturnValue({
       openFileDialog: jest.fn(),
       handleFileChange: jest.fn(),
@@ -137,13 +140,12 @@ describe('ImageUploadSection', () => {
     expect(screen.getByTestId('icon-button')).toBeDisabled();
   });
 
-  it('handles file selection correctly', async () => {
-    // ファイル選択時のハンドリングを確認
-    const mockRemoveBgProcess = jest.fn();
+  it('ファイル選択が正しく処理されること', async () => {
+    const mockOptimizationProcess = jest.fn();
     const mockHandleFileChange = jest.fn().mockResolvedValue({ file: new File([], 'test.jpg') });
 
     (useImage as jest.Mock).mockReturnValue({
-      removeBgProcess: mockRemoveBgProcess,
+      optimizationProcess: mockOptimizationProcess,
     });
     (useImageSelection as jest.Mock).mockReturnValue({
       openFileDialog: jest.fn(),
@@ -156,25 +158,22 @@ describe('ImageUploadSection', () => {
     const input = screen.getByTestId('hidden-file-input');
     const file = new File([], 'test.jpg', { type: 'image/jpeg' });
 
-    // ファイル変更イベントをトリガー
     await waitFor(() => {
       fireEvent.change(input, { target: { files: [file] } });
     });
 
-    // 関連する関数が呼び出されることを確認
     expect(mockHandleFileChange).toHaveBeenCalled();
-    expect(mockRemoveBgProcess).toHaveBeenCalledWith(file);
+    expect(mockOptimizationProcess).toHaveBeenCalledWith(file);
     expect(mockRouter.push).toHaveBeenCalledWith(defaultProps.redirectUrl);
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it('handles file selection cancellation correctly', async () => {
-    // ファイル選択キャンセル時のハンドリングを確認
-    const mockRemoveBgProcess = jest.fn();
+  it('ファイル選択がキャンセルされた場合、処理が中断されること', async () => {
+    const mockOptimizationProcess = jest.fn();
     const mockHandleFileChange = jest.fn().mockResolvedValue({ file: null });
 
     (useImage as jest.Mock).mockReturnValue({
-      removeBgProcess: mockRemoveBgProcess,
+      optimizationProcess: mockOptimizationProcess,
     });
     (useImageSelection as jest.Mock).mockReturnValue({
       openFileDialog: jest.fn(),
@@ -186,20 +185,17 @@ describe('ImageUploadSection', () => {
 
     const input = screen.getByTestId('hidden-file-input');
 
-    // 空のファイルリストでイベントをトリガー
     await waitFor(() => {
       fireEvent.change(input, { target: { files: [] } });
     });
 
-    // 関連する関数が呼び出されないことを確認
     expect(mockHandleFileChange).toHaveBeenCalled();
-    expect(mockRemoveBgProcess).not.toHaveBeenCalled();
+    expect(mockOptimizationProcess).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(defaultProps.onClose).not.toHaveBeenCalled();
   });
 
-  it('triggers file dialog when IconButton is clicked', () => {
-    // アイコンボタンクリック時にファイルダイアログが開くかを確認
+  it('IconButtonクリック時にファイルダイアログが開くこと', () => {
     const mockOpenFileDialog = jest.fn();
     (useImageSelection as jest.Mock).mockReturnValue({
       openFileDialog: mockOpenFileDialog,

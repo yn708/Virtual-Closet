@@ -11,6 +11,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       showText = true,
       rounded = false,
       className,
+      labelClassName,
       size = 'md',
       variant = 'outline',
       type = 'submit',
@@ -32,7 +33,11 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         {...props}
       >
         <Icon className={ICON_SIZE[size]} />
-        {showText ? <span>{label}</span> : <span className="sr-only">{label}</span>}
+        {showText ? (
+          <span className={`${labelClassName}`}>{label}</span>
+        ) : (
+          <span className="sr-only">{label}</span>
+        )}
       </Button>
     );
   },

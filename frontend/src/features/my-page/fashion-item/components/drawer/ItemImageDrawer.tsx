@@ -66,7 +66,7 @@ const ItemImageDrawer = ({ item, onDelete, onUpdate }: ItemImageProps) => {
           <DrawerFooter className="p-0 mt-4">
             <ItemActions item={item} onDelete={onDelete} onUpdate={handleUpdate} />
             <DrawerClose asChild>
-              <Button variant="outline" className="w-full">
+              <Button variant="link" type="button" className="w-full">
                 閉じる
               </Button>
             </DrawerClose>

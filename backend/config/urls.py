@@ -21,6 +21,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),  # allauth による認証機能へのルーティング 必須
     path("api/auth/", include("apps.accounts.urls")),  # 認証、ユーザー関連
     # アプリ
-    path("api/fashion-items/", include("apps.fashion_items.urls")),
     path("api/image/", include("apps.image_processing.urls")),
+    path("api/fashion-items/", include("apps.fashion_items.urls")),
+    path("api/coordinate/", include("apps.coordinate.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # 画像の保存先をローカルに設定しているため、後々変更

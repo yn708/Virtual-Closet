@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FashionItemsProvider } from '@/context/FashionItemsContext';
 import FashionItemsContents from '@/features/my-page/fashion-item/components/content/FashionItemsContents';
 import { BiCloset } from 'react-icons/bi';
 import { LuShirt } from 'react-icons/lu';
@@ -9,7 +10,11 @@ const MyPageTabs = () => {
       value: 'items',
       label: 'アイテム',
       icon: LuShirt,
-      content: () => <FashionItemsContents />,
+      content: () => (
+        <FashionItemsProvider>
+          <FashionItemsContents />
+        </FashionItemsProvider>
+      ),
     },
     {
       value: 'coordinate',

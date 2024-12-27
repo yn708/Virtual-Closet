@@ -1,5 +1,5 @@
 import IconLink from '@/components/elements/link/IconLink';
-import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_EDIT_URL } from '@/utils/constants';
+import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_CREATE_URL } from '@/utils/constants';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BiCloset } from 'react-icons/bi';
 import { MdOutlineSwipe } from 'react-icons/md';
@@ -61,7 +61,7 @@ describe('CreateOutfitSection', () => {
     expect(screen.getByTestId('value')).toHaveTextContent('create-outfit'); // セクションの値
     expect(screen.getByTestId('label')).toHaveTextContent('コーディネート作成'); // セクションのラベル
     expect(screen.getByTestId('icon-component')).toBeInTheDocument(); // アイコンが存在するか
-    expect(screen.getByTestId('redirect-url')).toHaveTextContent(COORDINATE_EDIT_URL); // リダイレクト先URL
+    expect(screen.getByTestId('redirect-url')).toHaveTextContent(COORDINATE_CREATE_URL); // リダイレクト先URL
 
     // IconLinkの確認
     const iconLink = screen.getByTestId('icon-link');
@@ -94,7 +94,7 @@ describe('CreateOutfitSection', () => {
         value: 'create-outfit', // セクションの値
         label: 'コーディネート作成', // セクションのラベル
         Icon: BiCloset, // セクションのアイコン
-        redirectUrl: COORDINATE_EDIT_URL, // リダイレクトURL
+        redirectUrl: COORDINATE_CREATE_URL, // リダイレクトURL
         onClose: mockOnClose, // 閉じるコールバック
         children: expect.any(Object), // 子コンポーネント
       },

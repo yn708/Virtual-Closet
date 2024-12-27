@@ -65,6 +65,14 @@ export const BRAND_SEARCH_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}brands/searc
 export const FASHION_ITEM_METADATA_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}metadata/`;
 export const FASHION_ITEMS_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}items/`;
 export const FASHION_ITEMS_BY_CATEGORY_ENDPOINT = `${FASHION_ITEMS_ENDPOINT}by_category/?category_id=`;
+
+// コーディネート関連
+export const BASE_COORDINATE_ENDPOINT = '/api/coordinate/';
+
+export const COORDINATE_METADATA_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}metadata/`;
+export const COORDINATE_CREATE_PHOTO_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}photo-coordination/`;
+export const COORDINATE_CREATE_CUSTOM_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}custom-coordination/`;
+
 /* ----------------------------------------------------------------
 URL
 ------------------------------------------------------------------ */
@@ -87,10 +95,10 @@ export const CONTACT_URL = '/contact';
 // マイページ
 export const MY_PAGE_URL = '/my-page';
 // ファッションアイテム
-export const ITEM_EDIT_URL = '/outfit/item/edit';
+export const ITEM_CREATE_URL = '/outfit/item/create';
 // コーディネート作成
-export const COORDINATE_EDIT_URL = '/outfit/coordinate/edit';
-export const COORDINATE_CREATE_CANVAS_URL = '/outfit/coordinate/canvas';
+export const COORDINATE_CREATE_URL = '/outfit/coordinate/create';
+export const COORDINATE_CREATE_CANVAS_URL = '/outfit/coordinate/create/canvas';
 
 /* ----------------------------------------------------------------
 ERROR MESSAGE
@@ -111,3 +119,10 @@ SEARCH
 ------------------------------------------------------------------ */
 export const MIN_SEARCH_LENGTH = 2;
 export const CACHE_DURATION = 5 * 60 * 1000; // 5分
+
+/* ----------------------------------------------------------------
+CANVAS
+------------------------------------------------------------------ */
+export const MOVEMENT_THRESHOLD = 15; // この距離（px）以上マウスを動かすまで回転しない
+export const SNAP_THRESHOLD = 2; // 指定された角度の±2度以内でスナップする
+export const SNAP_ANGLES = [0, 90, 180, 270, 360]; // スナップする角度のリスト（度）

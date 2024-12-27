@@ -33,4 +33,14 @@ export interface ImageDisplayProps {
 export interface IconButtonProps extends BaseIconProps, BaseButtonProps, LabelType {
   showText?: boolean;
   rounded?: boolean;
+  labelClassName?: string;
+}
+
+/* ----------------------------------------------------------------
+スイッチ
+------------------------------------------------------------------ */
+export interface ToggleSwitchProps extends LabelType, ClassNameType {
+  checked: boolean;
+  onChange: () => void;
+  disabled?: boolean;
 }

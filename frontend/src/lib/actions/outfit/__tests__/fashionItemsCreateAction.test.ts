@@ -1,12 +1,12 @@
 /**
  * @jest-environment node
  */
+import { registerFashionItemAPI } from '@/lib/api/fashionItemsApi';
 import type { FormState } from '@/types';
-import { TOP_URL } from '@/utils/constants';
+import { ITEM_CREATE_URL, TOP_URL } from '@/utils/constants';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { fashionItemsCreateAction } from '../fashionItemsCreateAction';
-import { registerFashionItemAPI } from '@/lib/api/fashionItemsApi';
 
 // 外部依存のモック
 jest.mock('@/lib/api/fashionItemsApi', () => ({
@@ -52,7 +52,7 @@ describe('fashionItemsCreateAction', () => {
 
     // API呼び出しとリダイレクトを検証
     expect(registerFashionItemAPI).toHaveBeenCalled();
-    expect(revalidatePath).toHaveBeenCalledWith(TOP_URL);
+    expect(revalidatePath).toHaveBeenCalledWith(ITEM_CREATE_URL);
     expect(redirect).toHaveBeenCalledWith(TOP_URL);
   });
 

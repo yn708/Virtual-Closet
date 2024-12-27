@@ -1,3 +1,4 @@
+import type { OnSelectItemType, SelectedItemsType } from '@/features/coordinate/types';
 import type { ChildrenType, ClassNameType, FashionItem } from '@/types';
 
 /*--------------------------------------------------------
@@ -17,7 +18,7 @@ export interface CategoryCache {
   [key: string]: FashionItem[];
 }
 
-export interface FashionItemListProps {
+export interface FashionItemListProps extends OnSelectItemType, SelectedItemsType {
   items: FashionItem[];
   isLoading?: boolean;
   onDelete: (id: string) => void;

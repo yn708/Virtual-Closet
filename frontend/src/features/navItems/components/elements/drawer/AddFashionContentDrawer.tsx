@@ -23,7 +23,7 @@ const AddFashionContentDrawer = () => {
 
   return (
     <Drawer open={isOpen} onOpenChange={onToggle}>
-      <DrawerTrigger>
+      <DrawerTrigger asChild>
         <IconButton
           Icon={IoMdAdd}
           label="Add"

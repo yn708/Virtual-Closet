@@ -52,7 +52,7 @@ export interface MetaDataType {
 export interface FashionItem {
   id: string;
   image: string;
-  sub_category: { id: string; subcategory_name: string };
+  sub_category: { id: string; subcategory_name: string; category: string };
   brand: { id: string; brand_name: string; brand_name_kana: string } | null;
   seasons: [{ id: string; season_name: string }];
   price_range: { id: string; price_range: string } | null;

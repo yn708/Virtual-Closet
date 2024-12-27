@@ -3,6 +3,7 @@ import os
 from django.db import models
 
 from apps.accounts.models import CustomUser
+from core.mixins.timestamp_mixin import TimestampMixin
 
 """
 コーディネート自動提案において、
@@ -78,7 +79,7 @@ class PriceRange(models.Model):
 
 
 # ファッションアイテム
-class FashionItem(models.Model):
+class FashionItem(TimestampMixin, models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # ユーザーとの関連付け
     sub_category = models.ForeignKey(SubCategory, on_delete=models.DO_NOTHING)
     brand = models.ForeignKey(Brand, on_delete=models.DO_NOTHING, null=True, blank=True)  # ブランド未選択可能
@@ -89,8 +90,6 @@ class FashionItem(models.Model):
     image = models.ImageField(upload_to="fashion_item/")
     is_owned = models.BooleanField(default=True)
     is_old_clothes = models.BooleanField(default=False)
-    created_at = models.DateTimeField("作成日", auto_now_add=True)
-    updated_at = models.DateTimeField("更新日", auto_now=True)
 
     def __str__(self):
         brand_name = self.brand.brand_name if self.brand else "No Brand"
