@@ -2,16 +2,27 @@ import IconButton from '@/components/elements/button/IconButton';
 import LoadingElements from '@/components/elements/loading/LoadingElements';
 
 import BaseDialog from '@/components/elements/dialog/BaseDialog';
+import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
+import type { CoordinateMetaDataType } from '@/types/coordinate';
 import { IoIosArrowForward } from 'react-icons/io';
-import type { FormDialogProps } from '../../types';
+import type { CoordinateEditTypes } from '../../types';
 import CustomCoordinateEditorForm from '../form/CustomCoordinateEditorForm';
+import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
+
+interface FormDialogProps extends InitialItemsProps, CoordinateEditTypes {
+  metaData: CoordinateMetaDataType | null;
+  isLoading: boolean;
+}
 
 const FormDialog: React.FC<FormDialogProps> = ({
   metaData,
-  selectedItems,
-  itemStyles,
   isLoading,
+  initialData,
+  initialItems,
+  onSuccess,
 }) => {
+  const { state } = useCoordinateCanvasState();
+
   return (
     <BaseDialog
       trigger={
@@ -28,12 +39,13 @@ const FormDialog: React.FC<FormDialogProps> = ({
       title="詳細情報"
       className="max-h-screen h-screen max-w-full rounded-none p-10"
     >
-      {metaData !== null ? (
+      {state.selectedItems && metaData !== null ? (
         <div className="max-w-4xl mx-auto w-full">
           <CustomCoordinateEditorForm
             metaData={metaData}
-            selectedItems={selectedItems}
-            itemStyles={itemStyles}
+            initialData={initialData}
+            initialItems={initialItems}
+            onSuccess={onSuccess}
           />
         </div>
       ) : (

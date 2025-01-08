@@ -1,27 +1,28 @@
 'use client';
 
+import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import { BACKEND_URL } from '@/utils/constants';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
 import { CgArrowsExpandLeft } from 'react-icons/cg';
 import { useCoordinateCanvas } from '../../hooks/useCoordinateCanvas';
-import type { CoordinateCanvasProps } from '../../types';
 
 /**
  * アイテムのドラッグ&ドロップ、回転、拡大縮小などの操作が可能なキャンバスを提供
  */
-const CoordinateCanvas: React.FC<CoordinateCanvasProps> = ({
-  selectedItems,
-  onRemoveItem,
-  itemStyles,
-  onUpdateStyles,
-  background = 'bg-gray-50',
-}) => {
+const CoordinateCanvas = () => {
+  const { state, handlers: coordinateHandlers } = useCoordinateCanvasState();
+  const { selectedItems, itemStyles, background } = state;
+  const { handleUpdateStyles, handleRemoveItem } = coordinateHandlers;
+
   const containerRef = useRef<HTMLDivElement>(null); // キャンバス要素への参照
 
   // カスタムフックから状態とハンドラーを取得
-  const { selectedItemId, isDragging, handlers } = useCoordinateCanvas(itemStyles, onUpdateStyles);
+  const { selectedItemId, isDragging, handlers } = useCoordinateCanvas(
+    itemStyles,
+    handleUpdateStyles,
+  );
 
   // アイテムの選択を解除する
   const handleBackgroundClick = useCallback(
@@ -37,6 +38,7 @@ const CoordinateCanvas: React.FC<CoordinateCanvasProps> = ({
     <div
       ref={containerRef}
       onClick={handleBackgroundClick}
+      data-testid="coordinate-canvas"
       className={`relative aspect-[4/5] w-full max-w-[65vh] mx-auto ${background} shadow-lg overflow-hidden coordinate-canvas`}
     >
       {selectedItems?.map((item) => {
@@ -54,6 +56,7 @@ const CoordinateCanvas: React.FC<CoordinateCanvasProps> = ({
         return (
           <div
             key={item.id}
+            data-testid="draggable-element"
             className="draggable-element absolute cursor-move"
             style={{
               position: 'absolute',
@@ -91,9 +94,10 @@ const CoordinateCanvas: React.FC<CoordinateCanvasProps> = ({
                 <div className="absolute inset-0 border-2 border-blue-500 rounded operation-ui">
                   {/* 削除ボタン */}
                   <button
+                    data-testid="delete-button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRemoveItem(item.id);
+                      handleRemoveItem(item.id);
                     }}
                     className="absolute -top-3 -left-3 p-1 bg-gray-500 rounded-full text-white hover:bg-gray-600 operation-ui"
                   >
@@ -101,6 +105,7 @@ const CoordinateCanvas: React.FC<CoordinateCanvasProps> = ({
                   </button>
                   {/* 変形（回転・拡大縮小）ハンドル */}
                   <div
+                    data-testid="transform-handle"
                     className="absolute -bottom-3 -right-3 p-1 bg-gray-500 border-2 rounded-full text-white cursor-move operation-ui"
                     onMouseDown={(e) => handlers.handleTransformStart(e, item.id)}
                     onTouchStart={(e) => handlers.handleTransformStart(e, item.id)}

@@ -23,6 +23,8 @@
   "plugins": ["unused-imports", "@typescript-eslint"],
   // カスタムルール設定
   "rules": {
+    // console.log()の使用を警告
+    "no-console": ["error", { "allow": ["warn", "error"] }],
     // 未使用のインポートを警告
     "unused-imports/no-unused-imports": "warn",
     // 一貫した型インポートを強制

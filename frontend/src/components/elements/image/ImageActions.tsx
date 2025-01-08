@@ -1,3 +1,4 @@
+import { useImage } from '@/context/ImageContext';
 import { FaExchangeAlt } from 'react-icons/fa';
 import IconButton from '../button/IconButton';
 import ToggleSwitch from '../utils/ToggleSwitch';
@@ -15,6 +16,8 @@ const ImageActions = ({
   onChangeClick,
   onToggleImage,
 }: ImageActionsProps) => {
+  const { preview } = useImage();
+
   return (
     <div className="mt-6 flex flex-wrap justify-between items-center">
       <IconButton
@@ -26,12 +29,14 @@ const ImageActions = ({
         onClick={onChangeClick}
         disabled={isProcessing}
       />
-      <ToggleSwitch
-        checked={isShowingRemovedBg}
-        onChange={onToggleImage}
-        label="背景除去"
-        disabled={isProcessing}
-      />
+      {!!preview && (
+        <ToggleSwitch
+          checked={isShowingRemovedBg}
+          onChange={onToggleImage}
+          label="背景除去"
+          disabled={isProcessing}
+        />
+      )}
     </div>
   );
 };

@@ -1,6 +1,10 @@
 import os
+import shutil
+import tempfile
+import uuid
 
 import pytest
+from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 
@@ -19,10 +23,11 @@ class TestScene:
 
     def test_scene_unique_name(self):
         """シーン名の一意性テスト"""
-        scene_name = "休日"
+        unique_id = uuid.uuid4().hex[:8]  # 一意のIDを生成
+        scene_name = f"休日_{unique_id}"
         Scene.objects.create(scene=scene_name)
         with pytest.raises(IntegrityError):
-            Scene.objects.create(scene=scene_name)
+            Scene.objects.create(scene=scene_name)  # 同じシーン名で作成を試みる
 
 
 @pytest.mark.django_db
@@ -46,11 +51,6 @@ class TestTaste:
 class TestPhotoCoordinate:
     def test_delete_with_image(self, user, settings):
         """画像ファイル削除のテスト"""
-        import shutil
-        import tempfile
-
-        from django.core.files.storage import FileSystemStorage
-
         # 一時的なメディアルートを設定
         temp_dir = tempfile.mkdtemp()
         settings.MEDIA_ROOT = temp_dir
@@ -69,6 +69,8 @@ class TestPhotoCoordinate:
 
         # ファイルが存在することを確認
         assert os.path.exists(image_path)
+        # 正しいパスに保存されていることを確認
+        assert "coordinations/photo" in image_path
 
         # 明示的にファイルを削除
         if coordinate.image:
@@ -84,13 +86,18 @@ class TestPhotoCoordinate:
 
 @pytest.mark.django_db
 class TestCustomCoordinate:
-    def test_delete_with_preview_image(self, user, settings):
-        """プレビュー画像ファイル削除のテスト"""
-        import shutil
-        import tempfile
+    def test_create_with_background(self, user):
+        """背景色を指定してコーディネートを作成するテスト"""
+        coordinate = CustomCoordinate.objects.create(user=user, background="bg-gray-100")
+        assert coordinate.background == "bg-gray-100"
 
-        from django.core.files.storage import FileSystemStorage
+    def test_default_background(self, user):
+        """デフォルトの背景色を確認するテスト"""
+        coordinate = CustomCoordinate.objects.create(user=user)
+        assert coordinate.background == "bg-white"
 
+    def test_delete_with_image(self, user, settings):
+        """画像ファイル削除のテスト"""
         # 一時的なメディアルートを設定
         temp_dir = tempfile.mkdtemp()
         settings.MEDIA_ROOT = temp_dir
@@ -99,18 +106,20 @@ class TestCustomCoordinate:
         _storage = FileSystemStorage(location=temp_dir, base_url="/media/")
 
         # 画像作成と保存
-        image_content = b"test preview content"
-        preview = SimpleUploadedFile("test_preview.jpg", image_content, content_type="image/jpeg")
+        image_content = b"test custom content"
+        image = SimpleUploadedFile("test_custom.jpg", image_content, content_type="image/jpeg")
 
-        coordinate = CustomCoordinate.objects.create(user=user, preview_image=preview)
-        image_path = coordinate.preview_image.path
+        coordinate = CustomCoordinate.objects.create(user=user, image=image)
+        image_path = coordinate.image.path
 
         # ファイルが存在することを確認
         assert os.path.exists(image_path)
+        # 正しいパスに保存されていることを確認
+        assert "coordinations/custom" in image_path
 
         # 明示的にファイルを削除
-        if coordinate.preview_image:
-            coordinate.preview_image.delete(save=False)
+        if coordinate.image:
+            coordinate.image.delete(save=False)
         coordinate.delete()
 
         # ファイルが削除されたことを確認

@@ -1,15 +1,20 @@
 import { useImage } from '@/context/ImageContext';
 import { useToast } from '@/hooks/use-toast';
-import { fashionItemsCreateAction } from '@/lib/actions/outfit/fashionItemsCreateAction';
-import { fashionItemsUpdateAction } from '@/lib/actions/outfit/fashionItemsUpdateAction';
+import {
+  fashionItemsCreateAction,
+  fashionItemsUpdateAction,
+} from '@/lib/actions/outfit/fashionItemsAction';
 import type { FashionItem, FormState, FormStateFashionItemUpdate } from '@/types';
+import { TOP_URL } from '@/utils/constants';
 import { initialState } from '@/utils/data/initialState';
+import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import type { UseItemEditorFormProps } from '../types';
 
 export const useItemEditorForm = ({ initialData, onSuccess }: UseItemEditorFormProps) => {
   const { toast } = useToast();
   const { isProcessing, preview, clearImage } = useImage();
+  const router = useRouter();
 
   const handleFormAction = async (
     prevState: FormState | FormStateFashionItemUpdate,
@@ -45,8 +50,10 @@ export const useItemEditorForm = ({ initialData, onSuccess }: UseItemEditorFormP
   // アイテム作成用アクション
   const handleCreateAction = async (prevState: FormState, formData: FormData) => {
     const result = await fashionItemsCreateAction(prevState, formData);
+
     if (result.success) {
       clearImage();
+      router.push(TOP_URL);
     }
     return result;
   };

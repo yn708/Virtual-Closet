@@ -1,5 +1,5 @@
+import MyPageTabs from '@/features/my-page/common/components/tabs/MyPageTabs';
 import UserProfileDetailContent from '@/features/my-page/profile/components/content/UserProfileDetailContent';
-import MyPageTabs from '@/features/my-page/profile/components/tabs/MyPageTabs';
 
 export default async function UserProfile() {
   return (

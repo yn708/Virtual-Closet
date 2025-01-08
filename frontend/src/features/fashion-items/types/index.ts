@@ -1,11 +1,11 @@
 import type {
   BaseFieldProps,
+  BaseFieldsStateProps,
   Brand,
   Category,
   Color,
   FashionItem,
   FieldValueProps,
-  FormState,
   LabelType,
   MetaDataType,
 } from '@/types';
@@ -34,17 +34,9 @@ export interface ItemEditorFormProps {
   onSuccess?: (updatedItem: FashionItem) => void;
 }
 
-export interface FormFieldsProps {
+export interface FormFieldsProps extends BaseFieldsStateProps {
   metaData: MetaDataType;
   initialData?: FashionItem;
-  isProcessing: boolean;
-  state: FormState;
-}
-
-export interface ImagePreviewSectionProps {
-  isProcessing: boolean;
-  preview?: string;
-  error?: string[];
 }
 
 /* ----------------------------------------------------------------

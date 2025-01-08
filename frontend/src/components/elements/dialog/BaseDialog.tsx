@@ -15,6 +15,9 @@ interface BaseDialogProps {
   children: React.ReactNode;
   className?: string;
   headerClassName?: string;
+  // 開閉制御プロパティ
+  isOpen?: boolean;
+  onToggle?: (open: boolean) => void;
 }
 
 const BaseDialog: React.FC<BaseDialogProps> = ({
@@ -25,12 +28,14 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
   children,
   className,
   headerClassName,
+  isOpen,
+  onToggle,
 }) => {
   // Headerセクションがいずれかのコンテンツがある場合のみ表示
   const showHeader = title || description || headerContent;
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={onToggle}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className={className}>
         {showHeader ? (

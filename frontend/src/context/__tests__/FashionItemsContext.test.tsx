@@ -1,3 +1,4 @@
+import { useToast } from '@/hooks/use-toast';
 import { deleteFashionItemAPI, fetchFashionItemsByCategoryAPI } from '@/lib/api/fashionItemsApi';
 import type { FashionItem } from '@/types';
 import { act, render, renderHook, screen } from '@testing-library/react';
@@ -9,25 +10,36 @@ jest.mock('@/lib/api/fashionItemsApi', () => ({
   fetchFashionItemsByCategoryAPI: jest.fn(),
 }));
 
-// テスト用のモックデータ
-const mockItems: FashionItem[] = [
-  {
+// useToastのモック
+jest.mock('@/hooks/use-toast', () => ({
+  useToast: jest.fn(),
+}));
+
+describe('FashionItemsProvider', () => {
+  const mockToast = { toast: jest.fn() };
+
+  const mockFashionItem: FashionItem = {
     id: '1',
-    image: 'test1.jpg',
+    image: 'test-image.jpg',
     sub_category: {
       id: 'sub1',
       subcategory_name: 'Tシャツ',
-      category: 'category1',
+      category: 'tops',
     },
     brand: {
       id: 'brand1',
-      brand_name: 'テストブランド1',
-      brand_name_kana: 'テストブランドイチ',
+      brand_name: 'TestBrand',
+      brand_name_kana: 'テストブランド',
     },
-    seasons: [{ id: 'spring', season_name: '春' }],
+    seasons: [
+      {
+        id: 'season1',
+        season_name: '春',
+      },
+    ],
     price_range: {
       id: 'price1',
-      price_range: '¥1,000-¥3,000',
+      price_range: '¥5,000-¥10,000',
     },
     design: {
       id: 'design1',
@@ -35,53 +47,31 @@ const mockItems: FashionItem[] = [
     },
     main_color: {
       id: 'color1',
-      color_name: '白',
-      color_code: '#FFFFFF',
+      color_name: '黒',
+      color_code: '#000000',
     },
     is_owned: true,
     is_old_clothes: false,
     created_at: new Date('2024-01-01'),
     updated_at: new Date('2024-01-01'),
-  },
-  {
-    id: '2',
-    image: 'test2.jpg',
-    sub_category: {
-      id: 'sub2',
-      subcategory_name: 'パンツ',
-      category: 'category1',
-    },
-    brand: null,
-    seasons: [{ id: 'summer', season_name: '夏' }],
-    price_range: null,
-    design: null,
-    main_color: {
-      id: 'color2',
-      color_name: '黒',
-      color_code: '#000000',
-    },
-    is_owned: false,
-    is_old_clothes: true,
-    created_at: new Date('2024-01-02'),
-    updated_at: new Date('2024-01-02'),
-  },
-];
+  };
 
-describe('FashionItemsProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+    (useToast as jest.Mock).mockReturnValue(mockToast);
   });
 
   // 基本的なコンテキスト提供のテスト
   it('provides default values', () => {
     const TestComponent = () => {
-      const { currentItems, selectedCategory, filters } = useFashionItems();
+      const { state } = useFashionItems();
       return (
         <div>
-          <div data-testid="items-count">{currentItems.length}</div>
-          <div data-testid="selected-category">{selectedCategory || 'none'}</div>
-          <div data-testid="filters">{JSON.stringify(filters)}</div>
+          <div data-testid="selected-category">{state.selectedCategory}</div>
+          <div data-testid="items-count">{state.currentItems.length}</div>
+          <div data-testid="is-pending">{state.isPending.toString()}</div>
+          <div data-testid="filters-status">{state.filters.status.toString()}</div>
+          <div data-testid="filters-season">{state.filters.season.join(',')}</div>
         </div>
       );
     };
@@ -92,187 +82,155 @@ describe('FashionItemsProvider', () => {
       </FashionItemsProvider>,
     );
 
+    expect(screen.getByTestId('selected-category')).toHaveTextContent('');
     expect(screen.getByTestId('items-count')).toHaveTextContent('0');
-    expect(screen.getByTestId('selected-category')).toHaveTextContent('none');
-    expect(JSON.parse(screen.getByTestId('filters').textContent || '{}')).toEqual({
-      category: '',
-      status: [],
-      season: [],
-    });
+    expect(screen.getByTestId('is-pending')).toHaveTextContent('false');
+    expect(screen.getByTestId('filters-status')).toHaveTextContent('');
+    expect(screen.getByTestId('filters-season')).toHaveTextContent('');
   });
 
   // カテゴリー変更のテスト
   it('handles category change correctly', async () => {
+    const mockItems = [mockFashionItem];
+    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+
     const { result } = renderHook(() => useFashionItems(), {
       wrapper: FashionItemsProvider,
     });
 
     await act(async () => {
-      await result.current.handleCategoryChange('category1');
+      await result.current.handlers.handleCategoryChange('tops');
     });
 
-    expect(fetchFashionItemsByCategoryAPI).toHaveBeenCalledWith('category1');
-    expect(result.current.selectedCategory).toBe('category1');
-    expect(result.current.currentItems).toEqual(mockItems);
-    expect(result.current.currentItems[0].sub_category.category).toBe('category1');
+    expect(result.current.state.selectedCategory).toBe('tops');
+    expect(result.current.state.currentItems).toHaveLength(1);
+    expect(result.current.state.filters.category).toBe('tops');
+    expect(fetchFashionItemsByCategoryAPI).toHaveBeenCalledWith('tops');
   });
 
-  // キャッシュの動作テスト
-  it('uses cache for repeated category selections', async () => {
-    const { result } = renderHook(() => useFashionItems(), {
-      wrapper: FashionItemsProvider,
-    });
+  // フィルター変更のテスト
+  describe('filter changes', () => {
+    it('handles owned status filter correctly', async () => {
+      const mockItems = [
+        { ...mockFashionItem, id: '1', is_owned: true },
+        { ...mockFashionItem, id: '2', is_owned: false },
+      ];
 
-    // 初回のカテゴリー選択
-    await act(async () => {
-      await result.current.handleCategoryChange('category1');
-    });
-
-    // 同じカテゴリーを再選択
-    await act(async () => {
-      await result.current.handleCategoryChange('category1');
-    });
-
-    // APIは1回だけ呼ばれるべき
-    expect(fetchFashionItemsByCategoryAPI).toHaveBeenCalledTimes(1);
-  });
-
-  // フィルター機能のテスト
-  describe('filtering', () => {
-    it('filters by ownership status correctly', async () => {
       const { result } = renderHook(() => useFashionItems(), {
         wrapper: FashionItemsProvider,
       });
 
+      (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
       await act(async () => {
-        await result.current.handleCategoryChange('category1');
-        result.current.handleFilterChange({ status: ['owned'] });
+        await result.current.handlers.handleCategoryChange('tops');
       });
 
-      expect(result.current.currentItems).toHaveLength(1);
-      expect(result.current.currentItems[0].id).toBe('1');
-      expect(result.current.currentItems[0].is_owned).toBe(true);
+      act(() => {
+        result.current.handlers.handleFilterChange({ status: ['owned'] });
+      });
+
+      expect(result.current.state.currentItems).toHaveLength(1);
+      expect(result.current.state.currentItems[0].id).toBe('1');
     });
 
-    it('filters by used clothes status correctly', async () => {
+    it('handles season filter correctly', async () => {
+      const mockItems = [
+        { ...mockFashionItem, id: '1', seasons: [{ id: 'spring', season_name: '春' }] },
+        { ...mockFashionItem, id: '2', seasons: [{ id: 'summer', season_name: '夏' }] },
+      ];
+
       const { result } = renderHook(() => useFashionItems(), {
         wrapper: FashionItemsProvider,
       });
 
+      (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
       await act(async () => {
-        await result.current.handleCategoryChange('category1');
-        result.current.handleFilterChange({ status: ['used'] });
+        await result.current.handlers.handleCategoryChange('tops');
       });
 
-      expect(result.current.currentItems).toHaveLength(1);
-      expect(result.current.currentItems[0].id).toBe('2');
-      expect(result.current.currentItems[0].is_old_clothes).toBe(true);
-    });
-
-    it('filters by season correctly', async () => {
-      const { result } = renderHook(() => useFashionItems(), {
-        wrapper: FashionItemsProvider,
+      act(() => {
+        result.current.handlers.handleFilterChange({ season: ['spring'] });
       });
 
-      await act(async () => {
-        await result.current.handleCategoryChange('category1');
-        result.current.handleFilterChange({ season: ['summer'] });
-      });
-
-      expect(result.current.currentItems).toHaveLength(1);
-      expect(result.current.currentItems[0].id).toBe('2');
-      expect(result.current.currentItems[0].seasons[0].id).toBe('summer');
-    });
-
-    it('combines multiple filters correctly', async () => {
-      const { result } = renderHook(() => useFashionItems(), {
-        wrapper: FashionItemsProvider,
-      });
-
-      await act(async () => {
-        await result.current.handleCategoryChange('category1');
-        result.current.handleFilterChange({
-          status: ['owned'],
-          season: ['spring'],
-        });
-      });
-
-      expect(result.current.currentItems).toHaveLength(1);
-      expect(result.current.currentItems[0].id).toBe('1');
-      expect(result.current.currentItems[0].is_owned).toBe(true);
-      expect(result.current.currentItems[0].seasons[0].id).toBe('spring');
+      expect(result.current.state.currentItems).toHaveLength(1);
+      expect(result.current.state.currentItems[0].id).toBe('1');
     });
   });
 
   // アイテム削除のテスト
-  describe('item deletion', () => {
-    it('handles successful item deletion', async () => {
-      const { result } = renderHook(() => useFashionItems(), {
-        wrapper: FashionItemsProvider,
-      });
+  it('handles item deletion correctly', async () => {
+    const mockItems = [
+      { ...mockFashionItem, id: '1' },
+      { ...mockFashionItem, id: '2' },
+    ];
 
-      await act(async () => {
-        await result.current.handleCategoryChange('category1');
-      });
+    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+    (deleteFashionItemAPI as jest.Mock).mockResolvedValue(undefined);
 
-      (deleteFashionItemAPI as jest.Mock).mockResolvedValueOnce(undefined);
-
-      await act(async () => {
-        await result.current.handleDelete('1');
-      });
-
-      expect(deleteFashionItemAPI).toHaveBeenCalledWith('1');
-      expect(result.current.currentItems).toHaveLength(1);
-      expect(result.current.currentItems[0].id).toBe('2');
+    const { result } = renderHook(() => useFashionItems(), {
+      wrapper: FashionItemsProvider,
     });
 
-    it('handles deletion error correctly', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const { result } = renderHook(() => useFashionItems(), {
-        wrapper: FashionItemsProvider,
-      });
+    await act(async () => {
+      await result.current.handlers.handleCategoryChange('tops');
+    });
 
-      await act(async () => {
-        await result.current.handleCategoryChange('category1');
-      });
+    await act(async () => {
+      await result.current.handlers.handleDelete('1');
+    });
 
-      (deleteFashionItemAPI as jest.Mock).mockRejectedValueOnce(new Error('Delete failed'));
+    expect(result.current.state.currentItems).toHaveLength(1);
+    expect(result.current.state.currentItems[0].id).toBe('2');
+    expect(deleteFashionItemAPI).toHaveBeenCalledWith('1');
+  });
 
-      await act(async () => {
-        await result.current.handleDelete('1');
-      });
+  // 削除エラーのテスト
+  it('handles deletion error correctly', async () => {
+    (deleteFashionItemAPI as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
-      expect(consoleErrorSpy).toHaveBeenCalled();
-      expect(result.current.currentItems).toHaveLength(2);
+    const { result } = renderHook(() => useFashionItems(), {
+      wrapper: FashionItemsProvider,
+    });
 
-      consoleErrorSpy.mockRestore();
+    await act(async () => {
+      await result.current.handlers.handleDelete('1');
+    });
+
+    expect(mockToast.toast).toHaveBeenCalledWith({
+      variant: 'destructive',
+      title: 'エラー',
+      description: 'アイテムの削除に失敗しました。',
     });
   });
 
   // アイテム更新のテスト
   it('handles item update correctly', async () => {
+    const initialItem = { ...mockFashionItem, id: '1' };
+    const mockItems = [initialItem];
+
     const { result } = renderHook(() => useFashionItems(), {
       wrapper: FashionItemsProvider,
     });
 
+    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
     await act(async () => {
-      await result.current.handleCategoryChange('category1');
+      await result.current.handlers.handleCategoryChange('tops');
     });
 
-    const updatedItem: FashionItem = {
-      ...mockItems[0],
-      brand: {
-        id: 'brand2',
-        brand_name: '更新されたブランド',
-        brand_name_kana: 'コウシンサレタブランド',
+    const updatedItem = {
+      ...initialItem,
+      main_color: {
+        id: 'color2',
+        color_name: '白',
+        color_code: '#FFFFFF',
       },
     };
 
     act(() => {
-      result.current.handleUpdate(updatedItem);
+      result.current.handlers.handleUpdate(updatedItem);
     });
 
-    expect(result.current.currentItems[0].brand?.brand_name).toBe('更新されたブランド');
+    expect(result.current.state.currentItems[0].main_color?.color_name).toBe('白');
   });
 
   // コンテキスト外使用のエラーテスト

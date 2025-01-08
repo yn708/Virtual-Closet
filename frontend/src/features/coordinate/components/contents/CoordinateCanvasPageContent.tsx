@@ -1,42 +1,31 @@
-'use client';
-
-import { useCoordinateCanvasState } from '../../hooks/useCoordinateCanvasState';
+import { CoordinateCanvasStateProvider } from '@/context/CoordinateCanvasContext';
+import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
+import type { CoordinateEditTypes } from '../../types';
 import Footer from '../navigation/Footer';
 import Header from '../navigation/Header';
 import CoordinateCanvas from './CoordinateCanvas';
 
-const CoordinateCanvasPageContent = () => {
-  // カスタムフックから状態とハンドラーを取得
-  const {
-    state: { selectedItems, itemStyles, background },
-    handlers,
-  } = useCoordinateCanvasState();
-
+const CoordinateCanvasPageContent = ({
+  initialItems,
+  initialData,
+  onSuccess,
+}: InitialItemsProps & CoordinateEditTypes) => {
   return (
-    <div className="h-screen w-full bg-gray-50 dark:bg-gray-950 ">
-      <div className="max-w-[65vh] flex flex-col items-center justify-center mx-auto">
-        {/* ヘッダーナビゲーション */}
-        <Header selectedItems={selectedItems} itemStyles={itemStyles} />
-
-        {/* メインキャンバス */}
-        <CoordinateCanvas
-          selectedItems={selectedItems}
-          onRemoveItem={handlers.handleRemoveItem}
-          itemStyles={itemStyles}
-          onUpdateStyles={handlers.handleUpdateStyles}
-          background={background}
-        />
-
-        {/* フッターナビゲーション */}
-        <Footer
-          selectedItems={selectedItems}
-          onSelectItem={handlers.handleSelectItem}
-          onReset={handlers.handleFullReset}
-          onBackgroundChange={handlers.handleBackgroundChange}
-          background={background}
-        />
+    <CoordinateCanvasStateProvider initialItems={initialItems}>
+      <div className="h-screen w-full bg-gray-50 dark:bg-gray-950" data-testid="main-container">
+        <div
+          className="max-w-[65vh] flex flex-col items-center justify-center mx-auto"
+          data-testid="inner-container"
+        >
+          {/* ヘッダーナビゲーション */}
+          <Header initialData={initialData} initialItems={initialItems} onSuccess={onSuccess} />
+          {/* メインキャンバス */}
+          <CoordinateCanvas />
+          {/* フッターナビゲーション */}
+          <Footer />
+        </div>
       </div>
-    </div>
+    </CoordinateCanvasStateProvider>
   );
 };
 

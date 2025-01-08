@@ -1,28 +1,25 @@
 'use client';
 
-import { useImage } from '@/context/ImageContext';
 import ImageFormField from '@/features/fashion-items/components/form/field/ImageFormField';
-import type { FormState } from '@/types';
-import { initialState } from '@/utils/data/initialState';
-import { useFormState } from 'react-dom';
-import type { CoordinateEditorFormProps } from '../../types';
+import { BACKEND_URL } from '@/utils/constants';
+import { usePhotoCoordinateForm } from '../../hooks/usePhotoCoordinateForm';
+import type { CoordinateEditTypes, CoordinateMetaDataTypes } from '../../types';
 import CoordinateEditorSelectFormFields from './field/CoordinateEditorSelectFormFields';
-import { photoCoordinateCreateAction } from '@/lib/actions/outfit/photoCoordinateCreateAction';
 
-const CoordinateEditorForm = ({ metaData }: CoordinateEditorFormProps) => {
-  const { isProcessing, preview, clearImage } = useImage();
+const CoordinateEditorForm = ({
+  metaData,
+  initialData,
+  onSuccess,
+}: CoordinateMetaDataTypes & CoordinateEditTypes) => {
+  const { state, formAction, isProcessing, preview } = usePhotoCoordinateForm({
+    initialData,
+    onSuccess,
+  });
 
-  // アイテム作成用アクション
-  const handleCreateAction = async (prevState: FormState, formData: FormData) => {
-    const result = await photoCoordinateCreateAction(prevState, formData);
-    if (result.success) {
-      clearImage();
-    }
-    return result;
-  };
-
-  const [state, formAction] = useFormState(handleCreateAction, initialState);
-  const currentPreview = preview || undefined;
+  const initialImage = initialData?.image
+    ? `${BACKEND_URL}${initialData.image.replace('http://backend:8000', '')}`
+    : undefined;
+  const currentPreview = preview || initialImage; // previewがある場合に優先で表示
 
   return (
     <form action={formAction} className="max-w-7xl mx-auto p-6">
@@ -41,6 +38,7 @@ const CoordinateEditorForm = ({ metaData }: CoordinateEditorFormProps) => {
         {/* 選択フォームエリア */}
         <CoordinateEditorSelectFormFields
           metaData={metaData}
+          initialData={initialData}
           isProcessing={isProcessing}
           state={state}
         />

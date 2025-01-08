@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes } from 'react';
+import type { FormState } from './actions';
 import type { ClassNameType } from './common';
 /* ----------------------------------------------------------------
 Base
@@ -24,6 +25,12 @@ export interface BaseOption {
   name: string;
   [key: string]: string | number;
 }
+
+export interface BaseFieldsStateProps {
+  isProcessing?: boolean;
+  state: FormState;
+}
+
 /* ----------------------------------------------------------------
 Input field
 ------------------------------------------------------------------ */
@@ -88,6 +95,7 @@ export interface SelectionGroup {
   labelKey: string;
   maxSelections?: number;
   error?: string[];
+  defaultValue?: string[];
 }
 
 export interface AccordionToggleGroupFieldProps {

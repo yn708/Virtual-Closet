@@ -1,7 +1,7 @@
 import ImageField from '@/components/elements/image/ImageField';
-import type { ImagePreviewSectionProps } from '@/features/fashion-items/types';
+import type { ImageFieldProps } from '@/types';
 
-const ImageFormField = ({ isProcessing, preview, error }: ImagePreviewSectionProps) => {
+const ImageFormField = ({ isProcessing, preview, error }: ImageFieldProps) => {
   return (
     <div className="col-span-2 p-4">
       <ImageField isProcessing={isProcessing} preview={preview} error={error} />
