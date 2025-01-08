@@ -96,14 +96,6 @@ class FashionItemViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(items, many=True)
         return Response(serializer.data)
 
-    def _handle_image_update(self, instance, new_image):
-        """ファッションアイテム画像の更新処理"""
-        # 古い画像が存在し、かつ新しい画像で更新された場合に古い画像を削除
-        if new_image and instance.image:
-            old_image = instance.image
-            if old_image != new_image and default_storage.exists(old_image.name):
-                default_storage.delete(old_image.name)
-
     # 特定アイテムの編集
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -111,47 +103,19 @@ class FashionItemViewSet(viewsets.ModelViewSet):
         if instance.user != request.user:
             return Response({"error": "このアイテムを編集する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
 
-        # データの前処理
-        update_fields = request.data.copy()
-
-        # 画像の更新処理
-        new_image = update_fields.get("image")
-        if new_image:
-            self._handle_image_update(instance, new_image)
-
-        # seasons の特別処理（既存のコード）
-        if "seasons" not in update_fields or not update_fields.getlist("seasons"):
-            instance.seasons.clear()
-            if "seasons" in update_fields:
-                update_fields.pop("seasons")
-
-        # その他のフィールドの null 処理（既存のコード）
-        for field in ["brand", "price_range", "design", "main_color"]:
-            if field in update_fields and (
-                update_fields[field] == "" or update_fields[field] == "null" or update_fields[field] is None
-            ):
-                update_fields[field] = None
-
         # 更新用のシリアライザーでバリデーションと保存
         update_serializer = self.get_serializer(
             instance,
-            data=update_fields,
+            data=request.data,
             partial=True,
         )
 
         update_serializer.is_valid(raise_exception=True)
         self.perform_update(update_serializer)
 
-        # シーズンデータの処理
-        if "seasons" in request.data and request.data.getlist("seasons"):
-            instance.seasons.set(request.data.getlist("seasons"))
-
         # 詳細シリアライザーで応答データを作成
         detailed_serializer = DetailedFashionItemSerializer(instance)
         return Response(detailed_serializer.data)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
 
     # 特定のアイテムの削除
     def destroy(self, request, *args, **kwargs):
@@ -159,6 +123,10 @@ class FashionItemViewSet(viewsets.ModelViewSet):
 
         if instance.user != request.user:
             return Response({"error": "このアイテムを削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
+        # 画像の削除処理
+        if instance.image:
+            if default_storage.exists(instance.image.name):
+                default_storage.delete(instance.image.name)
 
         self.perform_destroy(instance)
         return Response({"message": "アイテムが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)

@@ -1,4 +1,5 @@
 import pytest
+from django.core.files.storage import default_storage
 from django.urls import reverse
 from rest_framework import status
 
@@ -34,7 +35,7 @@ class TestMetaDataView:
 
 @pytest.mark.django_db
 class TestBrandSearchView:
-    """BrandSearchViewのテストクラス"""
+    """ブランド検索ビューのテストクラス"""
 
     def test_unauthenticated_access(self, api_client):
         """未認証アクセスのテスト"""
@@ -125,11 +126,17 @@ class TestFashionItemViewSet:
 
         assert response.status_code == status.HTTP_200_OK
 
-    def test_update_fashion_item(self, auth_client, fashion_item, season, test_image):
-        """アイテム更新テスト"""
+    def test_update_fashion_item_with_image(self, auth_client, fashion_item, test_image):
+        """画像付きのアイテム更新テスト"""
         url = reverse("fashionitem-detail", args=[fashion_item.id])
 
-        update_data = {"is_owned": False, "is_old_clothes": True, "seasons": [season.id], "image": test_image}
+        # 古い画像のパスを保存
+        old_image_path = fashion_item.image.name if fashion_item.image else None
+
+        update_data = {
+            "image": test_image,
+            "is_owned": False,
+        }
 
         response = auth_client.patch(url, data=update_data, format="multipart")
         assert response.status_code == status.HTTP_200_OK
@@ -137,8 +144,50 @@ class TestFashionItemViewSet:
         # 更新されたアイテムを取得して検証
         fashion_item.refresh_from_db()
         assert not fashion_item.is_owned
-        assert fashion_item.is_old_clothes
+        assert fashion_item.image  # 新しい画像が設定されていることを確認
+        if old_image_path:
+            assert not default_storage.exists(old_image_path)  # 古い画像が削除されていることを確認
+
+    def test_update_fashion_item_with_null_fields(self, auth_client, fashion_item):
+        """null値を含むアイテム更新テスト"""
+        url = reverse("fashionitem-detail", args=[fashion_item.id])
+
+        update_data = {
+            "brand": "",  # Noneの代わりに空文字列を使用
+            "price_range": "",
+            "design": "",
+            "main_color": "",
+        }
+
+        response = auth_client.patch(url, data=update_data, format="json")  # multipartからjsonに変更
+        assert response.status_code == status.HTTP_200_OK
+
+        # 更新されたアイテムを取得して検証
+        fashion_item.refresh_from_db()
+        assert fashion_item.brand is None
+        assert fashion_item.price_range is None
+        assert fashion_item.design is None
+        assert fashion_item.main_color is None
+
+    def test_update_fashion_item_with_seasons(self, auth_client, fashion_item, season):
+        """シーズンデータを含むアイテム更新テスト"""
+        url = reverse("fashionitem-detail", args=[fashion_item.id])
+
+        # シーズンを追加するテスト
+        update_data = {"seasons": [season.id]}
+        response = auth_client.patch(url, data=update_data, format="json")  # multipartからjsonに変更
+        assert response.status_code == status.HTTP_200_OK
+
+        fashion_item.refresh_from_db()
         assert list(fashion_item.seasons.values_list("id", flat=True)) == [season.id]
+
+        # シーズンをクリアするテスト（空リストを送信）
+        update_data = {"seasons": []}
+        response = auth_client.patch(url, data=update_data, format="json")  # multipartからjsonに変更
+        assert response.status_code == status.HTTP_200_OK
+
+        fashion_item.refresh_from_db()
+        assert not fashion_item.seasons.exists()
 
     def test_delete_fashion_item(self, auth_client, fashion_item):
         """アイテム削除テスト"""
@@ -146,14 +195,3 @@ class TestFashionItemViewSet:
         response = auth_client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not FashionItem.objects.filter(id=fashion_item.id).exists()
-
-    def test_clear_seasons(self, auth_client, fashion_item):
-        """シーズンクリアテスト"""
-        assert fashion_item.seasons.exists()
-
-        url = reverse("fashionitem-detail", args=[fashion_item.id])
-        response = auth_client.patch(url, data={"seasons": []}, format="multipart")
-
-        assert response.status_code == status.HTTP_200_OK
-        fashion_item.refresh_from_db()
-        assert not fashion_item.seasons.exists()

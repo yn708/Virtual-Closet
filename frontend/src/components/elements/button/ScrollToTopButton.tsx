@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { FaAngleDoubleUp } from 'react-icons/fa';
 
-export interface ScrollToTopButtonProps {
+interface ScrollToTopButtonProps {
   show: boolean;
   onClick: () => void;
 }

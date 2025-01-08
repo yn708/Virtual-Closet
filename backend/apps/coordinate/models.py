@@ -24,7 +24,7 @@ class Taste(models.Model):
 # 写真投稿用コーディネートモデル
 class PhotoCoordinate(TimestampMixin, models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="coordinations/")
+    image = models.ImageField(upload_to="coordinations/photo")
     seasons = models.ManyToManyField(Season, blank=True)
     scenes = models.ManyToManyField(Scene, blank=True)
     tastes = models.ManyToManyField(Taste, blank=True)
@@ -36,11 +36,12 @@ class PhotoCoordinate(TimestampMixin, models.Model):
 # コーディネートモデル（カスタマイズ用）
 class CustomCoordinate(TimestampMixin, models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    items = models.ManyToManyField(FashionItem, through="CoordinateItem", related_name="coordinates")
+    image = models.ImageField(upload_to="coordinations/custom/")
+    background = models.CharField(max_length=50, default="bg-white")
     seasons = models.ManyToManyField(Season, blank=True)
     scenes = models.ManyToManyField(Scene, blank=True)
     tastes = models.ManyToManyField(Taste, blank=True)
-    preview_image = models.ImageField(upload_to="coordinations/previews/")  # プレビュー画像の追加
+    items = models.ManyToManyField(FashionItem, through="CoordinateItem", related_name="coordinates")
 
     def __str__(self):
         return f"Coordinate by {self.user.username}"

@@ -17,7 +17,7 @@ export const fashionItemCreateFormSchema = z.object({
 });
 
 /* ----------------------------------------------------------------
-ファッションアイテム登録時詳細選択
+ファッションアイテム更新時詳細選択
 すべて任意選択
 ------------------------------------------------------------------ */
 export const fashionItemUpdateFormSchema = z.object({

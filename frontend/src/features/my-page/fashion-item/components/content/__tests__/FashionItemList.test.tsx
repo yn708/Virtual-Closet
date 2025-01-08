@@ -1,175 +1,214 @@
-import type { FashionItem } from '@/types';
+import type { FashionItem, FashionItemsContextValue } from '@/types';
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { FashionItemListProps } from '../../../types';
 import FashionItemList from '../FashionItemList';
 
-// 各コンポーネントのモック
-jest.mock('@/components/elements/loading/LoadingElements', () => {
-  return function MockLoadingElements({ message }: { message: string }) {
-    return <div data-testid="loading-elements">{message}</div>;
-  };
+// Next/Imageのモック
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: ({
+    src,
+    alt,
+    ...props
+  }: { src: string; alt: string } & React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <img src={src} alt={alt} {...props} />
+  ),
+}));
+
+// モックアイテムの作成
+const mockFashionItem: FashionItem = {
+  id: '1',
+  image: '/test-image.jpg',
+  sub_category: {
+    id: 'sub1',
+    subcategory_name: 'T-shirts',
+    category: 'tops',
+  },
+  brand: {
+    id: 'brand1',
+    brand_name: 'Test Brand',
+    brand_name_kana: 'テストブランド',
+  },
+  seasons: [{ id: 'season1', season_name: 'ALL' }],
+  price_range: { id: 'price1', price_range: '¥1,000-¥2,000' },
+  design: { id: 'design1', design_pattern: 'Solid' },
+  main_color: { id: 'color1', color_name: 'Black', color_code: '#000000' },
+  is_owned: true,
+  is_old_clothes: false,
+  created_at: new Date(),
+  updated_at: new Date(),
+};
+
+// モックコンテキスト値の作成
+const createMockContextValue = (
+  overrides: Partial<FashionItemsContextValue> = {},
+): FashionItemsContextValue => ({
+  state: {
+    categoryCache: {},
+    selectedCategory: 'tops',
+    filters: {
+      category: '',
+      status: '',
+      season: [],
+    },
+    isPending: false,
+    currentItems: [mockFashionItem],
+    ...overrides.state,
+  },
+  handlers: {
+    handleCategoryChange: jest.fn(),
+    handleDelete: jest.fn(),
+    handleUpdate: jest.fn(),
+    handleFilterChange: jest.fn(),
+    ...overrides.handlers,
+  },
 });
 
-jest.mock('../EmptyState', () => {
-  return function MockEmptyState() {
-    return <div data-testid="empty-state">アイテムがありません</div>;
-  };
-});
+// デフォルトのモックコンテキスト値
+const mockContextValue = createMockContextValue();
 
-jest.mock('../../drawer/ItemImageDrawer', () => {
-  return function MockItemImageDrawer({
+// コンテキストのモック
+jest.mock('@/context/FashionItemsContext', () => ({
+  useFashionItems: () => mockContextValue,
+}));
+
+// 共通コンポーネントのモック
+jest.mock('@/features/my-page/common/components/layout/BaseListLayout', () => ({
+  __esModule: true,
+  default: ({
+    items,
+    renderItem,
+  }: {
+    items: FashionItem[];
+    renderItem: (item: FashionItem) => React.ReactNode;
+  }) => (
+    <div data-testid="base-list-layout">
+      {items.map((item) => (
+        <div key={item.id} data-testid="list-item">
+          {renderItem(item)}
+        </div>
+      ))}
+    </div>
+  ),
+}));
+
+jest.mock('@/features/my-page/common/components/drawer/BaseImageDrawer', () => ({
+  __esModule: true,
+  default: ({
     item,
-    onDelete: _onDelete,
-    onUpdate: _onUpdate,
+    renderTrigger,
   }: {
     item: FashionItem;
-    onDelete?: (id: string) => void;
-    onUpdate?: (item: FashionItem) => void;
-  }) {
-    return <div data-testid={`item-drawer-${item.id}`}>{item.brand?.brand_name}</div>;
-  };
-});
+    renderTrigger: (imageUrl: string) => React.ReactNode;
+  }) => <div data-testid="base-image-drawer">{renderTrigger(item.image)}</div>,
+}));
 
-jest.mock('../ItemImage', () => {
-  return function MockItemImage({ src }: { src: string }) {
-    return <img data-testid="item-image" src={src} alt="" />;
-  };
-});
+jest.mock('../../button/ItemImageTrigger', () => ({
+  __esModule: true,
+  default: ({
+    imageUrl,
+    brand,
+    subCategoryName,
+  }: {
+    imageUrl: string;
+    brand: FashionItem['brand'];
+    subCategoryName: string;
+  }) => (
+    <button data-testid="item-image-trigger">
+      <img src={imageUrl} alt={subCategoryName} />
+      <span>{brand?.brand_name}</span>
+    </button>
+  ),
+}));
+
+jest.mock('../SelectableItem', () => ({
+  __esModule: true,
+  default: ({
+    item,
+    onSelectItem,
+    isSelected,
+  }: {
+    item: FashionItem;
+    onSelectItem: () => void;
+    isSelected: boolean;
+  }) => (
+    <button data-testid="selectable-item" onClick={onSelectItem} aria-pressed={isSelected}>
+      {item.sub_category.subcategory_name}
+    </button>
+  ),
+}));
 
 describe('FashionItemList', () => {
-  // 共通のprops
-  const defaultProps: FashionItemListProps = {
-    items: [],
-    isLoading: false,
-    onDelete: jest.fn(),
-    onUpdate: jest.fn(),
-  };
-
-  // テスト用のモックデータ
-  const mockItems: FashionItem[] = [
-    {
-      id: '1',
-      image: '/images/item1.jpg',
-      sub_category: {
-        id: '1',
-        subcategory_name: 'Test Sub Category 1',
-        category: 'tops',
-      },
-      brand: {
-        id: '1',
-        brand_name: 'Test Brand 1',
-        brand_name_kana: 'テストブランド1',
-      },
-      seasons: [{ id: '1', season_name: '春' }],
-      price_range: { id: '1', price_range: '~5000円' },
-      design: { id: '1', design_pattern: 'ストライプ' },
-      main_color: { id: '1', color_name: '黒', color_code: '#000000' },
-      is_owned: true,
-      is_old_clothes: false,
-      created_at: new Date('2024-01-01'),
-      updated_at: new Date('2024-01-01'),
-    },
-    {
-      id: '2',
-      image: '/images/item2.jpg',
-      sub_category: {
-        id: '2',
-        subcategory_name: 'Test Sub Category 2',
-        category: 'bottoms',
-      },
-      brand: {
-        id: '2',
-        brand_name: 'Test Brand 2',
-        brand_name_kana: 'テストブランド2',
-      },
-      seasons: [{ id: '2', season_name: '夏' }],
-      price_range: null,
-      design: null,
-      main_color: null,
-      is_owned: true,
-      is_old_clothes: false,
-      created_at: new Date('2024-01-01'),
-      updated_at: new Date('2024-01-01'),
-    },
-  ];
-
   beforeEach(() => {
     jest.clearAllMocks();
+    // テスト前にデフォルトのモック値に戻す
+    Object.assign(mockContextValue, createMockContextValue());
   });
 
-  it('ローディング状態が正しく表示されること', () => {
-    render(<FashionItemList {...defaultProps} isLoading={true} />);
-    expect(screen.getByTestId('loading-elements')).toBeInTheDocument();
-    expect(screen.getByText('アイテムを取得中...')).toBeInTheDocument();
+  it('通常モードで正しくレンダリングされること', () => {
+    render(<FashionItemList />);
+
+    expect(screen.getByTestId('base-list-layout')).toBeInTheDocument();
+    expect(screen.getByTestId('base-image-drawer')).toBeInTheDocument();
+    expect(screen.getByTestId('item-image-trigger')).toBeInTheDocument();
   });
 
-  it('アイテムが空の場合、EmptyStateが表示されること', () => {
-    render(<FashionItemList {...defaultProps} />);
-    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
-  });
+  it('選択モードで正しくレンダリングされること', () => {
+    const mockOnSelectItem = jest.fn();
+    const selectedItems: FashionItem[] = [];
 
-  it('選択モードがない場合、ItemImageDrawerとして表示されること', () => {
-    render(<FashionItemList {...defaultProps} items={mockItems} />);
-
-    mockItems.forEach((item) => {
-      expect(screen.getByTestId(`item-drawer-${item.id}`)).toBeInTheDocument();
-    });
-  });
-
-  it('選択モードの場合、アイテムが選択可能であること', () => {
-    const handleSelectItem = jest.fn();
-    const selectedItems = [mockItems[0]];
-
-    const { container } = render(
+    render(
       <FashionItemList
-        {...defaultProps}
-        items={mockItems}
-        onSelectItem={handleSelectItem}
-        selectedItems={selectedItems}
+        selection={{
+          onSelectItem: mockOnSelectItem,
+          selectedItems,
+        }}
       />,
     );
 
-    // 選択可能なアイテムを探して選択
-    const selectableItem = container.querySelector(`div[class*="group"]:not([class*="ring-2"])`);
-    expect(selectableItem).toBeInTheDocument();
-    fireEvent.click(selectableItem!);
-    expect(handleSelectItem).toHaveBeenCalledWith(mockItems[1]);
+    const selectableItem = screen.getByTestId('selectable-item');
+    fireEvent.click(selectableItem);
 
-    // 選択済みアイテムのスタイル確認
-    const selectedItem = container.querySelector(`div[class*="ring-2"][class*="ring-blue-500"]`);
-    expect(selectedItem).toBeInTheDocument();
+    expect(mockOnSelectItem).toHaveBeenCalledWith(mockFashionItem);
   });
 
-  it('画像URLが正しく生成されること', () => {
-    const { container } = render(
-      <FashionItemList {...defaultProps} items={mockItems} onSelectItem={jest.fn()} />,
-    );
+  it('アイテムが選択された状態を正しく表示すること', () => {
+    const mockOnSelectItem = jest.fn();
 
-    const images = container.querySelectorAll('[data-testid="item-image"]');
-    images.forEach((image, index) => {
-      const imgElement = image as HTMLImageElement;
-      expect(imgElement.src).toContain(mockItems[index].image.replace('http://backend:8000', ''));
-    });
-  });
-
-  it('選択状態のインジケーターが正しく表示されること', () => {
-    const { container } = render(
+    render(
       <FashionItemList
-        {...defaultProps}
-        items={mockItems}
-        onSelectItem={jest.fn()}
-        selectedItems={[mockItems[0]]}
+        selection={{
+          onSelectItem: mockOnSelectItem,
+          selectedItems: [mockFashionItem],
+        }}
       />,
     );
 
-    // 選択状態のインジケーター（チェックマークの円）を確認
-    const checkmarkContainer = container.querySelector(
-      'div[class*="bg-blue-500"][class*="rounded-full"]',
-    );
-    expect(checkmarkContainer).toBeInTheDocument();
+    const selectableItem = screen.getByTestId('selectable-item');
+    expect(selectableItem).toHaveAttribute('aria-pressed', 'true');
+  });
 
-    // SVGチェックマークの存在を確認
-    const checkmarkSvg = checkmarkContainer?.querySelector('svg');
-    expect(checkmarkSvg).toBeInTheDocument();
+  it('ローディング状態を正しく表示すること', () => {
+    // モック値を上書き
+    Object.assign(
+      mockContextValue,
+      createMockContextValue({
+        state: {
+          categoryCache: {},
+          selectedCategory: 'tops',
+          filters: {
+            category: '',
+            status: '',
+            season: [],
+          },
+          isPending: true,
+          currentItems: [mockFashionItem],
+        },
+      }),
+    );
+
+    render(<FashionItemList />);
+
+    const container = screen.getByTestId('base-list-layout').parentElement;
+    expect(container).toHaveClass('opacity-50');
   });
 });

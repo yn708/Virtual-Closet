@@ -1,18 +1,13 @@
-import { useImage } from '@/context/ImageContext';
-import { photoCoordinateCreateAction } from '@/lib/actions/outfit/photoCoordinateCreateAction';
+import { usePhotoCoordinateForm } from '@/features/coordinate/hooks/usePhotoCoordinateForm';
 import type { FormState } from '@/types';
-import type { CoordinateMetaDataType } from '@/types/coordinate';
+import type { BaseCoordinate } from '@/types/coordinate';
+import { BACKEND_URL } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
-import { useFormState } from 'react-dom';
 import CoordinateEditorForm from '../CoordinateEditorForm';
 
 // モジュールのモック
-jest.mock('@/context/ImageContext', () => ({
-  useImage: jest.fn(),
-}));
-
-jest.mock('@/lib/actions/outfit/photoCoordinateCreateAction', () => ({
-  photoCoordinateCreateAction: jest.fn(),
+jest.mock('../../../hooks/usePhotoCoordinateForm', () => ({
+  usePhotoCoordinateForm: jest.fn(),
 }));
 
 // 子コンポーネントのモック
@@ -36,49 +31,44 @@ jest.mock('@/features/fashion-items/components/form/field/ImageFormField', () =>
   };
 });
 
-jest.mock('../field/CoordinateEditorSelectFormFields', () => {
+jest.mock('./../field/CoordinateEditorSelectFormFields', () => {
   return function MockCoordinateEditorSelectFormFields({
     isProcessing,
     state,
+    initialData,
   }: {
     isProcessing: boolean;
     state: FormState;
+    initialData?: BaseCoordinate;
   }) {
     return (
       <div data-testid="select-form-fields">
         {isProcessing && <span>Processing...</span>}
         {state.errors && <span>Error State</span>}
+        {initialData && <span>Has Initial Data</span>}
       </div>
     );
   };
 });
 
-// React DOM のフックをモック
-jest.mock('react-dom', () => {
-  const originalModule = jest.requireActual('react-dom');
-  return {
-    ...originalModule,
-    useFormState: jest.fn((action) => [{ message: null, errors: null, success: false }, action]),
-  };
-});
-
 describe('CoordinateEditorForm', () => {
   // テストで使用するモックデータ
-  const mockMetaData: CoordinateMetaDataType = {
+  const mockMetaData = {
     seasons: [{ id: '1', name: '春', season_name: '春' }],
     scenes: [{ id: '1', name: 'カジュアル', scene: 'カジュアル' }],
     tastes: [{ id: '1', name: 'シンプル', taste: 'シンプル' }],
   };
 
-  const mockImageContext = {
+  const mockFormHook = {
+    state: { message: null, errors: null, success: false },
+    formAction: jest.fn(),
     isProcessing: false,
     preview: null,
-    clearImage: jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useImage as jest.Mock).mockReturnValue(mockImageContext);
+    (usePhotoCoordinateForm as jest.Mock).mockReturnValue(mockFormHook);
   });
 
   it('フォームが正しくレンダリングされること', () => {
@@ -98,8 +88,8 @@ describe('CoordinateEditorForm', () => {
   });
 
   it('画像処理中の状態が正しく反映されること', () => {
-    (useImage as jest.Mock).mockReturnValue({
-      ...mockImageContext,
+    (usePhotoCoordinateForm as jest.Mock).mockReturnValue({
+      ...mockFormHook,
       isProcessing: true,
     });
 
@@ -111,8 +101,8 @@ describe('CoordinateEditorForm', () => {
 
   it('プレビュー画像が存在する場合に正しく表示されること', () => {
     const previewUrl = 'test-preview-url';
-    (useImage as jest.Mock).mockReturnValue({
-      ...mockImageContext,
+    (usePhotoCoordinateForm as jest.Mock).mockReturnValue({
+      ...mockFormHook,
       preview: previewUrl,
     });
 
@@ -121,37 +111,51 @@ describe('CoordinateEditorForm', () => {
     expect(screen.getByTestId('image-form-field')).toHaveTextContent(`Preview: ${previewUrl}`);
   });
 
-  it('フォーム送信が成功した場合にclearImageが呼ばれること', async () => {
-    const mockFormData = new FormData();
-    (photoCoordinateCreateAction as jest.Mock).mockResolvedValue({
-      success: true,
-      message: 'Success',
-      errors: null,
-    });
+  it('初期データがある場合に正しく表示されること', () => {
+    const initialData: BaseCoordinate = {
+      id: '1',
+      image: 'http://backend:8000/media/test.jpg',
+      seasons: [{ id: 'season-1', season_name: '春' }],
+      scenes: [{ id: 'scene-1', scene: 'カジュアル' }],
+      tastes: [{ id: 'taste-1', taste: 'シンプル' }],
+    };
 
-    render(<CoordinateEditorForm metaData={mockMetaData} />);
+    render(
+      <CoordinateEditorForm
+        metaData={mockMetaData}
+        initialData={initialData}
+        onSuccess={jest.fn()}
+      />,
+    );
 
-    // フォームアクションのシミュレート
-    const formAction = (useFormState as jest.Mock).mock.calls[0][0];
-    await formAction({ success: false }, mockFormData);
-
-    expect(mockImageContext.clearImage).toHaveBeenCalled();
+    const expectedImageUrl = `${BACKEND_URL}/media/test.jpg`;
+    expect(screen.getByTestId('image-form-field')).toHaveTextContent(
+      `Preview: ${expectedImageUrl}`,
+    );
+    expect(screen.getByTestId('select-form-fields')).toHaveTextContent('Has Initial Data');
   });
 
-  it('フォーム送信がエラーの場合にclearImageが呼ばれないこと', async () => {
-    const mockFormData = new FormData();
-    (photoCoordinateCreateAction as jest.Mock).mockResolvedValue({
-      success: false,
-      message: 'Error',
-      errors: { image: 'Invalid image' },
+  it('カスタムフックが正しいパラメータで呼び出されること', () => {
+    const onSuccess = jest.fn();
+    const initialData: BaseCoordinate = {
+      id: '1',
+      image: 'test.jpg',
+      seasons: [{ id: 'season-1', season_name: '春' }],
+      scenes: [{ id: 'scene-1', scene: 'カジュアル' }],
+      tastes: [{ id: 'taste-1', taste: 'シンプル' }],
+    };
+
+    render(
+      <CoordinateEditorForm
+        metaData={mockMetaData}
+        initialData={initialData}
+        onSuccess={onSuccess}
+      />,
+    );
+
+    expect(usePhotoCoordinateForm).toHaveBeenCalledWith({
+      initialData,
+      onSuccess,
     });
-
-    render(<CoordinateEditorForm metaData={mockMetaData} />);
-
-    // フォームアクションのシミュレート
-    const formAction = (useFormState as jest.Mock).mock.calls[0][0];
-    await formAction({ success: false }, mockFormData);
-
-    expect(mockImageContext.clearImage).not.toHaveBeenCalled();
   });
 });

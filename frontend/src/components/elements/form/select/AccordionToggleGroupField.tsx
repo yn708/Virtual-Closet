@@ -17,7 +17,13 @@ import { FiCheck } from 'react-icons/fi';
 function AccordionToggleGroupField({ groups }: AccordionToggleGroupFieldProps) {
   /* 各グループの選択状態を管理するステート */
   const [selections, setSelections] = useState<Record<string, string[]>>(() =>
-    Object.fromEntries(groups.map((group) => [group.name, []])),
+    Object.fromEntries(
+      groups.map((group) => [
+        group.name,
+        // 初期値が存在する場合はそれを使用し、ない場合は空配列を使用
+        group.defaultValue || [],
+      ]),
+    ),
   );
 
   /* グループの選択値が変更された際のハンドラー */
@@ -73,7 +79,7 @@ function AccordionToggleGroupField({ groups }: AccordionToggleGroupFieldProps) {
     <ToggleGroup
       type="multiple"
       className={styles.group}
-      value={selections[group.name] || []}
+      defaultValue={group.defaultValue}
       onValueChange={(values) => handleValueChange(group.name, values)}
     >
       {group.options.map((option, index) => (

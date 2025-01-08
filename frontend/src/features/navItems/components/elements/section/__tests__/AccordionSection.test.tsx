@@ -1,6 +1,6 @@
 import { ICON_SIZE } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
-import { LuHome } from 'react-icons/lu';
+import { GoHome } from 'react-icons/go';
 import AccordionSection from '../AccordionSection';
 
 // Accordionコンポーネントのモック
@@ -37,7 +37,7 @@ jest.mock('@/components/ui/accordion', () => ({
 describe('AccordionSection', () => {
   const defaultProps = {
     value: 'home',
-    Icon: LuHome,
+    Icon: GoHome,
     label: 'Home Section',
   };
 
@@ -99,7 +99,7 @@ describe('AccordionSection', () => {
   it('renders with different props correctly', () => {
     const customProps = {
       value: 'settings',
-      Icon: LuHome,
+      Icon: GoHome,
       label: 'Settings Section',
     };
 

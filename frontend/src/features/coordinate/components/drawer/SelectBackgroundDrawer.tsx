@@ -1,14 +1,12 @@
 import IconButton from '@/components/elements/button/IconButton';
 import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import ThemeToggleButton from '@/features/navItems/components/elements/button/ThemeToggleButton';
 import { BG_COLOR } from '@/utils/data/selectData';
 import { TbBackground } from 'react-icons/tb';
-import type { SelectBackgroundProps } from '../../types';
 
-const SelectBackgroundDrawer: React.FC<SelectBackgroundProps> = ({
-  onBackgroundChange,
-  background,
-}) => {
+const SelectBackgroundDrawer = () => {
+  const { state, handlers } = useCoordinateCanvasState();
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -27,9 +25,9 @@ const SelectBackgroundDrawer: React.FC<SelectBackgroundProps> = ({
             {BG_COLOR.map((color) => (
               <DrawerClose key={color.value}>
                 <button
-                  onClick={() => onBackgroundChange(color.value)}
+                  onClick={() => handlers.handleBackgroundChange(color.value)}
                   className={`size-12 md:size-16 ${color.value} rounded-xl 
-            ${background === color.value ? 'ring-2 ring-offset-2 ring-gray-700' : ''}
+            ${state.background === color.value ? 'ring-2 ring-offset-2 ring-gray-700' : ''}
             border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.1)]
             transition-transform hover:scale-105`}
                 />

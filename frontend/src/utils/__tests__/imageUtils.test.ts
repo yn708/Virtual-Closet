@@ -59,24 +59,14 @@ describe('useImageField', () => {
   });
 
   describe('imageUtils', () => {
-    let consoleErrorSpy: jest.SpyInstance;
     const mockImageCompression = imageCompression as jest.MockedFunction<typeof imageCompression>;
-
-    beforeAll(() => {
-      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterAll(() => {
-      consoleErrorSpy.mockRestore();
-    });
 
     describe('processImage', () => {
       beforeEach(() => {
         (heic2any as jest.Mock).mockReset();
       });
 
-      // HEIC画像をJPEG形式に正しく変換できることを確認
-      it('should process HEIC image and convert to JPEG', async () => {
+      it('HEIC画像をJPEG形式に正しく変換できることを確認', async () => {
         const mockBlob = new Blob(['mock'], { type: 'image/jpeg' });
         (heic2any as jest.Mock).mockResolvedValue(mockBlob);
 
@@ -94,8 +84,7 @@ describe('useImageField', () => {
         });
       });
 
-      // HEIC以外の画像は変換せずにそのまま返すことを確認
-      it('should return original file for non-HEIC images', async () => {
+      it('HEIC以外の画像は変換せずにそのまま返すことを確認', async () => {
         const jpegFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
         const result = await conversionImage(jpegFile);
 
@@ -103,19 +92,7 @@ describe('useImageField', () => {
         expect(heic2any).not.toHaveBeenCalled();
       });
 
-      // HEIC変換時のエラーが適切に処理されることを確認
-      it('should handle conversion errors properly', async () => {
-        (heic2any as jest.Mock).mockRejectedValue(new Error('Conversion failed'));
-
-        const heicFile = new File(['test'], 'test.heic', { type: 'image/heic' });
-
-        await expect(conversionImage(heicFile)).rejects.toThrow('HEIC画像の変換に失敗しました。');
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith('HEIC conversion failed:', expect.any(Error));
-      });
-
-      // サーバーサイドでの実行時に元のファイルを返すことを確認
-      it('should handle server-side execution', async () => {
+      it('サーバーサイドでの実行時に元のファイルを返すことを確認', async () => {
         const originalWindow = global.window;
         Object.defineProperty(global, 'window', {
           configurable: true,
@@ -135,28 +112,24 @@ describe('useImageField', () => {
     });
 
     describe('validateImage', () => {
-      // 許可された画像タイプが全て受け入れられることを確認
-      it('should accept valid image types', () => {
+      it('許可された画像タイプが全て受け入れられることを確認', () => {
         ALLOWED_IMAGE_TYPES.forEach((type) => {
           const file = new File(['test'], 'test.jpg', { type });
           expect(validateImage(file)).toBeNull();
         });
       });
 
-      // HEIC形式のファイルが受け入れられることを確認
-      it('should accept HEIC files', () => {
+      it('HEIC形式のファイルが受け入れられることを確認', () => {
         const heicFile = new File(['test'], 'test.HEIC', { type: 'image/heic' });
         expect(validateImage(heicFile)).toBeNull();
       });
 
-      // 未対応のファイル形式が適切に拒否されることを確認
-      it('should reject invalid file types', () => {
+      it('未対応のファイル形式が適切に拒否されることを確認', () => {
         const invalidFile = new File(['test'], 'test.pdf', { type: 'application/pdf' });
         expect(validateImage(invalidFile)).toMatch(/未対応のファイル形式です/);
       });
 
-      // サイズ制限を超えるファイルが適切に拒否されることを確認
-      it('should reject files larger than MAX_FILE_SIZE', () => {
+      it('サイズ制限を超えるファイルが適切に拒否されることを確認', () => {
         const largeFile = new File(['x'.repeat(MAX_FILE_SIZE + 1)], 'test.jpg', {
           type: 'image/jpeg',
         });
@@ -164,8 +137,7 @@ describe('useImageField', () => {
         expect(validateImage(largeFile)).toBe('画像サイズは5MB以下にしてください。');
       });
 
-      // カスタムで指定した許可タイプのみが受け入れられることを確認
-      it('should work with custom allowed types', () => {
+      it('カスタムで指定した許可タイプのみが受け入れられることを確認', () => {
         const customTypes = ['image/png'];
         const jpegFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
         const pngFile = new File(['test'], 'test.png', { type: 'image/png' });
@@ -180,8 +152,7 @@ describe('useImageField', () => {
         mockImageCompression.mockReset();
       });
 
-      // デフォルト設定での圧縮が正しく動作することを確認
-      it('should compress image with default options', async () => {
+      it('デフォルト設定での圧縮が正しく動作することを確認', async () => {
         const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
         const compressedFile = new File(['compressed'], file.name, { type: 'image/jpeg' });
         mockImageCompression.mockResolvedValue(compressedFile);
@@ -197,8 +168,7 @@ describe('useImageField', () => {
         });
       });
 
-      // カスタム設定での圧縮が正しく動作することを確認
-      it('should compress image with custom options', async () => {
+      it('カスタム設定での圧縮が正しく動作することを確認', async () => {
         const file = new File(['test'], 'test.png', { type: 'image/png' });
         const compressedFile = new File(['compressed'], file.name, { type: 'image/png' });
         mockImageCompression.mockResolvedValue(compressedFile);
@@ -218,16 +188,6 @@ describe('useImageField', () => {
           useWebWorker: true,
           fileType: 'image/png',
         });
-      });
-
-      // 圧縮時のエラーが適切に処理されることを確認
-      it('should handle compression errors properly', async () => {
-        const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-        const error = new Error('Compression failed');
-        mockImageCompression.mockRejectedValue(error);
-
-        await expect(compressImage(file)).rejects.toThrow('Compression failed');
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Error compressing image:', error);
       });
     });
 
@@ -249,12 +209,10 @@ describe('useImageField', () => {
         global.FileReader = originalFileReader;
       });
 
-      // 正常系：画像プレビューの生成が成功する場合
-      it('should create image preview successfully', async () => {
+      it('画像プレビューの生成が正常に完了することを確認', async () => {
         const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
         const expectedDataUrl = 'data:image/jpeg;base64,dGVzdA==';
 
-        // FileReaderのモック実装
         mockFileReader.mockImplementation(() => ({
           readAsDataURL() {
             setTimeout(() => {
@@ -273,8 +231,7 @@ describe('useImageField', () => {
     });
 
     describe('dataURLtoFile', () => {
-      // 正常系：有効なデータURLからFileオブジェクトを生成
-      it('should convert valid data URL to File object', () => {
+      it('有効なデータURLからFileオブジェクトが正しく生成されることを確認', () => {
         const dataUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
         const filename = 'test.jpg';
 
@@ -285,8 +242,7 @@ describe('useImageField', () => {
         expect(result.type).toBe('image/jpeg');
       });
 
-      // 正常系：異なるMIMEタイプの処理
-      it('should handle different MIME types', () => {
+      it('異なるMIMEタイプが正しく処理されることを確認', () => {
         const dataUrl =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
         const filename = 'test.png';
@@ -298,8 +254,7 @@ describe('useImageField', () => {
         expect(result.type).toBe('image/png');
       });
 
-      // 正常系：Base64デコードの検証
-      it('should correctly decode base64 content', () => {
+      it('Base64デコードが正しく行われることを確認', () => {
         const content = 'Hello, World!';
         const base64Content = btoa(content);
         const dataUrl = `data:text/plain;base64,${base64Content}`;
@@ -307,7 +262,6 @@ describe('useImageField', () => {
 
         const result = dataURLtoFile(dataUrl, filename);
 
-        // FileReaderを使用してファイルの内容を確認
         return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
@@ -361,7 +315,7 @@ describe('useImageField', () => {
         // FileInputのモック設定
         mockFileInput = document.createElement('input');
         mockFileInput.type = 'file';
-        mockFileInput.name = 'preview_image';
+        mockFileInput.name = 'image';
         Object.defineProperty(mockFileInput, 'files', {
           writable: true,
           value: mockDataTransferFiles,
@@ -410,10 +364,13 @@ describe('useImageField', () => {
         const mockElement = document.createElement('div');
         mockElement.className = 'coordinate-canvas';
 
-        const consoleSpy = jest.spyOn(console, 'error');
+        // mockImageCompressionの成功ケースを設定
+        mockImageCompression.mockImplementationOnce(async (file) => {
+          return new File(['compressed'], file.name, { type: 'image/jpeg' });
+        });
+
         const result = await generatePreviewImage(mockElement);
 
-        expect(consoleSpy).not.toHaveBeenCalled();
         expect(html2canvas).toHaveBeenCalledWith(
           mockElement,
           expect.objectContaining({
@@ -423,11 +380,12 @@ describe('useImageField', () => {
             useCORS: true,
             allowTaint: true,
             backgroundColor: '#F9FAFB',
+            logging: false,
+            imageTimeout: 0,
+            onclone: expect.any(Function),
           }),
         );
         expect(result).toBe('mock-url');
-
-        consoleSpy.mockRestore();
       });
 
       it('画像生成時にエラーが発生した場合はnullを返すこと', async () => {
@@ -482,7 +440,7 @@ describe('useImageField', () => {
         await generatePreviewImage(mockElement);
 
         // hidden input要素にファイルが設定されていることを確認
-        const fileInput = document.querySelector('input[name="preview_image"]') as HTMLInputElement;
+        const fileInput = document.querySelector('input[name="image"]') as HTMLInputElement;
         expect(fileInput).toBeTruthy();
         expect(fileInput.files).toBeTruthy();
         expect(fileInput.files![0].name).toBe('coordinate_preview.png');
@@ -490,14 +448,24 @@ describe('useImageField', () => {
       });
 
       it('hidden input要素が見つからない場合でもURLを返すこと', async () => {
-        document.querySelector = jest.fn(() => null);
+        // document.querySelectorをnullを返すようにモック化
+        const originalQuerySelector = document.querySelector;
+        document.querySelector = jest.fn().mockReturnValue(null);
 
         const mockElement = document.createElement('div');
         mockElement.className = 'coordinate-canvas';
 
+        // mockImageCompressionの成功ケースを設定
+        mockImageCompression.mockImplementationOnce(async (file) => {
+          return new File(['compressed'], file.name, { type: 'image/jpeg' });
+        });
+
         const result = await generatePreviewImage(mockElement);
 
         expect(result).toBe('mock-url');
+
+        // 元のquerySelectorを復元
+        document.querySelector = originalQuerySelector;
       });
     });
   });

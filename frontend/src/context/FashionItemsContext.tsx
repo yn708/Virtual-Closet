@@ -1,96 +1,35 @@
 'use client';
-import type { CategoryCache, FilterState } from '@/features/my-page/fashion-item/types';
+import type { CategoryCache, FashionItemFilters } from '@/features/my-page/fashion-item/types';
 import { useToast } from '@/hooks/use-toast';
 import { deleteFashionItemAPI, fetchFashionItemsByCategoryAPI } from '@/lib/api/fashionItemsApi';
-import type { FashionItem, FashionItemsContextType } from '@/types';
+import type {
+  FashionItem,
+  FashionItemsContextValue,
+  FashionItemsHandlers,
+  FashionItemsState,
+} from '@/types';
 import { createContext, useContext, useState, useTransition } from 'react';
 
 /**
  * ファッションアイテムの表示、編集、削除に関するコンテキスト
  *
- * Sheet内での使用もあるため、
+ * Sheet内での使用もあるため、（CustomCoordinate作成時のCanvas内でのアイテムセレクト時）
  * カテゴリーの選択状態とキャッシュをContextで管理し、
  * Sheet開閉時のデータ保持と不要なAPI通信を防止
  */
-const FashionItemsContext = createContext<FashionItemsContextType | undefined>(undefined);
+const FashionItemsContext = createContext<FashionItemsContextValue | undefined>(undefined);
 
 export const FashionItemsProvider = ({ children }: { children: React.ReactNode }) => {
   const [categoryCache, setCategoryCache] = useState<CategoryCache>({}); // カテゴリーごとのアイテムをキャッシュ
-  const [selectedCategory, setSelectedCategory] = useState<string>(); // 選択されたカテゴリー
+  const [selectedCategory, setSelectedCategory] = useState<string>(''); // 選択されたカテゴリー
   // フィルター状態の初期化
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<FashionItemFilters>({
     category: '',
     status: [],
     season: [],
   });
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
-
-  /*
-  カテゴリー変更時の処理
-  キャッシュの有無を確認し、必要な場合のみデータフェッチを実行
-  */
-  const handleCategoryChange = async (categoryId: string) => {
-    startTransition(async () => {
-      try {
-        setSelectedCategory(categoryId);
-        setFilters((prev) => ({ ...prev, category: categoryId }));
-
-        if (categoryCache[categoryId]) return;
-        if (categoryId !== '') {
-          const newItems = await fetchFashionItemsByCategoryAPI(categoryId);
-          setCategoryCache((prev) => ({ ...prev, [categoryId]: newItems }));
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    });
-  };
-
-  const handleFilterChange = (newFilters: Partial<FilterState>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-  };
-
-  /*
-  アイテム削除時の処理
-  削除成功時、全カテゴリーのキャッシュから該当アイテムを削除
-  */
-  const handleDelete = async (id: string) => {
-    startTransition(async () => {
-      try {
-        await deleteFashionItemAPI(id);
-        setCategoryCache((prev) => {
-          const newCache = { ...prev };
-          Object.keys(newCache).forEach((categoryId) => {
-            newCache[categoryId] = newCache[categoryId].filter((item) => item.id !== id);
-          });
-          return newCache;
-        });
-      } catch (error) {
-        console.error(error);
-        toast({
-          variant: 'destructive',
-          title: 'エラー',
-          description: 'アイテムの削除に失敗しました。',
-        });
-      }
-    });
-  };
-
-  /*
-  アイテム更新時のキャッシュ更新関数
-  */
-  const handleUpdate = (updatedItem: FashionItem) => {
-    setCategoryCache((prev) => {
-      const newCache = { ...prev };
-      Object.keys(newCache).forEach((categoryId) => {
-        newCache[categoryId] = newCache[categoryId].map((item) =>
-          item.id === updatedItem.id ? updatedItem : item,
-        );
-      });
-      return newCache;
-    });
-  };
 
   /**
    * フィルタリング関数
@@ -115,18 +54,86 @@ export const FashionItemsProvider = ({ children }: { children: React.ReactNode }
 
   const currentItems = selectedCategory ? filterItems(categoryCache[selectedCategory] || []) : [];
 
+  const state: FashionItemsState = {
+    categoryCache,
+    selectedCategory,
+    filters,
+    isPending,
+    currentItems,
+  };
+
+  const handlers: FashionItemsHandlers = {
+    /*
+  カテゴリー変更時の処理
+  キャッシュの有無を確認し、必要な場合のみデータフェッチを実行
+  */
+    handleCategoryChange: async (categoryId: string) => {
+      startTransition(async () => {
+        try {
+          setSelectedCategory(categoryId);
+          setFilters((prev) => ({ ...prev, category: categoryId }));
+
+          if (categoryCache[categoryId]) return;
+          if (categoryId !== '') {
+            const newItems = await fetchFashionItemsByCategoryAPI(categoryId);
+            setCategoryCache((prev) => ({ ...prev, [categoryId]: newItems }));
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    },
+
+    handleFilterChange: (newFilters: Partial<FashionItemFilters>) => {
+      setFilters((prev) => ({ ...prev, ...newFilters }));
+    },
+
+    /*
+  アイテム削除時の処理
+  削除成功時、全カテゴリーのキャッシュから該当アイテムを削除
+  */
+    handleDelete: async (id: string) => {
+      startTransition(async () => {
+        try {
+          await deleteFashionItemAPI(id);
+          setCategoryCache((prev) => {
+            const newCache = { ...prev };
+            Object.keys(newCache).forEach((categoryId) => {
+              newCache[categoryId] = newCache[categoryId].filter((item) => item.id !== id);
+            });
+            return newCache;
+          });
+        } catch (error) {
+          console.error(error);
+          toast({
+            variant: 'destructive',
+            title: 'エラー',
+            description: 'アイテムの削除に失敗しました。',
+          });
+        }
+      });
+    },
+    /*
+  アイテム更新時のキャッシュ更新関数
+  */
+    handleUpdate: (updatedItem: FashionItem) => {
+      setCategoryCache((prev) => {
+        const newCache = { ...prev };
+        Object.keys(newCache).forEach((categoryId) => {
+          newCache[categoryId] = newCache[categoryId].map((item) =>
+            item.id === updatedItem.id ? updatedItem : item,
+          );
+        });
+        return newCache;
+      });
+    },
+  };
+
   return (
     <FashionItemsContext.Provider
       value={{
-        categoryCache,
-        selectedCategory,
-        filters,
-        isPending,
-        handleCategoryChange,
-        handleDelete,
-        handleUpdate,
-        handleFilterChange,
-        currentItems,
+        state,
+        handlers,
       }}
     >
       {children}

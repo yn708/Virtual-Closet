@@ -3,9 +3,12 @@
  */
 import { baseFetchAuthAPI } from '@/lib/api/baseApi';
 import {
+  deleteCoordinateAPI,
+  fetchCoordinateListAPI,
   fetchCoordinateMetaDataAPI,
-  registerCustomCoordinateAPI,
-  registerPhotoCoordinateAPI,
+  fetchCustomCoordinateInitialDataAPI,
+  registerCoordinateAPI,
+  updateCoordinateAPI,
 } from '@/lib/api/coordinateApi';
 import {
   COORDINATE_CREATE_CUSTOM_ENDPOINT,
@@ -32,7 +35,6 @@ describe('Coordinate APIs', () => {
    */
   describe('fetchCoordinateMetaDataAPI', () => {
     it('正常なメタデータ取得リクエストを送信する', async () => {
-      // モックの戻り値を設定
       const mockMetaData = {
         seasons: [
           { id: 1, name: '春' },
@@ -49,10 +51,8 @@ describe('Coordinate APIs', () => {
       };
       (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockMetaData);
 
-      // API呼び出し
       const result = await fetchCoordinateMetaDataAPI();
 
-      // 正しいエンドポイントとオプションでAPIが呼ばれたか確認
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(COORDINATE_METADATA_ENDPOINT, {
         cache: 'force-cache',
       });
@@ -60,35 +60,29 @@ describe('Coordinate APIs', () => {
     });
 
     it('APIエラーを適切に処理する', async () => {
-      // エラーレスポンスのモック
       const errorResponse = { message: 'メタデータの取得に失敗しました' };
       (baseFetchAuthAPI as jest.Mock).mockRejectedValueOnce(
         new Error(JSON.stringify(errorResponse)),
       );
 
-      // エラーがスローされることを確認
       await expect(fetchCoordinateMetaDataAPI()).rejects.toThrow(JSON.stringify(errorResponse));
     });
   });
 
   /**
-   * 写真コーディネート登録APIのテスト
+   * コーディネート登録APIのテスト
    */
-  describe('registerPhotoCoordinateAPI', () => {
-    it('正常な写真コーディネート登録リクエストを送信する', async () => {
-      // FormDataの作成とモックレスポンスの設定
+  describe('registerCoordinateAPI', () => {
+    it('写真コーディネートの登録リクエストを送信する', async () => {
       const mockFormData = new FormData();
       mockFormData.append('image', new Blob(['dummy image']), 'test.jpg');
       mockFormData.append('seasons', JSON.stringify(['spring', 'summer']));
-      mockFormData.append('tastes', JSON.stringify(['casual']));
 
       const mockResponse = { success: true, id: 1 };
       (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
 
-      // API呼び出し
-      const result = await registerPhotoCoordinateAPI(mockFormData);
+      const result = await registerCoordinateAPI('photo', mockFormData);
 
-      // 正しいエンドポイントとオプションでAPIが呼ばれたか確認
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(COORDINATE_CREATE_PHOTO_ENDPOINT, {
         method: 'POST',
         body: mockFormData,
@@ -96,37 +90,16 @@ describe('Coordinate APIs', () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it('APIエラーを適切に処理する', async () => {
-      const mockFormData = new FormData();
-      const errorResponse = { message: '写真コーディネートの登録に失敗しました' };
-      (baseFetchAuthAPI as jest.Mock).mockRejectedValueOnce(
-        new Error(JSON.stringify(errorResponse)),
-      );
-
-      await expect(registerPhotoCoordinateAPI(mockFormData)).rejects.toThrow(
-        JSON.stringify(errorResponse),
-      );
-    });
-  });
-
-  /**
-   * カスタムコーディネート登録APIのテスト
-   */
-  describe('registerCustomCoordinateAPI', () => {
-    it('正常なカスタムコーディネート登録リクエストを送信する', async () => {
-      // FormDataの作成とモックレスポンスの設定
+    it('カスタムコーディネートの登録リクエストを送信する', async () => {
       const mockFormData = new FormData();
       mockFormData.append('preview_image', new Blob(['dummy image']), 'preview.jpg');
       mockFormData.append('items', JSON.stringify([{ id: 1, type: 'tops' }]));
-      mockFormData.append('seasons', JSON.stringify(['spring', 'summer']));
 
       const mockResponse = { success: true, id: 1 };
       (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
 
-      // API呼び出し
-      const result = await registerCustomCoordinateAPI(mockFormData);
+      const result = await registerCoordinateAPI('custom', mockFormData);
 
-      // 正しいエンドポイントとオプションでAPIが呼ばれたか確認
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(COORDINATE_CREATE_CUSTOM_ENDPOINT, {
         method: 'POST',
         body: mockFormData,
@@ -136,14 +109,94 @@ describe('Coordinate APIs', () => {
 
     it('APIエラーを適切に処理する', async () => {
       const mockFormData = new FormData();
-      const errorResponse = { message: 'カスタムコーディネートの登録に失敗しました' };
+      const errorResponse = { message: 'コーディネートの登録に失敗しました' };
       (baseFetchAuthAPI as jest.Mock).mockRejectedValueOnce(
         new Error(JSON.stringify(errorResponse)),
       );
 
-      await expect(registerCustomCoordinateAPI(mockFormData)).rejects.toThrow(
+      await expect(registerCoordinateAPI('photo', mockFormData)).rejects.toThrow(
         JSON.stringify(errorResponse),
       );
+    });
+  });
+
+  /**
+   * コーディネート更新APIのテスト
+   */
+  describe('updateCoordinateAPI', () => {
+    it('写真コーディネートの更新リクエストを送信する', async () => {
+      const mockFormData = new FormData();
+      const mockId = '123';
+      const mockResponse = { success: true };
+      (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+      const result = await updateCoordinateAPI('photo', mockId, mockFormData);
+
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(
+        `${COORDINATE_CREATE_PHOTO_ENDPOINT}${mockId}/`,
+        {
+          method: 'PUT',
+          body: mockFormData,
+        },
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  /**
+   * コーディネート削除APIのテスト
+   */
+  describe('deleteCoordinateAPI', () => {
+    it('コーディネートの削除リクエストを送信する', async () => {
+      const mockId = '123';
+      const mockResponse = { success: true };
+      (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+      const result = await deleteCoordinateAPI('photo', mockId);
+
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(
+        `${COORDINATE_CREATE_PHOTO_ENDPOINT}${mockId}/`,
+        {
+          method: 'DELETE',
+        },
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  /**
+   * コーディネート一覧取得APIのテスト
+   */
+  describe('fetchCoordinateListAPI', () => {
+    it('コーディネート一覧を取得する', async () => {
+      const mockResponse = [
+        { id: 1, type: 'photo', image_url: 'test.jpg' },
+        { id: 2, type: 'custom', image_url: 'test2.jpg' },
+      ];
+      (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+      const result = await fetchCoordinateListAPI('photo');
+
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(COORDINATE_CREATE_PHOTO_ENDPOINT);
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  /**
+   * カスタムコーディネート初期データ取得APIのテスト
+   */
+  describe('fetchCustomCoordinateInitialDataAPI', () => {
+    it('初期データを取得する', async () => {
+      const mockId = '123';
+      const mockResponse = { items: [{ id: 1, type: 'tops', position: { x: 0, y: 0 } }] };
+      (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+      const result = await fetchCustomCoordinateInitialDataAPI(mockId);
+
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(
+        `${COORDINATE_CREATE_CUSTOM_ENDPOINT}${mockId}/`,
+      );
+      expect(result).toEqual(mockResponse);
     });
   });
 });

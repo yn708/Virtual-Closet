@@ -1,6 +1,7 @@
 import json
 
-from rest_framework.parsers import FormParser, MultiPartParser
+from django.core.files.storage import default_storage
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,7 +10,14 @@ from rest_framework.viewsets import ModelViewSet
 from apps.fashion_items.models import Season
 
 from .models import CustomCoordinate, PhotoCoordinate, Scene, Taste
-from .serializers import CustomCoordinateSerializer, MetaDataSerializer, PhotoCoordinateSerializer
+from .serializers import (
+    CoordinatePositionSerializer,
+    CustomCoordinateSerializer,
+    DetailedCustomCoordinateSerializer,
+    DetailedPhotoCoordinateSerializer,
+    MetaDataSerializer,
+    PhotoCoordinateSerializer,
+)
 
 
 class MetaDataView(APIView):
@@ -31,51 +39,75 @@ class MetaDataView(APIView):
 
 
 class PhotoCoordinateViewSet(ModelViewSet):
+    """写真投稿コーディネート"""
+
     queryset = PhotoCoordinate.objects.all()
-    serializer_class = PhotoCoordinateSerializer
-    parser_classes = (MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return PhotoCoordinateSerializer
+        return DetailedPhotoCoordinateSerializer
+
+    # ユーザーが所有するアイテムのみをフィルタリング
     def get_queryset(self):
-        return PhotoCoordinate.objects.filter(user=self.request.user)
+        return PhotoCoordinate.objects.filter(user=self.request.user).order_by("-created_at")
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-# class CustomCoordinateViewSet(ModelViewSet):
-#     queryset = CustomCoordinate.objects.all()
-#     serializer_class = CustomCoordinateSerializer
-#     permission_classes = [IsAuthenticated]
-#     # マルチパートフォームデータ（ファイルアップロード）とフォームデータの両方を処理可能に
-#     parser_classes = [MultiPartParser, FormParser]
+    # 特定アイテムの編集
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
 
-#     def create(self, request, *args, **kwargs):
-#         # フロントエンドから送られてくるデータ構造:
-#         # - preview_image: ファイルデータ（画像）
-#         # - items: JSON文字列（文字列化されたJSONデータ）
+        if instance.user != request.user:
+            return Response({"error": "このコーディネートを編集する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
 
-#         # リクエストデータを新しい辞書に整形
-#         data = {
-#             "preview_image": request.data.get("preview_image"),  # プレビュー画像をそのまま取得
-#             "items": json.loads(request.data.get("items", "[]")),  # items文字列をJSON形式にパース（デフォルトは空配列）
-#         }
+        # 更新用のシリアライザーでバリデーションと保存
+        update_serializer = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=True,
+        )
 
-#         try:
-#             serializer = self.get_serializer(data=data)  # シリアライザーにデータを渡してインスタンス化
-#             valid = serializer.is_valid()  # バリデーション実行
-#             if not valid:
-#                 return Response(serializer.errors, status=400)
+        update_serializer.is_valid(raise_exception=True)
+        self.perform_update(update_serializer)
 
-#             self.perform_create(serializer)  # バリデーション成功時にデータを保存
-#             return Response(serializer.data, status=201)
+        # 詳細シリアライザーで応答データを作成
+        detailed_serializer = DetailedPhotoCoordinateSerializer(instance)
+        return Response(detailed_serializer.data)
 
-#         except Exception as e:
-#             return Response({"detail": str(e)}, status=400)
+    # 特定のアイテムの削除
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user != request.user:
+            return Response({"error": "このコーディネートを削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
+
+        # 画像の削除処理
+        if instance.image:
+            if default_storage.exists(instance.image.name):
+                default_storage.delete(instance.image.name)
+
+        self.perform_destroy(instance)
+        return Response({"message": "コーディネートが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class CustomCoordinateViewSet(ModelViewSet):
+    """カスタムコーディネート"""
+
     queryset = CustomCoordinate.objects.all()
-    serializer_class = CustomCoordinateSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return CoordinatePositionSerializer
+        if self.action in ["create", "update", "partial_update"]:
+            return CustomCoordinateSerializer
+        return DetailedCustomCoordinateSerializer
+
+    def get_queryset(self):
+        return CustomCoordinate.objects.filter(user=self.request.user).order_by("-created_at")
 
     def get_serializer_context(self):
         """追加のコンテキストを提供"""
@@ -85,8 +117,12 @@ class CustomCoordinateViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = {
-            "preview_image": request.data.get("preview_image"),
+            "image": request.data.get("image"),
             "items": json.loads(request.data.get("items", "[]")),
+            "background": request.data.get("background", "bg-white"),
+            "seasons": request.data.getlist("seasons"),
+            "scenes": request.data.getlist("scenes"),
+            "tastes": request.data.getlist("tastes"),
         }
 
         try:
@@ -100,3 +136,68 @@ class CustomCoordinateViewSet(ModelViewSet):
 
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user != request.user:
+            return Response({"error": "このコーディネートを編集する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
+
+        # リクエストデータの整形
+        data = {}
+
+        # 画像が送信された場合のみ追加
+        if "image" in request.data:
+            data["image"] = request.data.get("image")
+
+        # 背景色の処理
+        if "background" in request.data:
+            data["background"] = request.data.get("background")
+
+        # アイテムの処理
+        if "items" in request.data:
+            try:
+                items = json.loads(request.data.get("items", "[]"))
+                if items:  # 空でない場合のみ追加
+                    data["items"] = items
+            except json.JSONDecodeError:
+                return Response({"error": "アイテムデータの形式が不正です"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 多対多フィールドの処理
+        for field in ["seasons", "scenes", "tastes"]:
+            if field in request.data:
+                values = request.data.getlist(field, [])
+                # 空文字列や'[]'の場合は空リストとして扱う
+                if len(values) == 1 and (values[0] == "[]" or values[0] == ""):
+                    values = []
+                data[field] = values
+
+        try:
+            # partial=Trueを指定して部分的な更新を許可
+            update_serializer = self.get_serializer(instance, data=data, partial=True)
+            update_serializer.is_valid(raise_exception=True)
+            self.perform_update(update_serializer)
+        except serializers.ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(
+                {"error": f"更新処理中にエラーが発生しました: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 詳細シリアライザーで応答データを作成
+        detailed_serializer = DetailedCustomCoordinateSerializer(instance)
+        return Response(detailed_serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user != request.user:
+            return Response({"error": "このコーディネートを削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
+
+        # 画像の削除処理
+        if instance.image:
+            if default_storage.exists(instance.image.name):
+                default_storage.delete(instance.image.name)
+
+        self.perform_destroy(instance)
+        return Response({"message": "コーディネートが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)

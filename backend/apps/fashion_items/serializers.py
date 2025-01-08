@@ -1,3 +1,4 @@
+from django.core.files.storage import default_storage
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import (
@@ -139,19 +140,23 @@ class FashionItemSerializer(ModelSerializer):
         ]
 
     def to_internal_value(self, data):
-        # 辞書形式でもQueryDict形式でも動作するように修正
         if "seasons" in data:
             if hasattr(data, "getlist"):
                 seasons = data.getlist("seasons")
+                # '[]' という文字列が送られてきた場合は空配列として扱う
+                if len(seasons) == 1 and (seasons[0] == "[]" or seasons[0] == ""):
+                    seasons = []
             else:
                 seasons = data.get("seasons", [])
+                if seasons == "[]" or seasons == "":
+                    seasons = []
 
-            if not seasons:
-                data = data.copy()
-                if hasattr(data, "setlist"):
-                    data.setlist("seasons", [])
-                else:
-                    data["seasons"] = []
+            data = data.copy()
+            if hasattr(data, "setlist"):
+                data.setlist("seasons", seasons)
+            else:
+                data["seasons"] = seasons
+
         return super().to_internal_value(data)
 
     @transaction.atomic
@@ -170,16 +175,34 @@ class FashionItemSerializer(ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        # seasonsが空リストの場合の処理
-        if "seasons" in validated_data:
-            instance.seasons.clear()  # 既存のシーズンをすべて削除
-            if validated_data["seasons"]:  # 新しいシーズンがある場合のみ追加
-                instance.seasons.set(validated_data["seasons"])
+        # 画像フィールドの処理
+        if "image" in validated_data:
+            # 古い画像が存在し、新しい画像が異なる場合は古い画像を削除
+            if instance.image and instance.image != validated_data["image"]:
+                if default_storage.exists(instance.image.name):
+                    default_storage.delete(instance.image.name)
+            instance.image = validated_data["image"]
 
-        # その他のフィールドの更新
-        for attr, value in validated_data.items():
-            if attr != "seasons":
-                setattr(instance, attr, value)
+        # 多対多フィールドの処理
+        if "seasons" in validated_data:
+            # 必ず既存の関連をクリア
+            instance.seasons.clear()
+            # seasonsが空でない場合のみsetを実行
+            seasons_data = validated_data.pop("seasons", [])
+            if seasons_data:
+                instance.seasons.set(seasons_data)
+
+        # Nullableなフィールドの処理
+        for field in ["main_color", "brand", "price_range", "design"]:
+            if field in validated_data:
+                value = validated_data[field]
+                # Noneの場合はNullとして保存
+                setattr(instance, field, None if value is None else value)
+
+        # booleanフィールドを含むその他のフィールドの処理
+        for field in ["is_owned", "is_old_clothes"]:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
 
         instance.save()
         return instance

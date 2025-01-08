@@ -1,17 +1,21 @@
-import type { FashionItem, FormState } from '@/types';
-import type { CoordinateMetaDataType } from '@/types/coordinate';
+import type { FashionItem } from '@/types';
+import type { BaseCoordinate, CoordinateMetaDataType } from '@/types/coordinate';
+
+/*--------------------------------------------------------
+Data
+--------------------------------------------------------*/
+export interface CoordinateMetaDataTypes {
+  metaData: CoordinateMetaDataType;
+}
+export interface CoordinateInitialDataTypes {
+  initialData?: BaseCoordinate;
+}
 
 /*--------------------------------------------------------
 Form
 --------------------------------------------------------*/
-export interface CoordinateEditorFormProps {
-  metaData: CoordinateMetaDataType;
-}
-
-export interface CoordinateFormFieldsProps {
-  metaData: CoordinateMetaDataType;
-  isProcessing: boolean;
-  state: FormState;
+export interface CoordinateEditTypes extends CoordinateInitialDataTypes {
+  onSuccess?: (updatedItem: BaseCoordinate) => void;
 }
 
 /*--------------------------------------------------------
@@ -71,53 +75,10 @@ export interface CanvasState {
 /*--------------------------------------------------------
 Canvas Props
 --------------------------------------------------------*/
-/**
- * Minimum Props
- */
+// Customコーディネート作成時の選択アイテムに関する型
 export interface OnSelectItemType {
-  onSelectItem: (item: FashionItem) => void;
+  onSelectItem?: (item: FashionItem) => void;
 }
-
 export interface SelectedItemsType {
-  selectedItems: FashionItem[];
-}
-
-export interface ItemTypeProps {
-  itemStyles: Record<string, ItemStyle>;
-}
-
-export interface OnResetProps {
-  onReset: () => void;
-}
-
-export interface SelectBackgroundProps {
-  onBackgroundChange: (background: string) => void;
-  background: string;
-}
-
-/**
- * Component Props
- */
-export interface CoordinateCanvasProps extends SelectedItemsType, ItemTypeProps {
-  onRemoveItem: (itemId: string) => void;
-  onUpdateStyles: (styles: Record<string, ItemStyle>) => void;
-  background: string;
-}
-
-export interface FormDialogProps extends SelectedItemsType, ItemTypeProps {
-  metaData: CoordinateMetaDataType | null;
-  isLoading: boolean;
-}
-
-/**
- * Content Props
- */
-export interface DraggableItemProps {
-  item: FashionItem;
-  style: ItemStyle;
-  isSelected: boolean;
-  onSelect: (e: React.MouseEvent) => void;
-  onRemove: () => void;
-  onDragStart: (e: React.MouseEvent | React.TouchEvent) => void;
-  onTransformStart: (e: React.MouseEvent | React.TouchEvent) => void;
+  selectedItems?: FashionItem[];
 }

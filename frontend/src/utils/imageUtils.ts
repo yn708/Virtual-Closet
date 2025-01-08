@@ -206,16 +206,37 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
       );
     });
 
-    // プレビューURLの生成
-    const previewUrl = URL.createObjectURL(blob);
+    // ユニークなファイル名を生成
+    const timestamp = Date.now();
+    const randomNum = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
+    const filename = `coordinate_preview_${timestamp}_${randomNum}.png`;
+
+    // 生成されたファイルを圧縮用のFileオブジェクトに変換
+    const uncompressedFile = new File([blob], filename, { type: 'image/png' });
+
+    // 圧縮オプションを設定
+    const compressionOptions = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920, // プレビュー用に適切なサイズに設定
+      useWebWorker: true,
+      fileType: 'image/jpeg', // JPEGで圧縮してファイルサイズを削減
+    };
+
+    // 画像を圧縮
+    const compressedFile = await compressImage(uncompressedFile, compressionOptions);
+
+    // 圧縮された画像のプレビューURL生成
+    const previewUrl = URL.createObjectURL(compressedFile);
 
     // FormDataにファイルを追加
-    const previewFile = new File([blob], 'coordinate_preview.png', { type: 'image/png' });
+
     const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(previewFile);
+    dataTransfer.items.add(compressedFile);
 
     // hidden input要素にファイルを設定
-    const fileInput = document.querySelector('input[name="preview_image"]') as HTMLInputElement;
+    const fileInput = document.querySelector('input[name="image"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.files = dataTransfer.files;
     }

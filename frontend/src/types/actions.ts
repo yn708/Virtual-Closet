@@ -2,6 +2,7 @@
 Server actions
 ------------------------------------------------------------------ */
 
+import type { BaseCoordinate } from './coordinate';
 import type { FashionItem } from './fashion-item';
 
 // Base
@@ -35,4 +36,9 @@ export interface FormStateWithChange extends FormState {
 // ファッションアイテムアップデート時
 export interface FormStateFashionItemUpdate extends FormStateWithChange {
   updatedItem?: FashionItem;
+}
+
+// コーディネートアップデート時
+export interface FormStateCoordinateUpdate extends FormStateWithChange {
+  updatedItem?: BaseCoordinate;
 }

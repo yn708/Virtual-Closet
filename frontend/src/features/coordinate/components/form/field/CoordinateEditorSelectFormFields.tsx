@@ -1,12 +1,17 @@
 import SubmitButton from '@/components/elements/button/SubmitButton';
 import AccordionToggleGroupField from '@/components/elements/form/select/AccordionToggleGroupField';
-import type { CoordinateFormFieldsProps } from '@/features/coordinate/types';
+import type {
+  CoordinateInitialDataTypes,
+  CoordinateMetaDataTypes,
+} from '@/features/coordinate/types';
+import type { BaseFieldsStateProps } from '@/types';
 
 const CoordinateEditorSelectFormFields = ({
   metaData,
+  initialData,
   isProcessing,
   state,
-}: CoordinateFormFieldsProps) => {
+}: BaseFieldsStateProps & CoordinateMetaDataTypes & CoordinateInitialDataTypes) => {
   return (
     <div className="col-span-3 space-y-6">
       <AccordionToggleGroupField
@@ -18,6 +23,7 @@ const CoordinateEditorSelectFormFields = ({
             labelKey: 'taste',
             maxSelections: 3,
             error: state.errors?.tastes,
+            defaultValue: initialData?.tastes?.map((taste) => taste.id),
           },
           {
             name: 'scenes',
@@ -26,6 +32,7 @@ const CoordinateEditorSelectFormFields = ({
             labelKey: 'scene',
             maxSelections: 3,
             error: state.errors?.scenes,
+            defaultValue: initialData?.scenes?.map((scene) => scene.id),
           },
           {
             name: 'seasons',
@@ -33,6 +40,7 @@ const CoordinateEditorSelectFormFields = ({
             options: metaData.seasons,
             labelKey: 'season_name',
             error: state.errors?.seasons,
+            defaultValue: initialData?.seasons?.map((season) => season.id),
           },
         ]}
       />

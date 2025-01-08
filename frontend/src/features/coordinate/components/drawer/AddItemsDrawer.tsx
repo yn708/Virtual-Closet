@@ -2,24 +2,23 @@ import IconButton from '@/components/elements/button/IconButton';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import FashionItemsContents from '@/features/my-page/fashion-item/components/content/FashionItemsContents';
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import { LuShirt } from 'react-icons/lu';
-import type { OnSelectItemType, SelectedItemsType } from '../../types';
 
-const AddItemsDrawer: React.FC<SelectedItemsType & OnSelectItemType> = ({
-  selectedItems,
-  onSelectItem,
-}) => {
+const AddItemsDrawer = () => {
+  const { state, handlers } = useCoordinateCanvasState();
+
   const { isOpen, setIsOpen, onClose, onToggle } = useIsOpen();
 
   useEffect(() => {
-    if (selectedItems?.length === 0) {
+    if (state.selectedItems?.length === 0) {
       setIsOpen(true);
     }
-  }, [selectedItems?.length, setIsOpen]);
+  }, [state.selectedItems?.length, setIsOpen]);
 
   return (
     <Drawer open={isOpen} onOpenChange={onToggle}>
@@ -44,7 +43,10 @@ const AddItemsDrawer: React.FC<SelectedItemsType & OnSelectItemType> = ({
               <X size={16} />
             </Button>
 
-            <FashionItemsContents onSelectItem={onSelectItem} selectedItems={selectedItems} />
+            <FashionItemsContents
+              onSelectItem={handlers.handleSelectItem}
+              selectedItems={state.selectedItems}
+            />
           </div>
         </ScrollArea>
       </DrawerContent>
