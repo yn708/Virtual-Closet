@@ -219,7 +219,7 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
 
-# -------------------- LINE Messaging API設定 --------------------
+# --------------- LINE Messaging API設定 --------------
 LINE_CHANNEL_ACCESS_TOKEN = env("LINE_CHANNEL_ACCESS_TOKEN")
 LINE_CHANNEL_SECRET = env("LINE_CHANNEL_SECRET")
 LINE_USER_ID = env("LINE_USER_ID")
