@@ -8,11 +8,12 @@ const SubmitButton: React.FC<LoadingType & LabelType & BaseButtonProps> = ({
   label = '送信',
   disabled,
   className,
+  type = 'submit',
   ...props
 }) => {
   return (
     <Button
-      type="submit"
+      type={type}
       disabled={disabled || loading}
       className={cn(
         `

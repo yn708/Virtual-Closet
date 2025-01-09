@@ -13,21 +13,6 @@ export const GENDER_ITEMS = [
 /* ----------------------------------------------------------------
 ファッションアイテムカテゴリー
 ------------------------------------------------------------------ */
-// export const FASHION_ITEMS_CATEGORY = [
-//   { id: 'recent', label: '最近のアイテム' },
-//   { id: 'tops', label: 'トップス' },
-//   { id: 'bottoms', label: 'ボトムス' },
-//   { id: 'dress', label: 'ワンピース' },
-//   { id: 'setup', label: 'セットアップ' },
-//   { id: 'outer', label: 'アウター' },
-//   { id: 'shoes', label: 'シューズ' },
-//   { id: 'bag', label: 'バッグ' },
-//   { id: 'legwear', label: 'レッグウェア' },
-//   { id: 'fashion_goods', label: 'ファッション雑貨' },
-//   { id: 'accessory', label: 'アクセサリー' },
-//   { id: 'other', label: 'その他' },
-// ];
-
 export const FASHION_ITEMS_CATEGORY = [
   { id: 'recent', label: '最近のアイテム' },
   { id: 'tops', label: 'トップス' },
@@ -147,4 +132,16 @@ export const TASTE_OPTIONS = [
   { id: '11', label: 'ミリタリー' },
   { id: '12', label: 'セレブティ' },
   { id: '13', label: 'その他' },
+];
+
+/* ----------------------------------------------------------------
+お問合せ機能
+------------------------------------------------------------------ */
+// 件名
+export const SUBJECT_OPTIONS = [
+  { id: 'サービス全般について', name: 'サービス全般について' },
+  { id: 'サービスの利用方法について', name: 'サービスの利用方法について' },
+  { id: 'バグの報告', name: 'バグの報告' },
+  { id: '機能要望', name: '機能要望' },
+  { id: 'その他', name: 'その他' },
 ];

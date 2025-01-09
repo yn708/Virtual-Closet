@@ -55,6 +55,11 @@ export const BASE_USER_ENDPOINT = `${BASE_AUTH_ENDPOINT}user/`;
 export const USER_DETAIL_ENDPOINT = `${BASE_USER_ENDPOINT}detail/`;
 export const USER_UPDATE_ENDPOINT = `${BASE_USER_ENDPOINT}update/`;
 
+// お問合せ
+export const BASE_CONTACT_ENDPOINT = `/api/contact/`;
+export const ANONYMOUS_CONTACT_ENDPOINT = `${BASE_CONTACT_ENDPOINT}anonymous/`;
+export const AUTHENTICATED_CONTACT_ENDPOINT = `${BASE_CONTACT_ENDPOINT}authenticated/`;
+
 // 画像
 export const IMAGE_REMOVE_BG_ENDPOINT = `/api/image/remove-bg/`;
 

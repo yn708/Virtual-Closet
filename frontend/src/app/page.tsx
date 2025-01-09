@@ -1,4 +1,4 @@
-import { LOGIN_URL, SIGN_UP_URL, TOP_URL } from '@/utils/constants';
+import { CONTACT_URL, LOGIN_URL, SIGN_UP_URL, TOP_URL } from '@/utils/constants';
 import Link from 'next/link';
 
 export default async function IntroductionsPage() {
@@ -11,6 +11,8 @@ export default async function IntroductionsPage() {
         <Link href={SIGN_UP_URL}>サインアップ</Link>
         <p></p>
         <Link href={TOP_URL}>トップページ</Link>
+        <p></p>
+        <Link href={CONTACT_URL}>お問合せページ</Link>
       </div>
     </div>
   );

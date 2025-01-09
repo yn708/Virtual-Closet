@@ -1,13 +1,14 @@
 import FooterLayout from '@/components/layout/FooterLayout';
 import { LegalDialog } from '@/features/auth/components/elements/dialog/LegalDialog';
+import type { ClassNameType } from '@/types';
 import { FOOTER_NAV_ITEMS } from '@/utils/data/navItems';
 import { privacyData } from '@/utils/data/privacy';
 import { termsData } from '@/utils/data/terms';
 import Link from 'next/link';
 
-const Footer = () => {
+const Footer = ({ className }: ClassNameType) => {
   return (
-    <FooterLayout>
+    <FooterLayout className={className}>
       <nav className="flex sm:flex-row flex-col items-center gap-7 text-xs lg:text-sm lg:m-0 mb-10 opacity-90">
         {FOOTER_NAV_ITEMS.map((items) => (
           <Link key={items.label} className="hover:font-bold" href={items.href}>

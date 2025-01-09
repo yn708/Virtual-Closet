@@ -1,8 +1,6 @@
-'use client';
-
 import type { CheckboxProps } from '@/types';
 
-const CheckboxField = ({ name, label, error, defaultChecked = false }: CheckboxProps) => {
+const CheckboxField = ({ name, label, error, defaultChecked = false, onChange }: CheckboxProps) => {
   return (
     <div className="flex flex-row items-start space-x-3 space-y-0 p-4">
       <div className="relative">
@@ -11,7 +9,8 @@ const CheckboxField = ({ name, label, error, defaultChecked = false }: CheckboxP
           id={name}
           name={name}
           value="true"
-          defaultChecked={defaultChecked} // デフォルト値を設定
+          defaultChecked={defaultChecked}
+          onChange={onChange}
           className="peer size-5 appearance-none rounded-md border-2 border-gray-300 checked:border-blue-500 
             checked:bg-blue-500 hover:border-blue-400 
             focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all
