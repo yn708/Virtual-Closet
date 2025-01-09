@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import type { FormState } from './actions';
 import type { ClassNameType } from './common';
 /* ----------------------------------------------------------------
@@ -6,7 +6,7 @@ Base
 ------------------------------------------------------------------ */
 export interface BaseFieldProps {
   name: string;
-  label: string;
+  label: string | ReactNode;
   error?: string[] | undefined;
 }
 
@@ -76,6 +76,7 @@ Checkbox field
 ------------------------------------------------------------------ */
 export interface CheckboxProps extends BaseFieldProps {
   defaultChecked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 /* ----------------------------------------------------------------

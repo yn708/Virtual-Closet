@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { floatingLabelStyles as styles } from '@/styles/form/floatingLabel';
+import type { ChangeEvent } from 'react';
 import { useState } from 'react';
 
 interface UseFloatingLabelProps {
@@ -27,7 +28,9 @@ export function useFloatingLabel({
 
   const hasValue = !!currentValue;
 
-  const handleValueChange = (newValue: string | React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = (
+    newValue: string | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const updatedValue = typeof newValue === 'string' ? newValue : newValue.target.value;
 
     // onChangeがある場合は親コンポーネントに通知
@@ -53,11 +56,20 @@ export function useFloatingLabel({
     error && styles.input.border.error,
   );
 
+  const textareaClassName = cn(
+    styles.textarea.base,
+    isFocused || hasValue ? styles.textarea.state.active : styles.textarea.state.inactive,
+    isFocused ? styles.textarea.border.focused : hasValue && styles.textarea.border.default,
+    error && styles.textarea.border.error,
+    'resize-none w-full border border-gray-200',
+  );
+
   return {
     currentValue,
     handleValueChange,
     setIsFocused,
     labelClassName,
     inputClassName,
+    textareaClassName,
   };
 }

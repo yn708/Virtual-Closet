@@ -20,6 +20,8 @@ urlpatterns = [
     # 認証関連のURL
     path("accounts/", include("allauth.urls")),  # allauth による認証機能へのルーティング 必須
     path("api/auth/", include("apps.accounts.urls")),  # 認証、ユーザー関連
+    # お問い合わせ
+    path("api/contact/", include("apps.contact.urls")),
     # アプリ
     path("api/image/", include("apps.image_processing.urls")),
     path("api/fashion-items/", include("apps.fashion_items.urls")),
