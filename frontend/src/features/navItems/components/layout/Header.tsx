@@ -28,10 +28,10 @@ const Header = () => {
             rounded={true}
             showText={false}
           />
-          {/* 追加ボタン（真ん中に配置） */}
-          {index === 1 && <AddFashionContentDrawer />}
         </React.Fragment>
       ))}
+      {/* 追加ボタン（真ん中に配置） */}
+      <AddFashionContentDrawer />
       {/* その他のメニュー */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

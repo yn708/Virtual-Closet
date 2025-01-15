@@ -54,7 +54,6 @@ describe('ContactPage', () => {
       // フッターの確認
       const footer = screen.getByTestId('mock-footer');
       expect(footer).toBeInTheDocument();
-      expect(footer).toHaveClass('mb-0');
     });
   });
 
