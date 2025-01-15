@@ -74,6 +74,7 @@ const WelcomeAlert = () => {
                 {TUTORIAL_STEPS.map((_, index) => (
                   <div
                     key={index}
+                    data-testid={`step-indicator-${index}`}
                     className={`h-1.5 rounded-full transition-all duration-200 ${
                       currentStep === index ? 'bg-blue-600 w-4' : 'bg-gray-200 w-1.5'
                     }`}
