@@ -20,7 +20,7 @@ export default async function ContactPage() {
           <StepContactForm isSession={isSession} />
         </div>
       </main>
-      <Footer className="mb-0" />
+      <Footer />
     </div>
   );
 }

@@ -1,19 +1,24 @@
-import { CONTACT_URL, LOGIN_URL, SIGN_UP_URL, TOP_URL } from '@/utils/constants';
-import Link from 'next/link';
+import ConcernsSection from '@/features/Introduction/components/section/ConcernsSection';
+import CTASection from '@/features/Introduction/components/section/CTASection';
+import FeaturesSection from '@/features/Introduction/components/section/FeaturesSection';
+import HeroSection from '@/features/Introduction/components/section/HeroSection';
+import BackgroundSlider from '@/features/Introduction/components/ui/BackgroundSlider';
+import Footer from '@/features/navItems/components/layout/Footer';
 
-export default async function IntroductionsPage() {
+export default function IntroductionPage() {
   return (
-    <div className="h-screen w-full flex items-center justify-center">
-      <div className="">
-        <h1>紹介ページ</h1>
-        <Link href={LOGIN_URL}>ログイン</Link>
-        <p></p>
-        <Link href={SIGN_UP_URL}>サインアップ</Link>
-        <p></p>
-        <Link href={TOP_URL}>トップページ</Link>
-        <p></p>
-        <Link href={CONTACT_URL}>お問合せページ</Link>
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
+        <BackgroundSlider /> {/* 背景画像アニメーション */}
+        {/* メインコンテンツ */}
+        <div className="relative z-20">
+          <HeroSection /> {/* Hero Section  */}
+          <ConcernsSection /> {/* 問いかけ Section */}
+          <FeaturesSection /> {/* 機能セクション */}
+          <CTASection /> {/* CTA Section */}
+        </div>
       </div>
-    </div>
+      <Footer className="relative" />
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { TOP_URL } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signIn } from 'next-auth/react';
@@ -48,7 +49,7 @@ describe('SocialAuthButtons', () => {
 
     expect(signIn).toHaveBeenCalledTimes(1);
     expect(signIn).toHaveBeenCalledWith('google', {
-      callbackUrl: '/top',
+      callbackUrl: TOP_URL,
     });
   });
 

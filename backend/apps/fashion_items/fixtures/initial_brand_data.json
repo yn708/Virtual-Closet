@@ -934,5 +934,23 @@
       "brand_name_kana": "ネオンサイン",
       "is_popular": false
     }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 105,
+    "fields": {
+      "brand_name": "MOMA",
+      "brand_name_kana": "モマ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 106,
+    "fields": {
+      "brand_name": "NEW ERA",
+      "brand_name_kana": "ニューエラ",
+      "is_popular": false
+    }
   }
 ]

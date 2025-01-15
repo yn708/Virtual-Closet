@@ -118,6 +118,8 @@ brands = [
     {"brand_name": "WHO's WHO gallery", "brand_name_kana": "フーズフーギャラリー", "is_popular": False},
     {"brand_name": "Jieda", "brand_name_kana": "ジエダ", "is_popular": False},
     {"brand_name": "NEONSIGN", "brand_name_kana": "ネオンサイン", "is_popular": False},
+    {"brand_name": "MOMA", "brand_name_kana": "モマ", "is_popular": False},
+    {"brand_name": "NEW ERA", "brand_name_kana": "ニューエラ", "is_popular": False},
 ]
 
 # リストの初期化

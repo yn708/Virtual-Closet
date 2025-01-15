@@ -1,7 +1,5 @@
 import { BiCloset } from 'react-icons/bi';
-import { FaRegUser } from 'react-icons/fa';
-import { GoHome } from 'react-icons/go';
-import { APP_ABOUT_URL, CONTACT_URL, MY_PAGE_URL, TOP_URL } from '../constants';
+import { APP_ABOUT_URL, CONTACT_URL, TOP_URL } from '../constants';
 /* ----------------------------------------------------------------
 フッター
 ------------------------------------------------------------------ */
@@ -13,22 +11,29 @@ export const FOOTER_NAV_ITEMS = [
 /* ----------------------------------------------------------------
 ヘッダー
 ------------------------------------------------------------------ */
+// 機能がまだ限定的なので、１のみ
 export const HEADER_NAV_ITEMS = [
+  // {
+  //   href: TOP_URL,
+  //   icon: GoHome,
+  //   label: 'top-page',
+  // },
+  // {
+  //   // ここは後々詳しく設定（マイクローゼット、検索、コーディネート提案等のどの機能にするにか）
+  //   href: '/#',
+  //   icon: BiCloset,
+  //   label: 'Closet',
+  // },
+  // {
+  //   href: MY_PAGE_URL,
+  //   icon: FaRegUser,
+  //   label: 'my-page',
+  // },
+
   {
     href: TOP_URL,
-    icon: GoHome,
-    label: 'top-page',
-  },
-  {
-    // ここは後々詳しく設定（マイクローゼット、検索、コーディネート提案等のどの機能にするにか）
-    href: '/#',
     icon: BiCloset,
-    label: 'Closet',
-  },
-  {
-    href: MY_PAGE_URL,
-    icon: FaRegUser,
-    label: 'my-page',
+    label: 'my-closet',
   },
 ];
 

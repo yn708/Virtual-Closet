@@ -85,7 +85,10 @@ URL
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // トップ
-export const TOP_URL = '/top';
+// 一旦my-closetをTOP_URLをmy-closetとして使用
+// export const MY_CLOSET_URL = '/my-closet';
+export const TOP_URL = '/my-closet';
+// export const TOP_URL = '/top';
 export const APP_ABOUT_URL = '/';
 
 // 認証系
@@ -98,7 +101,8 @@ export const PASSWORD_RESET_URL = '/auth/password/reset';
 // コンタクト
 export const CONTACT_URL = '/contact';
 // マイページ
-export const MY_PAGE_URL = '/my-page';
+// export const MY_PAGE_URL = '/my-page';
+export const MY_PAGE_URL = '/my-closet';
 // ファッションアイテム
 export const ITEM_CREATE_URL = '/outfit/item/create';
 // コーディネート作成

@@ -12,5 +12,5 @@ export default function FooterController() {
     return null;
   }
 
-  return <Footer />;
+  return <Footer className="mb-14 " />;
 }
