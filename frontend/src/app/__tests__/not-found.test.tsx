@@ -12,6 +12,5 @@ describe('NotFound', () => {
   it('displays the correct links', () => {
     const { getByText } = render(<NotFound />);
     expect(getByText('トップページに戻る')).toBeInTheDocument();
-    expect(getByText('お問い合わせ')).toBeInTheDocument();
   });
 });

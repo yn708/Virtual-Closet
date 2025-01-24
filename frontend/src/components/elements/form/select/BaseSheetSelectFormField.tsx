@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import type { BaseSheetSelectFieldProps } from '@/types';
+import { ChevronUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { IoIosArrowUp } from 'react-icons/io';
 
 const BaseSheetSelectField = ({
   name,
@@ -54,16 +54,16 @@ const BaseSheetSelectField = ({
                 </span>
                 <div className="w-full">{trigger(value)}</div>
               </div>
-              <IoIosArrowUp className="absolute top-1/2 -translate-y-1/2 right-5 opacity-65" />
+              <ChevronUp className="absolute top-1/2 -translate-y-1/2 right-5 opacity-65" />
             </Button>
           </SheetTrigger>
 
-          <SheetContent side="bottom" className="h-[80vh] p-10">
+          <SheetContent side="bottom" className="h-[80vh] px-5 py-10 md:p-10">
             <SheetHeader className="hidden">
               <SheetTitle />
               <SheetDescription />
             </SheetHeader>
-            <ScrollArea className="size-full px-10">
+            <ScrollArea className="size-full px-5 md:px-10">
               {children({
                 value,
                 onChange: (newValue) => {

@@ -1,12 +1,11 @@
 import DetailBox from '@/components/elements/utils/DetailBox';
 import TagGroup from '@/components/elements/utils/TagGroup';
 import type { FashionItem } from '@/types';
-import { FaRegCircle } from 'react-icons/fa';
-import { IoClose } from 'react-icons/io5';
-import { TbSlash } from 'react-icons/tb';
+import { Circle, Slash, X } from 'lucide-react';
+import React from 'react';
 
 const ItemDetailInfo = ({ item }: { item: FashionItem }) => {
-  const statusIcon = (status: boolean) => (status ? <FaRegCircle /> : <IoClose />);
+  const statusIcon = (status: boolean) => (status ? <Circle /> : <X />);
 
   const renderBorderBox = (label: string, value: React.ReactNode) => (
     <div className="flex justify-start items-center gap-6 text-sm">
@@ -31,7 +30,7 @@ const ItemDetailInfo = ({ item }: { item: FashionItem }) => {
 
       <div className="flex justify-start items-center gap-10">
         {renderBorderBox('所有', statusIcon(item.is_owned))}
-        <TbSlash />
+        <Slash />
         {renderBorderBox('古着', statusIcon(item.is_old_clothes))}
       </div>
     </div>

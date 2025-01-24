@@ -5,8 +5,8 @@ import { useFloatingLabel } from '@/hooks/form/useFloatingLabel';
 import { cn } from '@/lib/utils';
 import { floatingLabelStyles as styles } from '@/styles/form/floatingLabel';
 import type { FloatingLabelInputProps } from '@/types';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 import ErrorMessageList from '../../error/ErrorMessageList';
 
 const FloatingLabelInput = ({
@@ -53,7 +53,7 @@ const FloatingLabelInput = ({
             className={styles.passwordToggle}
             aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
           >
-            {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         )}
       </div>

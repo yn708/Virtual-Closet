@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { IoFilter } from 'react-icons/io5';
+import { ListFilter } from 'lucide-react';
 import { useFilterSheet } from '../../hooks/useFilterSheet';
 import type { BaseFilterProps } from '../../types';
 import CategorySelectButton from '../button/CategorySelectButton';
@@ -32,7 +32,7 @@ const FilterSheet = <T extends Record<string, unknown>>({
     <Sheet open={state.isOpen} onOpenChange={handlers.handleSheetOpenChange}>
       <SheetTrigger asChild>
         <Button variant="ghost" className="gap-2">
-          <IoFilter className="size-4" />
+          <ListFilter className="size-4" />
           <span className="hidden sm:inline">絞り込み</span>
         </Button>
       </SheetTrigger>

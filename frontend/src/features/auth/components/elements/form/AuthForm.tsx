@@ -39,7 +39,7 @@ export default function AuthForm({
   }
 
   return (
-    <form action={formAction} className="space-y-5 p-5">
+    <form action={formAction} className="space-y-5">
       {fields.map((field) => (
         <FloatingLabelInput
           key={field.name}

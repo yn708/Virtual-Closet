@@ -40,8 +40,7 @@ export const useImageSelection = () => {
         // エラーメッセージをトースト通知で表示
         toast({
           variant: 'destructive',
-          title: 'エラー',
-          description: validationError,
+          title: validationError,
         });
       }
       return { file };

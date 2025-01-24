@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { FaAngleDoubleUp } from 'react-icons/fa';
+import { ChevronsUp } from 'lucide-react';
 
 interface ScrollToTopButtonProps {
   show: boolean;
@@ -21,7 +21,7 @@ const ScrollToTopButton = ({ show, onClick }: ScrollToTopButtonProps) => (
     `}
     onClick={onClick}
   >
-    <FaAngleDoubleUp className="size-5" />
+    <ChevronsUp className="size-5" />
   </Button>
 );
 

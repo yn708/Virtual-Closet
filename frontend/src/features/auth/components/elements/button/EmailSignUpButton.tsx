@@ -12,8 +12,8 @@ import {
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import { signUpAction } from '@/lib/actions/auth/signUpAction';
 import { initialState } from '@/utils/data/initialState';
+import { Mail } from 'lucide-react';
 import { useFormState } from 'react-dom';
-import { FaEnvelope } from 'react-icons/fa';
 import ConfirmContent from '../content/ConfirmContent';
 import AuthForm from '../form/AuthForm';
 
@@ -30,8 +30,8 @@ const EmailSignUpButton = (): JSX.Element => {
     <Dialog open={isOpen} onOpenChange={onToggle}>
       <DialogTrigger asChild>
         <IconButton
-          Icon={FaEnvelope}
-          size="sm"
+          Icon={Mail}
+          size="sm_2"
           label="Emailで登録"
           className="w-full rounded-3xl p-5"
           data-testid="email-signup-button"

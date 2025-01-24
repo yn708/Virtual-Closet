@@ -32,7 +32,7 @@ const CheckboxField = ({ name, label, error, defaultChecked = false, onChange }:
       </div>
       <label
         htmlFor={name}
-        className="text-sm font-medium text-gray-700 cursor-pointer select-none
+        className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none
           hover:text-gray-900 transition-colors duration-200"
       >
         {label}

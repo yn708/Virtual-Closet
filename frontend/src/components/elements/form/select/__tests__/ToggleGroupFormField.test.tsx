@@ -83,8 +83,8 @@ jest.mock('@/components/ui/toggle-group', () => ({
   ),
 }));
 
-jest.mock('react-icons/fi', () => ({
-  FiCheck: () => <span data-testid="check-icon">✓</span>,
+jest.mock('lucide-react', () => ({
+  Check: () => <span data-testid="check-icon">✓</span>,
 }));
 
 describe('ToggleGroupFormField', () => {

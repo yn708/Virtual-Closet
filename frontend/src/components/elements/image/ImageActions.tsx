@@ -1,5 +1,5 @@
 import { useImage } from '@/context/ImageContext';
-import { FaExchangeAlt } from 'react-icons/fa';
+import { Paperclip } from 'lucide-react';
 import IconButton from '../button/IconButton';
 import ToggleSwitch from '../utils/ToggleSwitch';
 
@@ -25,7 +25,7 @@ const ImageActions = ({
         label="画像変更"
         variant="outline"
         size="sm"
-        Icon={FaExchangeAlt}
+        Icon={Paperclip}
         onClick={onChangeClick}
         disabled={isProcessing}
       />

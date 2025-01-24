@@ -2,11 +2,11 @@
 import IconButton from '@/components/elements/button/IconButton';
 import type { TextType } from '@/types';
 import { TOP_URL } from '@/utils/constants';
+import { GoogleIcon } from '@/utils/data/icons';
 import { signIn } from 'next-auth/react';
-import { FaGoogle } from 'react-icons/fa';
 
 // Googleのみ実装中（その他プロバイダーを実装する場合はここに追加）← 現時点で追加の予定なし
-const providers = [{ name: 'google', label: 'Google', icon: FaGoogle }];
+const providers = [{ name: 'google', label: 'Google', icon: GoogleIcon }];
 
 const SocialAuthButtons: React.FC<TextType> = ({ text }) => {
   // NextAuth認証

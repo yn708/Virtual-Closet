@@ -1,5 +1,4 @@
 import StepContactForm from '@/features/contact/components/StepContactForm';
-import Footer from '@/features/navItems/components/layout/Footer';
 import { authOptions } from '@/lib/next-auth';
 import { getServerSession } from 'next-auth';
 
@@ -20,7 +19,6 @@ export default async function ContactPage() {
           <StepContactForm isSession={isSession} />
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

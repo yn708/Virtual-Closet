@@ -50,10 +50,6 @@ describe('ContactPage', () => {
 
       // フォームコンポーネントの確認
       expect(screen.getByTestId('mock-contact-form')).toBeInTheDocument();
-
-      // フッターの確認
-      const footer = screen.getByTestId('mock-footer');
-      expect(footer).toBeInTheDocument();
     });
   });
 

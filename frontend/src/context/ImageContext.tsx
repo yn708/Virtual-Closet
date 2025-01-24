@@ -1,9 +1,17 @@
 'use client';
 import { removeBackgroundAPI } from '@/lib/api/imageApi';
 import type { UseImageType } from '@/types';
-import { compressImage, conversionImage, dataURLtoFile } from '@/utils/imageUtils';
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState } from 'react';
+
+// 画像処理関連の関数を動的インポート
+const loadImageUtils = async () => {
+  const { compressImage, conversionImage, dataURLtoFile } = await import(
+    /* webpackChunkName: "imageUtils" */
+    '@/utils/imageUtils'
+  );
+  return { compressImage, conversionImage, dataURLtoFile };
+};
 
 // 画像コンテキストの作成
 const ImageContext = createContext<UseImageType | undefined>(undefined);
@@ -14,8 +22,8 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isProcessing, setIsProcessing] = useState<boolean>(false); // 処理中の状態
 
   /*----------------------------------------------------------------------------
-  すべての画像をクリアする関数
-  ----------------------------------------------------------------------------*/
+ すべての画像をクリアする関数
+ ----------------------------------------------------------------------------*/
   const clearImage = () => {
     if (preview) {
       URL.revokeObjectURL(preview);
@@ -26,11 +34,11 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
-  最小限のImageセット
-  1. clearImage（既存の画像を削除）
-  2. プレビューを作成
-  3. setImage・setPreviewで画像・プレビューを最新化
-  ----------------------------------------------------------------------------*/
+ 最小限のImageセット
+ 1. clearImage（既存の画像を削除）
+ 2. プレビューを作成
+ 3. setImage・setPreviewで画像・プレビューを最新化
+ ----------------------------------------------------------------------------*/
   const minimumImageSet = async (file: File): Promise<File> => {
     clearImage();
     const newPreview = URL.createObjectURL(file);
@@ -40,18 +48,21 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
-  画像の最適化
-  1. clearImage（既存の画像を削除）
-  2. HEIC形式の場合、変換
-  3. 画像圧縮
-  4. プレビューを作成
-  5. setImage・setPreviewで画像・プレビューを最新化
-  ----------------------------------------------------------------------------*/
+ 画像の最適化
+ 1. clearImage（既存の画像を削除）
+ 2. HEIC形式の場合、変換
+ 3. 画像圧縮
+ 4. プレビューを作成
+ 5. setImage・setPreviewで画像・プレビューを最新化
+ ----------------------------------------------------------------------------*/
   const optimizationProcess = async (file: File): Promise<File | null> => {
     // 1. clearImage（既存の画像を削除）
     clearImage();
     setIsProcessing(true);
     try {
+      // 画像処理ユーティリティの動的ロード
+      const { conversionImage, compressImage } = await loadImageUtils();
+
       // 2. HEIC形式の場合、変換
       const convertedFile =
         file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
@@ -76,14 +87,14 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
-  背景除去する場合
-  1. clearImage（既存の画像を削除）
-  2. HEIC形式の場合、変換
-  3. 画像の圧縮
-  4. 背景除去
-  5 .プレビューを作成
-  6. setImage・setPreviewで画像・プレビューを最新化
-  ----------------------------------------------------------------------------*/
+ 背景除去する場合
+ 1. clearImage（既存の画像を削除）
+ 2. HEIC形式の場合、変換
+ 3. 画像の圧縮
+ 4. 背景除去
+ 5 .プレビューを作成
+ 6. setImage・setPreviewで画像・プレビューを最新化
+ ----------------------------------------------------------------------------*/
   const removeBgProcess = async (file: File): Promise<File | null> => {
     // ファイル名から背景除去済みかどうかをチェック
     const isAlreadyProcessed = file.name.includes('_removed_bg');
@@ -92,6 +103,8 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (isAlreadyProcessed) {
       setIsProcessing(true);
       try {
+        const { conversionImage, compressImage } = await loadImageUtils();
+
         // HEIC変換と圧縮のみ実行
         const convertedFile =
           file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
@@ -106,6 +119,7 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return compressedImage;
       } catch (error) {
         console.error('Error processing already removed background image:', error);
+        return null;
       } finally {
         setIsProcessing(false);
       }
@@ -115,6 +129,8 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     clearImage();
     setIsProcessing(true);
     try {
+      const { conversionImage, compressImage, dataURLtoFile } = await loadImageUtils();
+
       // 2. HEIC形式の場合、変換
       const convertedFile =
         file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')

@@ -46,14 +46,3 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 IconButton.displayName = 'IconButton';
 
 export default IconButton;
-
-// 使用例
-// import { IoMdAdd } from "react-icons/io";
-//
-// <IconButton
-//   Icon={IoMdAdd}
-//   label="Add"
-//   showText={false}
-//   rounded={true}
-//   variant="ghost"
-// />

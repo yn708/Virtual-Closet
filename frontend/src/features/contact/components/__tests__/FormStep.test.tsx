@@ -92,12 +92,6 @@ jest.mock('@/components/elements/button/SubmitButton', () => ({
   ),
 }));
 
-jest.mock('@/features/auth/components/elements/dialog/LegalDialog', () => ({
-  LegalDialog: jest.fn(({ label, className }: { label: string; className?: string }) => (
-    <span className={className}>{label}</span>
-  )),
-}));
-
 describe('FormStep', () => {
   // テスト用の共通props
   const defaultProps = {

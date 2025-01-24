@@ -10,12 +10,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import LogoutButton from '@/features/auth/components/elements/button/LogoutButton';
 import ThemeToggleButton from '@/features/navItems/components/elements/button/ThemeToggleButton';
+import { COORDINATE_CREATE_URL, ITEM_CREATE_URL } from '@/utils/constants';
 import { HEADER_NAV_ITEMS } from '@/utils/data/navItems';
+import { Menu } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import React from 'react';
-import { TbMenuDeep } from 'react-icons/tb';
 import AddFashionContentDrawer from '../elements/drawer/AddFashionContentDrawer';
 
 const Header = () => {
+  const pathname = usePathname();
+  const hideAddPaths = [COORDINATE_CREATE_URL, ITEM_CREATE_URL];
+
   return (
     <HeaderLayout>
       {/* Link関連のナブアイテム */}
@@ -31,12 +36,12 @@ const Header = () => {
         </React.Fragment>
       ))}
       {/* 追加ボタン（真ん中に配置） */}
-      <AddFashionContentDrawer />
+      {!hideAddPaths.includes(pathname) && <AddFashionContentDrawer />}
       {/* その他のメニュー */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <IconButton
-            Icon={TbMenuDeep}
+            Icon={Menu}
             label="Menu"
             showText={false}
             rounded={true}

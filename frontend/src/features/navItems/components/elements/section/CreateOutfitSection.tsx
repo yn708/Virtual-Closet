@@ -3,8 +3,7 @@
 import IconLink from '@/components/elements/link/IconLink';
 import type { UseIsOpenOnCloseType } from '@/types';
 import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_CREATE_URL } from '@/utils/constants';
-import { BiCloset } from 'react-icons/bi';
-import { MdOutlineSwipe } from 'react-icons/md';
+import { Shirt } from 'lucide-react';
 import ImageUploadSection from './ImageUploadSection';
 
 const CreateOutfitSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
@@ -12,13 +11,12 @@ const CreateOutfitSection: React.FC<UseIsOpenOnCloseType> = ({ onClose }) => {
     <ImageUploadSection
       value="create-outfit"
       label="コーディネート作成"
-      Icon={BiCloset}
       redirectUrl={COORDINATE_CREATE_URL}
       onClose={onClose}
     >
       <IconLink
         href={COORDINATE_CREATE_CANVAS_URL}
-        Icon={MdOutlineSwipe}
+        Icon={Shirt}
         size="sm"
         label="登録済みアイテムから作成"
         rounded={true}

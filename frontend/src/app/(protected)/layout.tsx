@@ -1,19 +1,20 @@
-import { ClientProviders } from '@/context/ClientProviders';
-import HeaderController from '@/features/navItems/components/layout/HeaderController';
-import { metadata, viewport } from '@/utils/data/metadata';
-import type { RootLayoutProps } from '../layout';
+import NextAuthProvider from '@/context/AuthProvider';
+import { ImageProvider } from '@/context/ImageContext';
 import FooterController from '@/features/navItems/components/layout/FooterController';
+import HeaderController from '@/features/navItems/components/layout/HeaderController';
+import type { ChildrenType } from '@/types';
+import { ThemeProvider } from 'next-themes';
 
-export { metadata, viewport };
-
-export default function ProtectedLayout({ children }: Readonly<RootLayoutProps>) {
+export default function ProtectedLayout({ children }: Readonly<ChildrenType>) {
   return (
-    <>
-      <ClientProviders>
-        <HeaderController />
-        <main>{children}</main>
-        <FooterController />
-      </ClientProviders>
-    </>
+    <NextAuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ImageProvider>
+          <HeaderController />
+          <main>{children}</main>
+          <FooterController />
+        </ImageProvider>
+      </ThemeProvider>
+    </NextAuthProvider>
   );
 }

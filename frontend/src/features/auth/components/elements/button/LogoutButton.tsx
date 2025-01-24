@@ -2,8 +2,8 @@
 
 import IconButton from '@/components/elements/button/IconButton';
 import { LOGIN_URL } from '@/utils/constants';
+import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { HiLogout } from 'react-icons/hi';
 
 const LogoutButton = () => {
   const handleLogout = async () => {
@@ -16,7 +16,7 @@ const LogoutButton = () => {
 
   return (
     <IconButton
-      Icon={HiLogout}
+      Icon={LogOut}
       label="ログアウト"
       onClick={handleLogout}
       variant="ghost"

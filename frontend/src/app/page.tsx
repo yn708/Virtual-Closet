@@ -9,13 +9,12 @@ export default function IntroductionPage() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
-        <BackgroundSlider /> {/* 背景画像アニメーション */}
-        {/* メインコンテンツ */}
+        <BackgroundSlider />
         <div className="relative z-20">
-          <HeroSection /> {/* Hero Section  */}
-          <ConcernsSection /> {/* 問いかけ Section */}
-          <FeaturesSection /> {/* 機能セクション */}
-          <CTASection /> {/* CTA Section */}
+          <HeroSection />
+          <ConcernsSection />
+          <FeaturesSection />
+          <CTASection />
         </div>
       </div>
       <Footer className="relative" />

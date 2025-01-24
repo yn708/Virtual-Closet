@@ -33,7 +33,7 @@ export default function AuthCodeInputForm({ email }: { email: string }) {
   const [state, formAction] = useFormState(wrappedSendCodeAction, initialState);
 
   return (
-    <form action={formAction} className="w-3/4 mx-auto space-y-5">
+    <form action={formAction} className="w-full mx-auto space-y-5">
       <InputOTP maxLength={6} name="code">
         <div className="flex justify-center gap-2 mx-auto">
           <InputOTPGroup>
@@ -41,7 +41,7 @@ export default function AuthCodeInputForm({ email }: { email: string }) {
               <InputOTPSlot
                 key={i}
                 index={i}
-                className={`p-6 text-center
+                className={`p-3 md:p-6 text-center
                   ${state?.errors?.code ? 'border-destructive' : ''}
                 `}
               />

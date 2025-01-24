@@ -13,8 +13,8 @@ jest.mock('@/components/elements/link/LinkWithText', () => ({
   ),
 }));
 
-jest.mock('react-icons/ci', () => ({
-  CiCircleAlert: () => <div data-testid="error-icon">Error Icon</div>,
+jest.mock('lucide-react', () => ({
+  CircleAlert: () => <div data-testid="error-icon">Error Icon</div>,
 }));
 
 describe('GoogleAuthError', () => {

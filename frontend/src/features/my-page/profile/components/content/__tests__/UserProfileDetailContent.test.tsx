@@ -49,8 +49,8 @@ describe('UserProfileDetailContent', () => {
 
     expect(screen.getByText('Test User')).toBeInTheDocument();
     expect(screen.getByText('@testuser')).toBeInTheDocument();
-    expect(screen.getByText('/ 170cm')).toBeInTheDocument();
-    expect(screen.getByText('/ 20s')).toBeInTheDocument();
+    expect(screen.getByText('170cm')).toBeInTheDocument();
+    expect(screen.getByText('20s')).toBeInTheDocument();
   });
 
   it('renders profile avatar with correct props', async () => {

@@ -29,40 +29,42 @@ export const emailSchema = z.string().email({ message: 'メールアドレスの
 /* ----------------------------------------------------------------
 画像関連
 ------------------------------------------------------------------ */
-// 共通の画像ファイル検証ロジック
-const baseImageSchema = () => {
-  // ファイルの基本的なバリデーション
-  const fileValidation = z
-    .instanceof(File)
-    .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.type), {
-      message: 'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
-    })
-    .refine((file) => file.size <= MAX_FILE_SIZE, {
-      message: `画像サイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください。`,
-    });
-
-  // 共通の前処理
-  const preprocess = (val: unknown) => {
-    if (val instanceof File && val.name !== 'undefined') {
-      return val;
-    }
-    return null;
-  };
-
-  return { fileValidation, preprocess };
-};
-
 // 任意の画像スキーマ
-export const optionalImageSchema = z.preprocess(
-  baseImageSchema().preprocess,
-  z.union([baseImageSchema().fileValidation, z.null()]),
-);
+export const optionalImageSchema = z.union([
+  z.instanceof(File).superRefine((file, ctx) => {
+    if (file?.size === 0) {
+      // ファイルサイズが0の場合にFileがないと判断し、検証をスキップ
+      return true;
+    }
+
+    // 画像の形式チェック
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+      });
+    }
+
+    // 画像サイズのチェック
+    if (file.size > MAX_FILE_SIZE) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `画像サイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください。`,
+      });
+    }
+  }),
+  z.null(),
+]);
 
 // 必須の画像スキーマ
-export const requiredImageSchema = z.preprocess(
-  baseImageSchema().preprocess,
-  // 一時的にnull許容をしてエラーメッセージを表示
-  z.union([baseImageSchema().fileValidation, z.null()]).refine((val) => val !== null, {
-    message: '画像ファイルは必須です。',
-  }),
-);
+export const requiredImageSchema = z
+  .instanceof(File)
+  .refine((file) => file && file.size > 0, {
+    message: '画像を選択してください。',
+  })
+  .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.type), {
+    message: 'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+  })
+  .refine((file) => file.size <= MAX_FILE_SIZE, {
+    message: `画像サイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください。`,
+  });

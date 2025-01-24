@@ -3,7 +3,6 @@ import type { ImageUploadSectionProps } from '@/features/navItems/types';
 import { useImageSelection } from '@/hooks/image/useImageSelection';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
-import { BiCamera } from 'react-icons/bi';
 import ImageUploadSection from '../ImageUploadSection';
 
 // モックの設定
@@ -86,7 +85,6 @@ describe('ImageUploadSection', () => {
   const defaultProps: ImageUploadSectionProps = {
     value: 'test-section',
     label: 'Test Section',
-    Icon: BiCamera,
     redirectUrl: '/test-redirect',
     onClose: jest.fn(),
     children: <div data-testid="test-children">Test Children</div>,
@@ -118,7 +116,6 @@ describe('ImageUploadSection', () => {
     expect(screen.getByTestId('accordion-section')).toBeInTheDocument();
     expect(screen.getByTestId('value')).toHaveTextContent('test-section');
     expect(screen.getByTestId('label')).toHaveTextContent('Test Section');
-    expect(screen.getByTestId('section-icon')).toBeInTheDocument();
     expect(screen.getByTestId('test-children')).toBeInTheDocument();
     expect(screen.getByTestId('hidden-file-input')).toBeInTheDocument();
     expect(screen.getByTestId('icon-button')).toBeInTheDocument();

@@ -2,9 +2,9 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
+import { Minus, Plus } from 'lucide-react';
 import React from 'react';
 import Cropper from 'react-easy-crop';
-import { IoIosRemove, IoMdAdd } from 'react-icons/io';
 import { useImageCrop } from '../../hooks/useImageCrop';
 import type { ImageCropDialogProps } from '../../types';
 
@@ -34,8 +34,8 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
             onCropComplete={onCropCompleteCallback}
           />
         </div>
-        <div className="flex justify-center items-center ga mt-4">
-          <IoIosRemove className="size-6" />
+        <div className="flex justify-center items-center gap-2 mt-4">
+          <Minus className="size-4" />
           {/* ズームレベルを調整するスライダー */}
           <Slider
             value={[zoom]}
@@ -44,7 +44,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
             max={3}
             step={0.05}
           />
-          <IoMdAdd className="size-6" />
+          <Plus className="size-4" />
         </div>
         <div className="mt-4 flex justify-end space-x-2">
           <Button onClick={createCroppedImage}>完了</Button>

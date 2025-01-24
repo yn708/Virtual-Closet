@@ -32,11 +32,12 @@ const HeroSection = () => {
 
         <div className="relative aspect-[2/5] w-full h-80 md:h-[32rem] hover:scale-105 transition-transform duration-300">
           <Image
-            src="/images/example1.png"
+            src="/images/example1.webp"
             alt="Virtual Closet Example"
             fill
             className="object-contain hover:scale-105 transition-transform duration-500"
             priority
+            quality={85}
           />
         </div>
       </div>

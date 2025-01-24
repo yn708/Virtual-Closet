@@ -1,11 +1,29 @@
 import LoginPage, { metadata } from '@/app/auth/login/page';
-
 import { render, screen } from '@testing-library/react';
 
 // コンポーネントのモック
-jest.mock('@/features/auth/components/elements/content/LoginPageContent', () => ({
+jest.mock('@/features/auth/components/elements/button/SocialAuthButtons', () => ({
   __esModule: true,
-  default: () => <div data-testid="login-page-content">Login Page Content</div>,
+  default: () => <div data-testid="social-auth-buttons">Social Auth Buttons</div>,
+}));
+
+jest.mock('@/features/auth/components/elements/form/LoginForm', () => ({
+  __esModule: true,
+  default: () => <div data-testid="login-form">Login Form</div>,
+}));
+
+jest.mock('@/components/elements/utils/DividerWithText', () => ({
+  __esModule: true,
+  default: ({ text }: { text: string }) => <div data-testid="divider">{text}</div>,
+}));
+
+jest.mock('@/components/elements/link/LinkWithText', () => ({
+  __esModule: true,
+  default: ({ text, label, href }: { text: string; label: string; href: string }) => (
+    <div data-testid={`link-${href}`}>
+      {text} {label}
+    </div>
+  ),
 }));
 
 jest.mock('@/features/auth/components/layout/AuthPageTemplate', () => ({
@@ -39,16 +57,25 @@ describe('LoginPage', () => {
     expect(screen.getByText('ログイン')).toBeInTheDocument();
     expect(screen.getByText('ログインして、virtual closetを始めましょう。')).toBeInTheDocument();
 
-    // LoginPageContent がレンダリングされていることを確認
-    expect(screen.getByTestId('login-page-content')).toBeInTheDocument();
+    // コンポーネントのレンダリングを確認
+    expect(screen.getByTestId('social-auth-buttons')).toBeInTheDocument();
+    expect(screen.getByTestId('divider')).toBeInTheDocument();
+    expect(screen.getByTestId('login-form')).toBeInTheDocument();
+    expect(screen.getByTestId('link-/auth/password/reset')).toBeInTheDocument();
+    expect(screen.getByTestId('link-/auth/sign-up')).toBeInTheDocument(); // Updated test ID
   });
 
-  it('AuthPageTemplateとLoginPageContentが正しい順序でレンダリングされている', () => {
+  it('コンポーネントが正しい順序でレンダリングされている', () => {
     render(<LoginPage />);
 
     const template = screen.getByTestId('auth-page-template');
-    const content = screen.getByTestId('login-page-content');
+    const socialButtons = screen.getByTestId('social-auth-buttons');
+    const divider = screen.getByTestId('divider');
+    const loginForm = screen.getByTestId('login-form');
 
-    expect(template).toContainElement(content);
+    // テンプレート内にコンポーネントが含まれていることを確認
+    expect(template).toContainElement(socialButtons);
+    expect(template).toContainElement(divider);
+    expect(template).toContainElement(loginForm);
   });
 });

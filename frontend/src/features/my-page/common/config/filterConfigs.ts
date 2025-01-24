@@ -67,7 +67,7 @@ export const coordinateConfig: FilterSheetConfig = {
   layout: {
     categoryGrid: {
       small: 'grid-cols-2',
-      large: 'grid-cols-2',
+      large: 'grid-cols-1 md:grid-cols-2',
     },
   },
   filterHandlers: {

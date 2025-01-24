@@ -44,7 +44,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         ${disabled ? 'peer-checked:bg-blue-400' : ''}
       `}
     />
-    {label && <span className="ml-3 text-sm text-gray-600">{label}</span>}
+    {label && <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">{label}</span>}
   </label>
 );
 

@@ -11,8 +11,8 @@ import type {
   AccordionToggleGroupLabel,
   SelectionGroup,
 } from '@/types';
+import { Check } from 'lucide-react';
 import { useState } from 'react';
-import { FiCheck } from 'react-icons/fi';
 
 function AccordionToggleGroupField({ groups }: AccordionToggleGroupFieldProps) {
   /* 各グループの選択状態を管理するステート */
@@ -91,7 +91,7 @@ function AccordionToggleGroupField({ groups }: AccordionToggleGroupFieldProps) {
           disabled={isItemDisabled(group, option.id)}
         >
           <div className={styles.itemContent}>
-            <FiCheck className={styles.icon} aria-hidden="true" />
+            <Check className={styles.icon} aria-hidden="true" />
             <span className={styles.text}>{String(option[group.labelKey])}</span>
           </div>
         </ToggleGroupItem>

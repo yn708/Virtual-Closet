@@ -14,7 +14,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
-import { IoMdAdd } from 'react-icons/io';
+import { Plus } from 'lucide-react';
 import AddItemSection from '../section/AddItemSection';
 import CreateOutfitSection from '../section/CreateOutfitSection';
 
@@ -25,7 +25,7 @@ const AddFashionContentDrawer = () => {
     <Drawer open={isOpen} onOpenChange={onToggle}>
       <DrawerTrigger asChild>
         <IconButton
-          Icon={IoMdAdd}
+          Icon={Plus}
           label="Add"
           size="lg"
           showText={false}

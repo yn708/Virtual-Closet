@@ -1,15 +1,26 @@
-import { privacyData } from '@/utils/data/privacy';
-import { termsData } from '@/utils/data/terms';
-import { LegalDialog } from '../dialog/LegalDialog';
+import NormalLink from '@/components/elements/link/NormalLink';
+import { PRIVACY_URL, TERMS_URL } from '@/utils/constants';
 
 const LegalContent = () => {
   return (
     <div className="text-sm text-muted-foreground pt-2">
       <p>
         登録で
-        <LegalDialog data={privacyData} label="プライバシーポリシー" />
+        <NormalLink
+          href={PRIVACY_URL}
+          rel="nofollow"
+          prefetch={false}
+          target="_blank"
+          label="プライバシーポリシー"
+        />
         、
-        <LegalDialog data={termsData} label="利用規約" />
+        <NormalLink
+          href={TERMS_URL}
+          rel="nofollow"
+          prefetch={false}
+          target="_blank"
+          label="利用規約"
+        />
         に同意したことになります。
       </p>
     </div>

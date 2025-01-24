@@ -12,7 +12,7 @@ const BrandContent = ({ selectedValue, onValueChange, initialOptions }: BrandCon
 
   return (
     <>
-      <div className="sticky top-0 z-10 bg-white py-2">
+      <div className="sticky top-0 z-10 py-2">
         <SearchInput
           value={searchTerm}
           onChange={setSearchTerm}

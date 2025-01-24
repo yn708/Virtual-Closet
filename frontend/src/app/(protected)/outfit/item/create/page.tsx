@@ -1,6 +1,10 @@
 import ItemEditorForm from '@/features/fashion-items/components/form/ItemEditorForm';
 import { fetchFashionMetaDataAPI } from '@/lib/api/fashionItemsApi';
+import type { Metadata } from 'next';
 
+export const metadata: Metadata = {
+  title: 'アイテム登録',
+};
 export default async function ItemCreatePage() {
   const metaData = await fetchFashionMetaDataAPI();
 

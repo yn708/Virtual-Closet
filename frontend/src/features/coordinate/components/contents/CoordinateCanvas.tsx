@@ -2,10 +2,9 @@
 
 import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import { BACKEND_URL } from '@/utils/constants';
-import { X } from 'lucide-react';
+import { Maximize2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
-import { CgArrowsExpandLeft } from 'react-icons/cg';
 import { useCoordinateCanvas } from '../../hooks/useCoordinateCanvas';
 
 /**
@@ -110,7 +109,7 @@ const CoordinateCanvas = () => {
                     onMouseDown={(e) => handlers.handleTransformStart(e, item.id)}
                     onTouchStart={(e) => handlers.handleTransformStart(e, item.id)}
                   >
-                    <CgArrowsExpandLeft size={12} />
+                    <Maximize2 size={12} />
                   </div>
                 </div>
               )}

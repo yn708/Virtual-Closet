@@ -4,7 +4,6 @@ import SheetSelectField from '@/components/elements/form/select/SheetSelectFormF
 import ToggleGroupFormField from '@/components/elements/form/select/ToggleGroupFormField';
 import type { FormFieldsProps } from '@/features/fashion-items/types';
 import type { Brand, Design, PriceRange } from '@/types';
-import { CATEGORY_ICONS } from '@/utils/data/icons';
 import BrandSelectFormField from './BrandSelectFormField';
 import CategorySelectField from './CategorySelectField';
 import ColorSelectFormField from './ColorSelectFormField';
@@ -15,11 +14,6 @@ const ItemEditorSelectFormFields = ({
   isProcessing,
   state,
 }: FormFieldsProps) => {
-  const renderCategoryIcon = (categoryId: string) => {
-    const Icon = CATEGORY_ICONS[categoryId as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS.other;
-    return <Icon className="size-4" />;
-  };
-
   return (
     <div className="col-span-3">
       <div className="space-y-3 p-3">
@@ -28,7 +22,6 @@ const ItemEditorSelectFormFields = ({
           label="カテゴリー"
           options={metaData.categories}
           error={state.errors?.sub_category}
-          renderIcon={renderCategoryIcon}
           value={initialData?.sub_category.id}
         />
 

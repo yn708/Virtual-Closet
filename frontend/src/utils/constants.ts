@@ -11,6 +11,7 @@ size
 ------------------------------------------------------------------ */
 export const ICON_SIZE = {
   sm: 'w-4 h-4',
+  sm_2: 'w-5 h-5',
   md: 'w-6 h-6',
   lg: 'w-8 h-8',
 };
@@ -98,13 +99,20 @@ export const SIGN_UP_URL = '/auth/sign-up';
 export const CONFIRM_CODE_URL = '/auth/confirm';
 export const PASSWORD_RESET_URL = '/auth/password/reset';
 
+// legal系
+export const PRIVACY_URL = '/legal/privacy';
+export const TERMS_URL = '/legal/terms';
+
 // コンタクト
 export const CONTACT_URL = '/contact';
+
 // マイページ
 // export const MY_PAGE_URL = '/my-page';
 export const MY_PAGE_URL = '/my-closet';
+
 // ファッションアイテム
 export const ITEM_CREATE_URL = '/outfit/item/create';
+
 // コーディネート作成
 export const COORDINATE_CREATE_URL = '/outfit/coordinate/create';
 export const COORDINATE_CREATE_CANVAS_URL = '/outfit/coordinate/create/canvas';
@@ -121,7 +129,7 @@ image
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/heic'];
 export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.heic'];
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-export const DEFAULT_USER_IMAGE = '/images/default.png';
+export const DEFAULT_USER_IMAGE = '/images/default.webp';
 
 /* ----------------------------------------------------------------
 SEARCH
@@ -135,3 +143,11 @@ CANVAS
 export const MOVEMENT_THRESHOLD = 15; // この距離（px）以上マウスを動かすまで回転しない
 export const SNAP_THRESHOLD = 2; // 指定された角度の±2度以内でスナップする
 export const SNAP_ANGLES = [0, 90, 180, 270, 360]; // スナップする角度のリスト（度）
+
+/* ----------------------------------------------------------------
+画面サイズ
+------------------------------------------------------------------ */
+// 定数を外部に定義
+export const ORIGINAL_HEIGHT = 1080;
+export const ORIGINAL_WIDTH = 3840;
+export const DEFAULT_DIMENSIONS = { width: 1920, height: 1080, scale: 1 };

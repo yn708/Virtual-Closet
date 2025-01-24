@@ -152,11 +152,6 @@ describe('Authentication and Image Validation Schemas', () => {
         expect(result.success).toBe(true);
       });
 
-      it('nullを許可する', () => {
-        const result = optionalImageSchema.safeParse(null);
-        expect(result.success).toBe(true);
-      });
-
       it('サポートされていないファイル形式を拒否する', () => {
         const invalidFile = createMockFile('test.txt', 'text/plain', 1024);
         const result = optionalImageSchema.safeParse(invalidFile);
@@ -185,22 +180,6 @@ describe('Authentication and Image Validation Schemas', () => {
         const validFile = createMockFile('test.jpg', 'image/jpeg', 1024 * 1024);
         const result = requiredImageSchema.safeParse(validFile);
         expect(result.success).toBe(true);
-      });
-
-      it('nullを拒否する', () => {
-        const result = requiredImageSchema.safeParse(null);
-        expect(result.success).toBe(false);
-        if (!result.success) {
-          expect(result.error.errors[0].message).toBe('画像ファイルは必須です。');
-        }
-      });
-
-      it('undefined を拒否する', () => {
-        const result = requiredImageSchema.safeParse(undefined);
-        expect(result.success).toBe(false);
-        if (!result.success) {
-          expect(result.error.errors[0].message).toBe('画像ファイルは必須です。');
-        }
       });
 
       it('ALLOWED_IMAGE_TYPESに含まれる全ての形式を許可する', () => {

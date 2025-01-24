@@ -3,7 +3,7 @@ import BaseDialog from '@/components/elements/dialog/BaseDialog';
 import { Button } from '@/components/ui/button';
 import { DialogClose, DialogFooter } from '@/components/ui/dialog';
 import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
-import { GrPowerReset } from 'react-icons/gr';
+import { RotateCcw } from 'lucide-react';
 
 const ResetDialog = () => {
   const { handlers } = useCoordinateCanvasState();
@@ -12,7 +12,7 @@ const ResetDialog = () => {
     <BaseDialog
       trigger={
         <IconButton
-          Icon={GrPowerReset}
+          Icon={RotateCcw}
           label="クリア"
           size="md"
           variant="ghost"

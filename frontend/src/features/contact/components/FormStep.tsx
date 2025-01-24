@@ -3,10 +3,10 @@ import CheckboxField from '@/components/elements/form/checkbox/CheckboxFormField
 import FloatingLabelInput from '@/components/elements/form/input/FloatingLabelInput';
 import FloatingLabelTextarea from '@/components/elements/form/input/FloatingLabelTextarea';
 import FloatingLabelSelect from '@/components/elements/form/select/FloatingLabelSelect';
-import { LegalDialog } from '@/features/auth/components/elements/dialog/LegalDialog';
-import { privacyData } from '@/utils/data/privacy';
+import { PRIVACY_URL } from '@/utils/constants';
 import { SUBJECT_OPTIONS } from '@/utils/data/selectData';
 import type { FormStepProps } from '../types';
+import NormalLink from '@/components/elements/link/NormalLink';
 
 const FormStep = ({
   isSession,
@@ -64,11 +64,14 @@ const FormStep = ({
         name="privacyAgreed"
         label={
           <>
-            <LegalDialog
-              data={privacyData}
+            <NormalLink
+              href={PRIVACY_URL}
+              rel="nofollow"
+              prefetch={false}
+              target="_blank"
               label="プライバシーポリシー"
-              className="h-auto text-blue-600 dark:text-blue-300 p-0 hover:font-bold underline lg:text-sm text-xs"
             />
+
             <span className="pl-1">に同意する</span>
           </>
         }

@@ -133,8 +133,7 @@ describe('useImageSelection', () => {
     expect(selectionResult).toEqual({ file });
     expect(mockToast).toHaveBeenCalledWith({
       variant: 'destructive',
-      title: 'エラー',
-      description: validationError,
+      title: validationError,
     });
     expect(result.current.isLoading).toBe(false);
   });

@@ -1,8 +1,8 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { toggleGroupStyles as styles } from '@/styles/toggle/toggleGroupStyles';
 import type { BaseOption, ToggleGroupFieldProps } from '@/types';
+import { Check } from 'lucide-react';
 import { useState } from 'react';
-import { FiCheck } from 'react-icons/fi';
 
 function ToggleGroupFormField<T extends BaseOption>({
   name,
@@ -35,7 +35,7 @@ function ToggleGroupFormField<T extends BaseOption>({
             aria-label={`${String(option[labelKey])} を選択`}
           >
             <div className={styles.itemContent}>
-              <FiCheck className={styles.icon} aria-hidden="true" />
+              <Check className={styles.icon} aria-hidden="true" />
               <span className={styles.text}>{String(option[labelKey])}</span>
             </div>
           </ToggleGroupItem>

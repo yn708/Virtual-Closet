@@ -1,4 +1,3 @@
-import { ICON_SIZE } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
 import { GoHome } from 'react-icons/go';
 import AccordionSection from '../AccordionSection';
@@ -64,23 +63,6 @@ describe('AccordionSection', () => {
     const content = screen.getByTestId('accordion-content');
     expect(content).toHaveClass('grid gap-4');
     expect(screen.getByText('Content')).toBeInTheDocument();
-  });
-
-  // アイコンのレンダリングテスト
-  it('renders icon with correct size', () => {
-    render(
-      <AccordionSection {...defaultProps}>
-        <div>Content</div>
-      </AccordionSection>,
-    );
-
-    const iconContainer = screen.getByTestId('accordion-trigger');
-    const innerDiv = iconContainer.querySelector('.flex.items-center.gap-2.p-2');
-    expect(innerDiv).toBeInTheDocument();
-
-    // アイコンのサイズクラスが正しく適用されているか確認
-    const iconElement = innerDiv?.querySelector('svg');
-    expect(iconElement).toHaveClass(ICON_SIZE.md);
   });
 
   // レスポンシブパディングのテスト

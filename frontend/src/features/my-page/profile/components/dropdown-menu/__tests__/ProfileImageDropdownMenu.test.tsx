@@ -3,13 +3,8 @@ import userEvent from '@testing-library/user-event';
 import ProfileImageDropdownMenu from '../ProfileImageDropdownMenu';
 
 // アイコンのモック
-jest.mock('react-icons/md', () => ({
-  MdEdit: () => <div data-testid="mock-edit-icon" />,
-}));
-
-jest.mock('react-icons/ai', () => ({
-  AiOutlinePicture: () => <div data-testid="mock-picture-icon" />,
-  AiFillDelete: () => <div data-testid="mock-delete-icon" />,
+jest.mock('lucide-react', () => ({
+  Pencil: () => <div data-testid="mock-edit-icon" />,
 }));
 
 // shadcn/uiコンポーネントのモック
@@ -74,7 +69,6 @@ describe('ProfileImageDropdownMenu', () => {
 
       const menuItem = screen.getByText('カメラロールから選択');
       expect(menuItem).toBeInTheDocument();
-      expect(screen.getByTestId('mock-picture-icon')).toBeInTheDocument();
       expect(menuItem.closest('label')).toHaveAttribute('for', 'image-upload');
     });
   });
@@ -94,7 +88,6 @@ describe('ProfileImageDropdownMenu', () => {
       const deleteOption = screen.getByText('選択取り消し');
       expect(deleteOption).toBeInTheDocument();
       expect(deleteOption).toHaveClass('text-red-500');
-      expect(screen.getByTestId('mock-delete-icon')).toBeInTheDocument();
     });
 
     it('should show "削除" option when hasImage is true', () => {
@@ -103,7 +96,6 @@ describe('ProfileImageDropdownMenu', () => {
       const deleteOption = screen.getByText('削除');
       expect(deleteOption).toBeInTheDocument();
       expect(deleteOption).toHaveClass('text-red-500');
-      expect(screen.getByTestId('mock-delete-icon')).toBeInTheDocument();
     });
 
     it('should call onDeleteImage when delete option is clicked', async () => {

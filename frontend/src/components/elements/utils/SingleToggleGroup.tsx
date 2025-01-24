@@ -1,7 +1,7 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { toggleGroupStyles as styles } from '@/styles/toggle/toggleGroupStyles';
 import type { LabelType } from '@/types';
-import { FiCheck } from 'react-icons/fi';
+import { Check } from 'lucide-react';
 
 export interface SingleToggleGroupProps extends LabelType {
   options: readonly { id: string; label: string }[];
@@ -27,7 +27,7 @@ const SingleToggleGroup = ({ label, options, value, onValueChange }: SingleToggl
             aria-label={`${option.label} を選択`}
           >
             <div className={styles.itemContent}>
-              <FiCheck className={styles.icon} aria-hidden="true" />
+              <Check className={styles.icon} aria-hidden="true" />
 
               <span className={styles.text}>{option.label}</span>
             </div>
