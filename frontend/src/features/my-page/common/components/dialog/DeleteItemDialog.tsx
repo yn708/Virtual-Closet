@@ -2,13 +2,13 @@ import IconButton from '@/components/elements/button/IconButton';
 import BaseDialog from '@/components/elements/dialog/BaseDialog';
 import { Button } from '@/components/ui/button';
 import { DialogClose, DialogFooter } from '@/components/ui/dialog';
-import { AiOutlineDelete } from 'react-icons/ai';
+import { Trash } from 'lucide-react';
 
 const DeleteItemDialog = ({ onDelete }: { onDelete: () => void }) => (
   <BaseDialog
     trigger={
       <IconButton
-        Icon={AiOutlineDelete}
+        Icon={Trash}
         label="削除"
         size="sm"
         variant="destructive"

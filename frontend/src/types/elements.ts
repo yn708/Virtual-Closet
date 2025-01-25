@@ -1,6 +1,6 @@
 import type { ICON_SIZE } from '@/utils/constants';
+import type { LucideIcon } from 'lucide-react';
 import type { ButtonHTMLAttributes } from 'react';
-import type { IconType } from 'react-icons/lib';
 import type { ClassNameType, LabelType } from './common';
 
 /* ----------------------------------------------------------------
@@ -10,8 +10,9 @@ export interface BaseLinkProps extends ClassNameType {
   href: string;
 }
 
+export type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 export interface BaseIconProps {
-  Icon: IconType;
+  Icon: IconComponent | LucideIcon;
   size?: keyof typeof ICON_SIZE;
 }
 

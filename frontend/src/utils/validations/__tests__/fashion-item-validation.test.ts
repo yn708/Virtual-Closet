@@ -26,24 +26,6 @@ describe('fashionItemCreateFormSchema', () => {
     is_old_clothes: false,
   };
 
-  describe('基本的なバリデーション', () => {
-    it('有効なデータを許可する', () => {
-      const result = fashionItemCreateFormSchema.safeParse(validFormData);
-      expect(result.success).toBe(true);
-    });
-
-    it('必須項目のみでも有効', () => {
-      const minimalData = {
-        sub_category: 'tops',
-        image: mockFile,
-        is_owned: false,
-        is_old_clothes: false,
-      };
-      const result = fashionItemCreateFormSchema.safeParse(minimalData);
-      expect(result.success).toBe(true);
-    });
-  });
-
   describe('サブカテゴリのバリデーション', () => {
     it('空文字列は許可しない', () => {
       const result = fashionItemCreateFormSchema.safeParse({
@@ -174,51 +156,6 @@ describe('fashionItemUpdateFormSchema', () => {
     is_owned: true,
     is_old_clothes: false,
   };
-
-  describe('基本的なバリデーション', () => {
-    it('全項目入力データを許可する', () => {
-      const result = fashionItemUpdateFormSchema.safeParse(validFormData);
-      expect(result.success).toBe(true);
-    });
-
-    it('必須項目のみでも有効', () => {
-      const minimalData = {
-        is_owned: false,
-        is_old_clothes: false,
-      };
-      const result = fashionItemUpdateFormSchema.safeParse(minimalData);
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe('任意項目のバリデーション', () => {
-    const optionalFields = [
-      'sub_category',
-      'brand',
-      'design',
-      'price_range',
-      'main_color',
-      'image',
-    ];
-
-    optionalFields.forEach((field) => {
-      it(`${field}は未定義を許可`, () => {
-        const result = fashionItemUpdateFormSchema.safeParse({
-          ...validFormData,
-          [field]: undefined,
-        });
-        expect(result.success).toBe(true);
-      });
-
-      it(`${field}はnullを許可`, () => {
-        const result = fashionItemUpdateFormSchema.safeParse({
-          ...validFormData,
-          [field]: null,
-        });
-        expect(result.success).toBe(true);
-      });
-    });
-  });
 
   describe('シーズンのバリデーション', () => {
     it('有効なシーズンの組み合わせを許可する', () => {

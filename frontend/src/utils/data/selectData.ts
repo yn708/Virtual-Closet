@@ -1,5 +1,3 @@
-import { CATEGORY_AND_RECENT_ICONS } from './icons';
-
 /* ----------------------------------------------------------------
 性別
 ------------------------------------------------------------------ */
@@ -26,10 +24,7 @@ export const FASHION_ITEMS_CATEGORY = [
   { id: 'fashion_goods', label: 'ファッション雑貨' },
   { id: 'accessory', label: 'アクセサリー' },
   { id: 'other', label: 'その他' },
-].map((category) => ({
-  ...category,
-  icon: CATEGORY_AND_RECENT_ICONS[category.id as keyof typeof CATEGORY_AND_RECENT_ICONS], // 型安全なアクセス
-}));
+];
 
 /* ----------------------------------------------------------------
 所有、古着選択

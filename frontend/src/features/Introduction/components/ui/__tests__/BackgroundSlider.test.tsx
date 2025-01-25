@@ -1,3 +1,4 @@
+import { ORIGINAL_WIDTH } from '@/utils/constants';
 import { act, render } from '@testing-library/react';
 import BackgroundSlider from '../BackgroundSlider';
 
@@ -7,38 +8,44 @@ jest.mock('next/image', () => ({
   default: function MockImage({
     src,
     alt,
-    className,
+    fill,
     priority,
+    className,
     sizes,
   }: {
     src: string;
     alt: string;
-    className?: string;
+    fill?: boolean;
     priority?: boolean;
+    className?: string;
     sizes?: string;
   }) {
     return (
-      <img src={src} alt={alt} className={className} data-priority={priority} data-sizes={sizes} />
+      <img
+        src={src}
+        alt={alt}
+        data-fill={fill}
+        data-priority={priority}
+        className={className}
+        data-sizes={sizes}
+      />
     );
   },
 }));
 
 describe('BackgroundSlider', () => {
-  // 画面サイズのモック値
   const mockScreenSize = {
     width: 1920,
     height: 1080,
   };
 
   beforeEach(() => {
-    // window.innerHeight のモック
     Object.defineProperty(window, 'innerHeight', {
       writable: true,
       configurable: true,
       value: mockScreenSize.height,
     });
 
-    // ResizeObserver のモック
     global.ResizeObserver = jest.fn().mockImplementation(() => ({
       observe: jest.fn(),
       unobserve: jest.fn(),
@@ -62,9 +69,9 @@ describe('BackgroundSlider', () => {
 
     // 各画像の属性を確認
     Array.from(images).forEach((img) => {
-      expect(img).toHaveAttribute('src', '/images/fashion-bg.png');
-      expect(img).toHaveAttribute('alt', 'Fashion items background');
-      expect(img).toHaveAttribute('data-priority', 'true');
+      expect(img).toHaveAttribute('src', '/images/fashion-bg.webp');
+      expect(img).toHaveAttribute('alt', 'Fashion background');
+      expect(img).toHaveAttribute('data-sizes', '100vw');
     });
   });
 
@@ -73,27 +80,23 @@ describe('BackgroundSlider', () => {
 
     // 新しい画面サイズを設定
     const newHeight = 800;
+
     act(() => {
       window.innerHeight = newHeight;
       window.dispatchEvent(new Event('resize'));
     });
 
-    // スケールと幅の計算
-    const expectedScale = newHeight / 1080;
-    const expectedWidth = 3840 * expectedScale;
-
     // スタイルの検証
     const slideContainer = container.querySelector('.animate-slide');
     expect(slideContainer).toHaveStyle({
-      '--image-width': `${expectedWidth}px`,
+      '--image-width': `${ORIGINAL_WIDTH}px`,
     });
 
     // 画像コンテナのサイズ検証
-    const imageContainers = container.querySelectorAll('.shrink-0');
+    const imageContainers = container.querySelectorAll('.slider-image');
     imageContainers.forEach((container) => {
       expect(container).toHaveStyle({
-        width: `${expectedWidth}px`,
-        height: '100vh',
+        width: `${ORIGINAL_WIDTH}px`,
       });
     });
   });
@@ -105,17 +108,5 @@ describe('BackgroundSlider', () => {
     unmount();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
-  });
-
-  it('画像のsizes属性が正しく設定されること', () => {
-    const { container } = render(<BackgroundSlider />);
-
-    const expectedScale = mockScreenSize.height / 1080;
-    const expectedWidth = 3840 * expectedScale;
-
-    const images = container.getElementsByTagName('img');
-    Array.from(images).forEach((img) => {
-      expect(img).toHaveAttribute('data-sizes', `${expectedWidth}px`);
-    });
   });
 });

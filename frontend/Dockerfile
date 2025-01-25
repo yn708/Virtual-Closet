@@ -1,19 +1,30 @@
-
 # oven/bun:latest を使用すると
 # jest実行でエラーになるため、nodeを使用してそこにbunをインストールして使用
-FROM node:22.12
 
+# 外部イメージをbaseステージとして扱う
+FROM oven/bun:latest AS base
+
+# baseステージをもとにbuilderステージを開始
+FROM base AS builder
 WORKDIR /frontend
 
-# npmのバージョンを最新にし、bunをインストール
-RUN npm install -g npm@latest
-RUN npm install -g bun
-
-COPY package.json bun.lockb /frontend/
+COPY package.json bun.lockb ./
 RUN bun install
 
-COPY . /frontend
+# ソースコードのコピーとビルド
+COPY . .
+RUN bun run build
 
-EXPOSE 4000
+# baseステージをもとにrunnerステージを開始
+FROM base AS runner
+WORKDIR /frontend
 
-CMD ["bun", "dev", "-p", "4000"]
+
+COPY --from=builder /frontend/package.json ./
+COPY --from=builder /frontend/bun.lockb ./
+COPY --from=builder /frontend/node_modules ./node_modules
+COPY --from=builder /frontend/public ./public
+COPY --from=builder /frontend/.next/static ./.next/static
+COPY --from=builder /frontend/.next/standalone ./
+
+CMD ["bun", "server.js"]

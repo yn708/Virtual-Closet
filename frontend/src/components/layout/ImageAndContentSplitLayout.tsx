@@ -7,8 +7,8 @@ import type { ImageAndContentSplitLayoutProps } from '@/features/auth/types';
 const ImageAndContentSplitLayout: React.FC<ImageAndContentSplitLayoutProps> = ({
   leftContent,
   rightContent,
-  rightBackgroundImage = '/images/background.webp',
-  rightOverlayClassName = 'bg-black bg-opacity-40 backdrop-blur-sm',
+  rightBackgroundImage = '/images/fashion-bg2.webp',
+  rightOverlayClassName = 'bg-black/10',
   isReversed = false,
 }) => {
   // コンテンツコンポーネント

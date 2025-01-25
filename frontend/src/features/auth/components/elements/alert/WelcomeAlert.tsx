@@ -57,7 +57,9 @@ const WelcomeAlert = () => {
             <h2 className="text-2xl font-bold text-blue-600">
               {TUTORIAL_STEPS[currentStep].title}
             </h2>
-            <p className="text-gray-600">{TUTORIAL_STEPS[currentStep].description}</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              {TUTORIAL_STEPS[currentStep].description}
+            </p>
           </div>
           {TUTORIAL_STEPS[currentStep].content}
           <DialogFooter className="flex flex-col gap-4">
@@ -66,7 +68,7 @@ const WelcomeAlert = () => {
                 variant="ghost"
                 onClick={handleBack}
                 disabled={currentStep === 0}
-                className="text-gray-600"
+                className="text-gray-600 dark:text-gray-400"
               >
                 戻る
               </Button>

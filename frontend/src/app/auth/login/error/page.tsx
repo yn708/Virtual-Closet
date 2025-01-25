@@ -1,12 +1,12 @@
 import LinkWithText from '@/components/elements/link/LinkWithText';
 import { CONTACT_URL, LOGIN_URL } from '@/utils/constants';
-import { CiCircleAlert } from 'react-icons/ci';
+import { CircleAlert } from 'lucide-react';
 
 export default function GoogleAuthError() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-20 space-y-10">
       <div className="flex items-center justify-center gap-4">
-        <CiCircleAlert className="size-12 text-red-500" />
+        <CircleAlert className="size-12 text-red-500" />
         <div className="text-xl">
           <p>認証中にエラーが発生しました。</p>
           <p>お手数ですが、もう一度お試しください。</p>

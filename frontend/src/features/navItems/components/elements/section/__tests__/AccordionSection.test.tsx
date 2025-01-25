@@ -1,6 +1,4 @@
-import { ICON_SIZE } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
-import { GoHome } from 'react-icons/go';
 import AccordionSection from '../AccordionSection';
 
 // Accordionコンポーネントのモック
@@ -37,7 +35,6 @@ jest.mock('@/components/ui/accordion', () => ({
 describe('AccordionSection', () => {
   const defaultProps = {
     value: 'home',
-    Icon: GoHome,
     label: 'Home Section',
   };
 
@@ -66,23 +63,6 @@ describe('AccordionSection', () => {
     expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
-  // アイコンのレンダリングテスト
-  it('renders icon with correct size', () => {
-    render(
-      <AccordionSection {...defaultProps}>
-        <div>Content</div>
-      </AccordionSection>,
-    );
-
-    const iconContainer = screen.getByTestId('accordion-trigger');
-    const innerDiv = iconContainer.querySelector('.flex.items-center.gap-2.p-2');
-    expect(innerDiv).toBeInTheDocument();
-
-    // アイコンのサイズクラスが正しく適用されているか確認
-    const iconElement = innerDiv?.querySelector('svg');
-    expect(iconElement).toHaveClass(ICON_SIZE.md);
-  });
-
   // レスポンシブパディングのテスト
   it('applies correct responsive padding classes to content', () => {
     render(
@@ -99,7 +79,6 @@ describe('AccordionSection', () => {
   it('renders with different props correctly', () => {
     const customProps = {
       value: 'settings',
-      Icon: GoHome,
       label: 'Settings Section',
     };
 

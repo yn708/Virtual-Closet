@@ -1,8 +1,8 @@
 import { TOP_URL } from '@/utils/constants';
 import { HEADER_NAV_ITEMS } from '@/utils/data/navItems';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { BiCloset } from 'react-icons/bi';
 import Header from '../Header';
+import { House } from 'lucide-react';
 
 // モックモジュールの定義
 jest.mock('@/components/layout/HeaderLayout', () => {
@@ -82,7 +82,7 @@ describe('Header', () => {
 
         {
           href: TOP_URL,
-          icon: BiCloset,
+          icon: House,
           label: 'my-closet',
         },
       ]);

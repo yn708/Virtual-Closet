@@ -1,5 +1,10 @@
 import CoordinateEditorForm from '@/features/coordinate/components/form/CoordinateEditorForm';
 import { fetchCoordinateMetaDataAPI } from '@/lib/api/coordinateApi';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'コーディネート作成',
+};
 
 export default async function PhotoCoordinateCreatePage() {
   const metaData = await fetchCoordinateMetaDataAPI();

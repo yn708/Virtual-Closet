@@ -1,11 +1,14 @@
-import { BiCloset } from 'react-icons/bi';
-import { APP_ABOUT_URL, CONTACT_URL, TOP_URL } from '../constants';
+import { House } from 'lucide-react';
+import { APP_ABOUT_URL, CONTACT_URL, PRIVACY_URL, TERMS_URL, TOP_URL } from '../constants';
+
 /* ----------------------------------------------------------------
 フッター
 ------------------------------------------------------------------ */
 export const FOOTER_NAV_ITEMS = [
   { href: APP_ABOUT_URL, label: 'このサイトについて' },
   { href: CONTACT_URL, label: 'お問い合わせ' },
+  { href: PRIVACY_URL, label: 'プライバシーポリシー' },
+  { href: TERMS_URL, label: '利用規約' },
 ];
 
 /* ----------------------------------------------------------------
@@ -32,7 +35,7 @@ export const HEADER_NAV_ITEMS = [
 
   {
     href: TOP_URL,
-    icon: BiCloset,
+    icon: House,
     label: 'my-closet',
   },
 ];

@@ -25,9 +25,9 @@ const ImageField = ({ preview, isProcessing, error }: ImageFieldProps) => {
           <ImageUploadArea />
         ) : (
           <div>
-            <div className="relative group max-w-2xl mx-auto h-40 md:h-96 bg-gray-50 rounded-lg overflow-hidden">
+            <div className="relative group max-w-2xl mx-auto h-40 md:h-96 rounded-lg overflow-hidden">
               {isProcessing ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm">
                   <LoadingElements message="画像処理中..." />
                 </div>
               ) : (
@@ -44,7 +44,7 @@ const ImageField = ({ preview, isProcessing, error }: ImageFieldProps) => {
         )}
       </div>
 
-      {error && <p className="text-sm text-destructive mt-2">{error}</p>}
+      {error && <p className="text-sm text-destructive mt-2">{error[0]}</p>}
     </div>
   );
 };

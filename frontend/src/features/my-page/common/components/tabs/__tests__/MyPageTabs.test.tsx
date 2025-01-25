@@ -124,12 +124,6 @@ describe('MyPageTabs', () => {
     expect(coordinateTab.className).toContain('text-gray-500');
   });
 
-  it('各タブトリガーにアイコンが表示されること', () => {
-    const { container } = render(<MyPageTabs />);
-    const icons = container.querySelectorAll('svg');
-    expect(icons.length).toBe(2);
-  });
-
   it('TabsContentが正しいマージン設定を持つこと', () => {
     render(<MyPageTabs />);
     const coordinateContent = screen.getByTestId('tab-content-coordinate');

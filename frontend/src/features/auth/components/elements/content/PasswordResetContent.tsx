@@ -48,7 +48,11 @@ const PasswordResetContent = ({ mode, uid = '', token = '' }: PasswordResetConte
             passwordLabel={mode === 'confirm' ? '新しい' : undefined}
           />
         </div>
-        {mode === 'request' && <NormalLink href={LOGIN_URL} label="ログインに戻る" />}
+        {mode === 'request' && (
+          <div className="mt-8">
+            <NormalLink href={LOGIN_URL} label="戻る" />
+          </div>
+        )}
       </TitleLayout>
     </main>
   );

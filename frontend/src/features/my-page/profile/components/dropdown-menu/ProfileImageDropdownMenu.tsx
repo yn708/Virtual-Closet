@@ -6,8 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { AiFillDelete, AiOutlinePicture } from 'react-icons/ai';
-import { MdEdit } from 'react-icons/md';
+import { Pencil } from 'lucide-react';
 import type { ProfileImageActionsProps } from '../../types';
 
 const ProfileImageDropdownMenu: React.FC<ProfileImageActionsProps> = ({
@@ -18,7 +17,7 @@ const ProfileImageDropdownMenu: React.FC<ProfileImageActionsProps> = ({
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <IconButton
-        Icon={MdEdit}
+        Icon={Pencil}
         label="アップロード"
         showText={false}
         rounded={true}
@@ -30,13 +29,11 @@ const ProfileImageDropdownMenu: React.FC<ProfileImageActionsProps> = ({
     <DropdownMenuContent>
       <label htmlFor="image-upload">
         <DropdownMenuItem className="px-3">
-          <AiOutlinePicture />
           <span>カメラロールから選択</span>
         </DropdownMenuItem>
       </label>
       {(hasPreview || hasImage) && (
         <DropdownMenuItem className="px-3" onClick={onDeleteImage}>
-          <AiFillDelete className="text-red-500" />
           <span className="text-red-500">{hasPreview ? '選択取り消し' : '削除'}</span>
         </DropdownMenuItem>
       )}

@@ -14,8 +14,8 @@ import {
 import { fetchFashionMetaDataAPI } from '@/lib/api/fashionItemsApi';
 import type { FashionItem, MetaDataType } from '@/types';
 import type { BaseCoordinate, CoordinateMetaDataType, CoordinateType } from '@/types/coordinate';
+import { Pen } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { LuPencil } from 'react-icons/lu';
 import type { UpdateItemTypes } from '../../types';
 
 interface EditItemDialogProps<T extends FashionItem | BaseCoordinate> extends UpdateItemTypes<T> {
@@ -72,7 +72,7 @@ const EditItemDialog = <T extends FashionItem | BaseCoordinate>({
       onToggle={onToggle}
       trigger={
         <IconButton
-          Icon={LuPencil}
+          Icon={Pen}
           label="編集"
           size="sm"
           variant="default"

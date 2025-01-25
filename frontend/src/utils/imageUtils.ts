@@ -1,21 +1,21 @@
-import imageCompression from 'browser-image-compression';
-import html2canvas from 'html2canvas';
 import { ALLOWED_IMAGE_EXTENSIONS, ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from './constants';
 
 /* ----------------------------------------------------------------
 HEIC形式をJPEGに変換する関数
 ------------------------------------------------------------------ */
 export const conversionImage = async (file: File): Promise<File> => {
-  // クライアントサイドでのみ実行されるチェック
-  if (typeof window === 'undefined') {
-    return file; // サーバーサイドの場合は処理せずに元のファイルを返す
-  }
+  // クライアントサイドでのみ実行されるチェック（サーバーサイドの場合は処理せずに元のファイルを返す）
+  if (typeof window === 'undefined') return file;
 
   // ファイルがHEIC形式かどうかをチェック
   if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
     try {
       // heic2anyを動的にインポート
-      const heic2any = (await import('heic2any')).default;
+      // より効率的な動的インポート
+      const { default: heic2any } = await import(
+        /* webpackChunkName: "heic2any" */
+        'heic2any'
+      );
 
       // HEIC形式をJPEGに変換
       const blob = await heic2any({
@@ -85,6 +85,11 @@ export const compressImage = async (
   const options = { ...defaultOptions, ...customOptions };
 
   try {
+    const { default: imageCompression } = await import(
+      /* webpackChunkName: "imageCompression" */
+      'browser-image-compression'
+    );
+
     // 画像の圧縮を実行
     const compressedFile = await imageCompression(file, options);
 
@@ -142,6 +147,11 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
   if (!canvasRef) return null;
 
   try {
+    const { default: html2canvas } = await import(
+      /* webpackChunkName: "html2canvas" */
+      'html2canvas'
+    );
+
     // キャンバス要素のサイズを取得
     const canvasRect = canvasRef.getBoundingClientRect();
 

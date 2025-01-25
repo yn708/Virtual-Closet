@@ -3,7 +3,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/
 import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import ThemeToggleButton from '@/features/navItems/components/elements/button/ThemeToggleButton';
 import { BG_COLOR } from '@/utils/data/selectData';
-import { TbBackground } from 'react-icons/tb';
+import { TableProperties } from 'lucide-react';
 
 const SelectBackgroundDrawer = () => {
   const { state, handlers } = useCoordinateCanvasState();
@@ -11,7 +11,7 @@ const SelectBackgroundDrawer = () => {
     <Drawer>
       <DrawerTrigger asChild>
         <IconButton
-          Icon={TbBackground}
+          Icon={TableProperties}
           label="背景"
           size="lg"
           variant="ghost"

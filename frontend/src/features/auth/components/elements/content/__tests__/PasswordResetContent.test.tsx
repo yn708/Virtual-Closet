@@ -79,7 +79,7 @@ describe('PasswordResetContent', () => {
       ).toBeInTheDocument();
       expect(screen.getByTestId('auth-form')).toBeInTheDocument();
       expect(screen.getByText('送信')).toBeInTheDocument();
-      expect(screen.getByText('ログインに戻る')).toBeInTheDocument();
+      expect(screen.getByText('戻る')).toBeInTheDocument();
     });
 
     it('メール送信リクエストが成功した場合の処理が正しく実行されること', async () => {

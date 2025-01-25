@@ -1,4 +1,4 @@
-import { APP_ABOUT_URL, CONTACT_URL } from '@/utils/constants';
+import { APP_ABOUT_URL, CONTACT_URL, PRIVACY_URL, TERMS_URL } from '@/utils/constants';
 import { FOOTER_NAV_ITEMS } from '@/utils/data/navItems';
 import { render, screen } from '@testing-library/react';
 import Footer from '../Footer';
@@ -7,14 +7,6 @@ import Footer from '../Footer';
 jest.mock('@/components/layout/FooterLayout', () => {
   return function MockFooterLayout({ children }: { children: React.ReactNode }) {
     return <div data-testid="footer-layout">{children}</div>;
-  };
-});
-
-jest.mock('@/features/auth/components/elements/dialog/LegalDialog', () => {
-  return {
-    LegalDialog: ({ label, className }: { label: string; className: string }) => (
-      <button className={className}>{label}</button>
-    ),
   };
 });
 
@@ -38,19 +30,27 @@ describe('Footer', () => {
     expect(FOOTER_NAV_ITEMS).toEqual([
       { href: APP_ABOUT_URL, label: 'このサイトについて' },
       { href: CONTACT_URL, label: 'お問い合わせ' },
+      { href: PRIVACY_URL, label: 'プライバシーポリシー' },
+      { href: TERMS_URL, label: '利用規約' },
     ]);
 
     // 各ナビゲーションアイテムが正しくレンダリングされているか検証
     const aboutLink = screen.getByText('このサイトについて');
     const contactLink = screen.getByText('お問い合わせ');
+    const privacyLink = screen.getByText('プライバシーポリシー');
+    const termsLink = screen.getByText('利用規約');
 
     // リンクの存在確認
     expect(aboutLink).toBeInTheDocument();
     expect(contactLink).toBeInTheDocument();
+    expect(privacyLink).toBeInTheDocument();
+    expect(termsLink).toBeInTheDocument();
 
     // リンクのURLが正しいか確認
     expect(aboutLink).toHaveAttribute('href', APP_ABOUT_URL);
     expect(contactLink).toHaveAttribute('href', CONTACT_URL);
+    expect(privacyLink).toHaveAttribute('href', PRIVACY_URL);
+    expect(termsLink).toHaveAttribute('href', TERMS_URL);
 
     // ホバー時のスタイルクラスを確認
     expect(aboutLink).toHaveClass('hover:font-bold');
@@ -66,50 +66,13 @@ describe('Footer', () => {
     expect(navLinks[1]).toHaveTextContent('お問い合わせ');
   });
 
-  // 法的文書のダイアログボタンが正しくレンダリングされることをテスト
-  it('renders legal document dialog buttons', () => {
-    render(<Footer />);
-
-    // プライバシーポリシーボタンのテスト
-    const privacyButton = screen.getByText('プライバシーポリシー');
-    expect(privacyButton).toBeInTheDocument();
-    expect(privacyButton).toHaveClass(
-      'h-auto',
-      'text-gray-600',
-      'dark:text-gray-300',
-      'opacity-90',
-      'p-0',
-      'font-normal',
-      'hover:font-bold',
-      'hover:no-underline',
-      'lg:text-sm',
-      'text-xs',
-    );
-
-    // 利用規約ボタンのテスト
-    const termsButton = screen.getByText('利用規約');
-    expect(termsButton).toBeInTheDocument();
-    expect(termsButton).toHaveClass(
-      'h-auto',
-      'text-gray-600',
-      'dark:text-gray-300',
-      'opacity-90',
-      'p-0',
-      'font-normal',
-      'hover:font-bold',
-      'hover:no-underline',
-      'lg:text-sm',
-      'text-xs',
-    );
-  });
-
   // コピーライトテキストが正しくレンダリングされることをテスト
   it('renders copyright text', () => {
     render(<Footer />);
 
     const copyright = screen.getByText('© 2024 Virtual Closet. All rights reserved.');
     expect(copyright).toBeInTheDocument();
-    expect(copyright).toHaveClass('text-sm', 'opacity-70');
+    expect(copyright).toHaveClass('text-xs', 'opacity-70');
   });
 
   // レスポンシブデザインのクラスが正しく適用されていることをテスト

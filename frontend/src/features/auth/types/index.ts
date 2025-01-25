@@ -1,9 +1,7 @@
 import type {
   ChildrenType,
-  ClassNameType,
   DescriptionType,
   FormState,
-  LabelType,
   SubDescriptionType,
   TitleType,
 } from '@/types';
@@ -42,9 +40,6 @@ export interface AuthFormProps {
 /* ----------------------------------------------------------------
 プライバシーポリシー、利用規約関連
 ------------------------------------------------------------------ */
-export interface LegalDialogProps extends LabelType, ClassNameType {
-  data: LegalDocument;
-}
 
 export interface LegalDocument extends TitleType, DescriptionType {
   sections: LegalDocumentSection[];

@@ -1,6 +1,11 @@
-export { default } from 'next-auth/middleware';
+import { withAuth } from 'next-auth/middleware';
+
+export default withAuth({
+  callbacks: {
+    authorized: ({ token }) => !!token,
+  },
+});
 
 export const config = {
-  // ログインが必要なページのパスを指定
-  matcher: ['/top', '/outfit/:path*', '/my-closet/:path*'],
+  matcher: ['/outfit/:path*', '/my-closet/:path*'],
 };

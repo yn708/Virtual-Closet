@@ -1,8 +1,7 @@
 import IconLink from '@/components/elements/link/IconLink';
 import { COORDINATE_CREATE_CANVAS_URL, COORDINATE_CREATE_URL } from '@/utils/constants';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { BiCloset } from 'react-icons/bi';
-import { MdOutlineSwipe } from 'react-icons/md';
+import { Shirt } from 'lucide-react';
 import CreateOutfitSection from '../CreateOutfitSection';
 import ImageUploadSection from '../ImageUploadSection';
 
@@ -60,7 +59,6 @@ describe('CreateOutfitSection', () => {
     // ImageUploadSectionのプロパティ確認
     expect(screen.getByTestId('value')).toHaveTextContent('create-outfit'); // セクションの値
     expect(screen.getByTestId('label')).toHaveTextContent('コーディネート作成'); // セクションのラベル
-    expect(screen.getByTestId('icon-component')).toBeInTheDocument(); // アイコンが存在するか
     expect(screen.getByTestId('redirect-url')).toHaveTextContent(COORDINATE_CREATE_URL); // リダイレクト先URL
 
     // IconLinkの確認
@@ -93,7 +91,6 @@ describe('CreateOutfitSection', () => {
       {
         value: 'create-outfit', // セクションの値
         label: 'コーディネート作成', // セクションのラベル
-        Icon: BiCloset, // セクションのアイコン
         redirectUrl: COORDINATE_CREATE_URL, // リダイレクトURL
         onClose: mockOnClose, // 閉じるコールバック
         children: expect.any(Object), // 子コンポーネント
@@ -105,7 +102,7 @@ describe('CreateOutfitSection', () => {
     expect(IconLink).toHaveBeenCalledWith(
       {
         href: COORDINATE_CREATE_CANVAS_URL, // リンクのURL
-        Icon: MdOutlineSwipe, // リンクのアイコン
+        Icon: Shirt, // リンクのアイコン
         size: 'sm', // サイズ設定
         label: '登録済みアイテムから作成', // リンクのラベル
         rounded: true, // スタイル設定

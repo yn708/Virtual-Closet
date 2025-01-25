@@ -1,0 +1,18 @@
+# oven/bunだとJestテストがうまくできないため、テスト用のdocker Fileを作成
+FROM node:23.6-slim
+
+WORKDIR /frontend
+
+# Bunのインストール
+RUN npm install -g bun
+
+# 依存関係のインストール
+COPY package.json bun.lockb ./
+RUN bun install
+
+
+# テスト環境のセットアップ
+ENV NODE_ENV=test
+
+EXPOSE 4001
+CMD ["bun", "dev", "-p", "4001"]

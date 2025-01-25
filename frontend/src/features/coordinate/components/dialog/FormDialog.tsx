@@ -2,12 +2,12 @@ import IconButton from '@/components/elements/button/IconButton';
 import LoadingElements from '@/components/elements/loading/LoadingElements';
 
 import BaseDialog from '@/components/elements/dialog/BaseDialog';
+import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
 import type { CoordinateMetaDataType } from '@/types/coordinate';
-import { IoIosArrowForward } from 'react-icons/io';
+import { ChevronRight } from 'lucide-react';
 import type { CoordinateEditTypes } from '../../types';
 import CustomCoordinateEditorForm from '../form/CustomCoordinateEditorForm';
-import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 
 interface FormDialogProps extends InitialItemsProps, CoordinateEditTypes {
   metaData: CoordinateMetaDataType | null;
@@ -27,7 +27,7 @@ const FormDialog: React.FC<FormDialogProps> = ({
     <BaseDialog
       trigger={
         <IconButton
-          Icon={IoIosArrowForward}
+          Icon={ChevronRight}
           label="次へ"
           size="sm"
           rounded={true}

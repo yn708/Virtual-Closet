@@ -43,7 +43,7 @@ export async function profileUpdateAction(
     let hasChanges = false; // 変更があった場合のみに送信（Trueの場合にのみAPI通信）
 
     // プロフィール画像の変更検出
-    if (profile_image instanceof File) {
+    if (profile_image && profile_image.size > 0) {
       apiFormData.append('profile_image', profile_image);
       hasChanges = true;
     } else if (deleteState.image && userDetail.profile_image) {

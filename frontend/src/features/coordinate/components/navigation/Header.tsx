@@ -7,9 +7,8 @@ import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
 import { fetchCoordinateMetaDataAPI } from '@/lib/api/coordinateApi';
 import type { CoordinateMetaDataType } from '@/types/coordinate';
 import { TOP_URL } from '@/utils/constants';
+import { ChevronRight, CircleAlert } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { CiCircleAlert } from 'react-icons/ci';
-import { IoIosArrowForward } from 'react-icons/io';
 import type { CoordinateEditTypes } from '../../types';
 import FormDialog from '../dialog/FormDialog';
 
@@ -49,7 +48,7 @@ const Header: React.FC<InitialItemsProps & CoordinateEditTypes> = ({
         {!initialData && (
           <IconLink
             href={TOP_URL}
-            Icon={IoIosArrowForward}
+            Icon={ChevronRight}
             label="トップへ戻る"
             size="sm"
             rounded={true}
@@ -70,7 +69,7 @@ const Header: React.FC<InitialItemsProps & CoordinateEditTypes> = ({
         ) : (
           <>
             <div className="flex justify-center items-center gap-2 text-gray-500 dark:text-gray-300">
-              <CiCircleAlert className="size-5" />
+              <CircleAlert className="size-5" />
               <p className="text-xs">アイテムは2個以上選択する必要があります（20個まで）</p>
             </div>
           </>

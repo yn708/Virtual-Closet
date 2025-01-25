@@ -1,19 +1,17 @@
 'use client';
 import IconButton from '@/components/elements/button/IconButton';
+import { MonitorSmartphone, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import React, { useCallback } from 'react';
-import { IoMoonOutline } from 'react-icons/io5';
-import { LuMonitorSmartphone } from 'react-icons/lu';
-import { MdOutlineWbSunny } from 'react-icons/md';
 
 type Theme = 'light' | 'dark' | 'system';
 
 const THEME_OPTIONS: Theme[] = ['light', 'system', 'dark'];
 
 const THEME_ICONS: Record<Theme, React.ComponentProps<typeof IconButton>['Icon']> = {
-  light: MdOutlineWbSunny,
-  system: LuMonitorSmartphone,
-  dark: IoMoonOutline,
+  light: Sun,
+  system: MonitorSmartphone,
+  dark: Moon,
 };
 
 const ThemeToggleButton: React.FC = () => {
