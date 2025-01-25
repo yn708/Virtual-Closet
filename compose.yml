@@ -20,15 +20,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 5G
+          memory: 3G
         reservations:
           memory: 1G
     depends_on:
       - backend
 
-  # テスト時のみコメントアウト解除
-  # 使用時以外はコメントアウトしておくこと
-
+  # テスト時に使用
   frontend-test:
     build:
       context: ./frontend
@@ -57,9 +55,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
         reservations:
-          memory: 256M
+          memory: 512M
 
   # DB(postgresql)
   db:
@@ -74,9 +72,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
         reservations:
-          memory: 128M
+          memory: 256M
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
       interval: 5s

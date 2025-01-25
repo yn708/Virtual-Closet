@@ -61,24 +61,24 @@ jobs:
       - name: Build and run frontend Docker container
         working-directory: ./frontend
         run: |
-          docker compose build frontend
-          docker compose up -d frontend
+          docker compose build frontend-test
+          docker compose up -d frontend-test
           docker compose ps
 
       - name: Install Dependencies
-        run: docker compose exec -T frontend bun install
+        run: docker compose exec -T frontend-test bun install
         working-directory: ./frontend
 
       - name: Run format check
-        run: docker compose exec -T frontend bun run format
+        run: docker compose exec -T frontend-test bun run format
         working-directory: ./frontend
 
       - name: Run linter
-        run: docker compose exec -T frontend bun run lint
+        run: docker compose exec -T frontend-test bun run lint
         working-directory: ./frontend
 
       - name: Run Test
-        run: docker compose exec -T frontend bun run test
+        run: docker compose exec -T frontend-test bun run test
         working-directory: ./frontend
 
       - name: Collect test logs
