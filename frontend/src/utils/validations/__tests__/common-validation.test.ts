@@ -158,7 +158,7 @@ describe('Authentication and Image Validation Schemas', () => {
         expect(result.success).toBe(false);
         if (!result.success) {
           expect(result.error.errors[0].message).toBe(
-            'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+            'JPEG, PNG, GIF、HEIC, WebP形式の画像のみがサポートされています。',
           );
         }
       });

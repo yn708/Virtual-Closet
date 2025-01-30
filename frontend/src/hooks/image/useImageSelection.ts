@@ -42,6 +42,9 @@ export const useImageSelection = () => {
           variant: 'destructive',
           title: validationError,
         });
+        // クリア
+        e.target.value = '';
+        return { file: null };
       }
       return { file };
     } catch (error) {
@@ -51,6 +54,7 @@ export const useImageSelection = () => {
         title: 'エラー',
         description: '画像の処理中にエラーが発生しました。もう一度お試しください。',
       });
+      e.target.value = '';
       return { file: null };
     } finally {
       setIsLoading(false);

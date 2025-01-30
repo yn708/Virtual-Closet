@@ -1,13 +1,13 @@
 import { ALLOWED_IMAGE_EXTENSIONS, ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from './constants';
 
 /* ----------------------------------------------------------------
-HEIC形式をJPEGに変換する関数
+WebPに変換する関数
 ------------------------------------------------------------------ */
 export const conversionImage = async (file: File): Promise<File> => {
   // クライアントサイドでのみ実行されるチェック（サーバーサイドの場合は処理せずに元のファイルを返す）
   if (typeof window === 'undefined') return file;
 
-  // ファイルがHEIC形式かどうかをチェック
+  // ファイルがHEIC形式かどうかをチェック（HEICの場合はheic2anyを使用）
   if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
     try {
       // heic2anyを動的にインポート
@@ -20,13 +20,13 @@ export const conversionImage = async (file: File): Promise<File> => {
       // HEIC形式をJPEGに変換
       const blob = await heic2any({
         blob: file,
-        toType: 'image/jpeg',
+        toType: 'image/webp',
         quality: 0.8,
       });
 
       // 変換されたBlobから新しいFileオブジェクトを作成
-      return new File([blob as Blob], file.name.replace(/\.heic$/i, '.jpg'), {
-        type: 'image/jpeg',
+      return new File([blob as Blob], file.name.replace(/\.heic$/i, '.webp'), {
+        type: 'image/webp',
       });
     } catch (error) {
       console.error('HEIC conversion failed:', error);
@@ -34,8 +34,15 @@ export const conversionImage = async (file: File): Promise<File> => {
     }
   }
 
-  // HEIC以外の形式の場合、元のファイルをそのまま返す
-  return file;
+  // それ以外の形式をWebPに変換
+  const { default: imageCompression } = await import('browser-image-compression');
+  const webpFile = await imageCompression(file, {
+    fileType: 'image/webp',
+  });
+
+  return new File([webpFile], file.name.replace(/\.[^.]+$/, '.webp'), {
+    type: 'image/webp',
+  });
 };
 
 /* ----------------------------------------------------------------
@@ -67,8 +74,8 @@ export const compressImage = async (
 ): Promise<File> => {
   const defaultOptions = {
     // 圧縮後の最大ファイルサイズ（MB）
-    // 1MBを超える場合、品質を下げて1MB以下に抑える
-    maxSizeMB: 1,
+    // 1MBを超える場合、品質を下げて0.5MB以下に抑える
+    maxSizeMB: 0.5,
 
     // 画像の最大幅または高さ（ピクセル）
     // 元の画像がこれより大きい場合、この値まで縮小される
@@ -80,7 +87,7 @@ export const compressImage = async (
     // メインスレッドのブロックを防ぐ
     useWebWorker: true,
 
-    fileType: 'image/jpeg',
+    fileType: 'image/webp',
   };
   const options = { ...defaultOptions, ...customOptions };
 
@@ -167,7 +174,6 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
       height: canvasRect.height, // キャンバスの実際の高さを指定
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#F9FAFB',
       logging: false,
       imageTimeout: 0, // 画像読み込みのタイムアウトを無効化
       onclone: (clonedDoc) => {
@@ -211,7 +217,7 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
         (blob) => {
           resolve(blob as Blob);
         },
-        'image/png',
+        'image/webp',
         1.0, // 最高品質で出力
       );
     });
@@ -221,17 +227,17 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
     const randomNum = Math.floor(Math.random() * 10000)
       .toString()
       .padStart(4, '0');
-    const filename = `coordinate_preview_${timestamp}_${randomNum}.png`;
+    const filename = `coordinate_preview_${timestamp}_${randomNum}.webp`;
 
     // 生成されたファイルを圧縮用のFileオブジェクトに変換
-    const uncompressedFile = new File([blob], filename, { type: 'image/png' });
+    const uncompressedFile = new File([blob], filename, { type: 'image/webp' });
 
     // 圧縮オプションを設定
     const compressionOptions = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920, // プレビュー用に適切なサイズに設定
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 1024, // プレビュー用に適切なサイズに設定
       useWebWorker: true,
-      fileType: 'image/jpeg', // JPEGで圧縮してファイルサイズを削減
+      fileType: 'image/webp',
     };
 
     // 画像を圧縮
@@ -241,7 +247,6 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
     const previewUrl = URL.createObjectURL(compressedFile);
 
     // FormDataにファイルを追加
-
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(compressedFile);
 

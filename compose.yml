@@ -2,18 +2,18 @@ services:
   # フロントエンド（React/Next.js）
   frontend:
     container_name: VC_frontend
-    restart: unless-stopped
-
     build:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
       TZ: Asia/Tokyo
+      NODE_ENV: development
     env_file:
       - ./frontend/.env.local
     volumes:
-      - ./frontend:/frontend
+      - ./frontend:/frontend:delegated
       - node_modules:/frontend/node_modules
+
     command: bun run dev -p 4000
     ports:
       - '4000:4000'
@@ -24,7 +24,8 @@ services:
         reservations:
           memory: 1G
     depends_on:
-      - backend
+      backend:
+        condition: service_started
 
   # テスト時に使用
   frontend-test:
@@ -45,11 +46,12 @@ services:
       dockerfile: Dockerfile
     command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./backend:/backend
+      - ./backend:/backend:delegated
     ports:
       - '8000:8000'
     depends_on:
-      - db
+      db:
+        condition: service_healthy # DBの健全性確認後に起動
     env_file:
       - ./backend/.env
     deploy:
@@ -64,7 +66,7 @@ services:
     container_name: VC_db
     image: postgres:16.2-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data:delegated
     env_file:
       - .env
     ports:

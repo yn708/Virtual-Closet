@@ -84,15 +84,15 @@ export const useImageCrop = ({ image, onCropComplete, onClose }: UseImageCropPro
       size, // キャンバスの高さ
     );
 
-    // キャンバスの内容をPNG形式のデータURLとして取得
-    const croppedImageDataUrl = canvas.toDataURL('image/png');
+    // キャンバスの内容をWebP形式のデータURLとして取得
+    const croppedImageDataUrl = canvas.toDataURL('image/webp');
 
     // データURLをBlobに変換
     const croppedImageBlob = dataURLToBlob(croppedImageDataUrl);
 
     // BlobをFileとして扱う
-    const file = new File([croppedImageBlob], `profile-image-${Date.now()}.png`, {
-      type: 'image/png',
+    const file = new File([croppedImageBlob], `profile-image-${Date.now()}.webp`, {
+      type: 'image/webp',
     });
 
     // クロップ完了後の処理として、onCropComplete関数にデータURLを渡す

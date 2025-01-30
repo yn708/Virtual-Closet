@@ -14,15 +14,19 @@ const createMockContextValue = (
       status: '',
       season: [],
     },
-    isPending: false,
+    isInitialLoading: false,
+    isLoadingMore: false,
     currentItems: [],
     ...overrides.state,
+    hasMore: false,
+    currentPage: 1,
   },
   handlers: {
     handleCategoryChange: jest.fn(),
     handleDelete: jest.fn(),
     handleUpdate: jest.fn(),
     handleFilterChange: jest.fn(),
+    loadMore: jest.fn(),
     ...overrides.handlers,
   },
 });
@@ -84,7 +88,8 @@ describe('FashionItemsContents', () => {
       createMockContextValue({
         state: {
           selectedCategory: '',
-          isPending: false,
+          isInitialLoading: false,
+          isLoadingMore: false,
           filters: {
             category: '',
             status: '',
@@ -92,6 +97,8 @@ describe('FashionItemsContents', () => {
           },
           categoryCache: {},
           currentItems: [],
+          hasMore: false,
+          currentPage: 1,
         },
       }),
     );
@@ -110,7 +117,8 @@ describe('FashionItemsContents', () => {
       createMockContextValue({
         state: {
           selectedCategory: 'tops',
-          isPending: true,
+          isInitialLoading: false,
+          isLoadingMore: false,
           filters: {
             category: '',
             status: '',
@@ -118,6 +126,8 @@ describe('FashionItemsContents', () => {
           },
           categoryCache: {},
           currentItems: [],
+          hasMore: false,
+          currentPage: 1,
         },
       }),
     );

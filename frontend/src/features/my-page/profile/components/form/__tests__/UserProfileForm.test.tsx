@@ -2,6 +2,12 @@ import type { UserDetailType } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { useProfileForm } from '../../../hooks/useProfileForm';
 import UserProfileForm from '../UserProfileForm';
+import { useImage } from '@/context/ImageContext';
+
+// useImageのモック作成
+jest.mock('@/context/ImageContext', () => ({
+  useImage: jest.fn(),
+}));
 
 // モックの作成
 jest.mock('../../../hooks/useProfileForm', () => ({
@@ -70,8 +76,15 @@ describe('UserProfileForm', () => {
     handleDelete: (_type: 'image' | 'birthDate') => jest.fn(),
   };
 
+  // beforeEach内でデフォルト値を設定
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // useImageのデフォルトモック設定
+    (useImage as jest.Mock).mockReturnValue({
+      isProcessing: false, // 必要に応じて true に変更
+    });
+
     (useProfileForm as jest.Mock).mockReturnValue(defaultMockReturn);
   });
 

@@ -85,6 +85,12 @@ URL
 // バックエンド
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// 開発環境では完全なURLが必要
+export const IMAGE_URL =
+  process.env.NODE_ENV === 'development'
+    ? BACKEND_URL
+    : `https://${process.env.AWS_CLOUDFRONT_DOMAIN}`;
+
 // トップ
 // 一旦my-closetをTOP_URLをmy-closetとして使用
 // export const MY_CLOSET_URL = '/my-closet';
@@ -126,10 +132,21 @@ export const ERROR_DESCRIPTION_MESSAGE = '時間をおいてから再度お試�
 /* ----------------------------------------------------------------
 image
 ------------------------------------------------------------------ */
-export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/heic'];
+export const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/heic',
+  'image/webp',
+];
 export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.heic'];
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export const DEFAULT_USER_IMAGE = '/images/default.webp';
+
+// 画面サイズ
+export const ORIGINAL_HEIGHT = 1080;
+export const ORIGINAL_WIDTH = 3840;
+export const DEFAULT_DIMENSIONS = { width: 1920, height: 1080, scale: 1 };
 
 /* ----------------------------------------------------------------
 SEARCH
@@ -143,11 +160,3 @@ CANVAS
 export const MOVEMENT_THRESHOLD = 15; // この距離（px）以上マウスを動かすまで回転しない
 export const SNAP_THRESHOLD = 2; // 指定された角度の±2度以内でスナップする
 export const SNAP_ANGLES = [0, 90, 180, 270, 360]; // スナップする角度のリスト（度）
-
-/* ----------------------------------------------------------------
-画面サイズ
------------------------------------------------------------------- */
-// 定数を外部に定義
-export const ORIGINAL_HEIGHT = 1080;
-export const ORIGINAL_WIDTH = 3840;
-export const DEFAULT_DIMENSIONS = { width: 1920, height: 1080, scale: 1 };

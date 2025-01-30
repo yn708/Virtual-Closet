@@ -2,8 +2,9 @@ import { useImage } from '@/context/ImageContext';
 import { useImageSelection } from '@/hooks/image/useImageSelection';
 import { useToast } from '@/hooks/use-toast';
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { compressImage, conversionImage, createImagePreview } from '@/utils/imageUtils';
+import type React from 'react';
 import { useState } from 'react';
 import type { UseProfileImageProps } from '../types';
 
@@ -21,7 +22,7 @@ export const useProfileImage = ({ profileImage, onDelete }: UseProfileImageProps
 
   // 画像のプレビューURL生成
   const currentPreviewImage =
-    preview || (defaultProfileImage ? `${BACKEND_URL}${defaultProfileImage}` : '');
+    preview || (defaultProfileImage ? `${IMAGE_URL}${defaultProfileImage}` : '');
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsProcessing(true);

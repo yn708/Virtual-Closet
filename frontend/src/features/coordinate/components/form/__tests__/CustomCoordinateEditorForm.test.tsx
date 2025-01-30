@@ -197,16 +197,6 @@ describe('CustomCoordinateEditorForm', () => {
     expect(screen.getByTestId('select-form-fields')).toHaveTextContent('Processing...');
   });
 
-  it('フォーム送信中の状態が正しく反映されること', () => {
-    mockUseFormStatus.mockReturnValue({
-      pending: true,
-    });
-
-    render(<CustomCoordinateEditorForm metaData={mockMetaData} initialItems={mockInitialItems} />);
-
-    expect(screen.getByTestId('select-form-fields')).toHaveTextContent('Processing...');
-  });
-
   it('カスタムフックが正しいパラメータで呼び出されること', () => {
     const onSuccess = jest.fn();
     const initialData: BaseCoordinate = {

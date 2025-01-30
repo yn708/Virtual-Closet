@@ -1,12 +1,13 @@
-# ベースイメージの設定
-FROM python:3.12-slim
+# ベースイメージの設定 (ビルドステージ)
+FROM python:3.12-slim AS builder
 
-# Pythonの標準出力のバッファリングを解除して、出力を即座に表示できるよう設定
+# Pythonの標準出力のバッファリングを解除
 ENV PYTHONUNBUFFERED=1
 
 # 作業ディレクトリの設定
 WORKDIR /backend
 
+# 必要なパッケージのインストール
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     wget \
@@ -15,17 +16,33 @@ RUN apt-get update && \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# u2netモデルのダウンロードを追加(rembg)
+# u2netモデルのダウンロード (rembg 用)
 RUN mkdir -p /root/.u2net && \
     wget https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx -O /root/.u2net/u2net.onnx
-
 
 # pipの最新バージョンにアップグレード
 RUN pip install --upgrade pip
 
 # 依存関係のインストール
-ADD requirements.txt /backend/
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ソースコードをコンテナ内にコピー
-COPY . /backend
+# 実行用の軽量イメージ
+FROM python:3.12-slim AS runner
+
+ENV PYTHONUNBUFFERED=1
+WORKDIR /backend
+
+# 必要なシステムライブラリを再インストール (PostgreSQL 用)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# builderからの必要なファイルのコピー
+COPY --from=builder /root/.u2net /root/.u2net
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# アプリケーションコードのコピー
+COPY . .

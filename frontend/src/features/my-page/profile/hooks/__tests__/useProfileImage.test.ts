@@ -56,7 +56,7 @@ describe('useProfileImage', () => {
       await result.current.handleFileSelect(mockEvent);
     });
 
-    expect(result.current.imageToEdit).toBeTruthy();
+    expect(result.current.imageToEdit).toBe('data:image/jpeg;base64,test');
     expect(result.current.isProcessing).toBe(false);
   });
 

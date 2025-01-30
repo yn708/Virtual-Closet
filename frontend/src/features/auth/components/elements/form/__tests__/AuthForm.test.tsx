@@ -5,6 +5,11 @@ import AuthForm from '../AuthForm';
 // モックのフォームアクションを作成
 const mockFormAction = jest.fn();
 
+jest.mock('react-dom', () => ({
+  ...jest.requireActual('react-dom'),
+  useFormStatus: () => ({ pending: false }),
+}));
+
 // テストセットアップ用のヘルパー関数を修正
 const setup = ({
   mode = 'login',

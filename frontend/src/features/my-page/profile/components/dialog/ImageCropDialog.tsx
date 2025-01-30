@@ -20,7 +20,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="">
+      <DialogContent>
         <div className="relative w max-h-screen h-96">
           <Cropper
             image={image}

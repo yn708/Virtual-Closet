@@ -105,16 +105,6 @@ describe('BaseContentsLayout', () => {
     expect(mockScrollIntoView).not.toHaveBeenCalled();
   });
 
-  it('isPendingがtrueの場合はscrollIntoViewが呼ばれないこと', () => {
-    render(
-      <BaseContentsLayout selectedCategory="test" isPending={true}>
-        <div>Test Content</div>
-      </BaseContentsLayout>,
-    );
-
-    expect(mockScrollIntoView).not.toHaveBeenCalled();
-  });
-
   it('正しいスタイリングが適用されること', () => {
     const { container } = render(
       <BaseContentsLayout>

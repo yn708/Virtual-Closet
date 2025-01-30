@@ -193,7 +193,7 @@ class FashionItemSerializer(ModelSerializer):
                 instance.seasons.set(seasons_data)
 
         # Nullableなフィールドの処理
-        for field in ["main_color", "brand", "price_range", "design"]:
+        for field in ["sub_category", "main_color", "brand", "price_range", "design"]:
             if field in validated_data:
                 value = validated_data[field]
                 # Noneの場合はNullとして保存

@@ -30,8 +30,11 @@ export interface FashionItemsState {
   categoryCache: CategoryCache;
   selectedCategory: string;
   filters: FashionItemFilters;
-  isPending: boolean;
+  isInitialLoading: boolean;
+  isLoadingMore: boolean;
   currentItems: FashionItem[];
+  hasMore: boolean;
+  currentPage: number;
 }
 
 // ハンドラーの型定義
@@ -40,6 +43,7 @@ export interface FashionItemsHandlers {
   handleDelete: (id: string) => Promise<void>;
   handleUpdate: (updatedItem: FashionItem) => void;
   handleFilterChange: (newFilters: Partial<FashionItemFilters>) => void;
+  loadMore: () => void;
 }
 
 export interface FashionItemsContextValue {

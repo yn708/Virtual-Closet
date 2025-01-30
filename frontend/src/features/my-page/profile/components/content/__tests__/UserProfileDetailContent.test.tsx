@@ -1,6 +1,6 @@
 import { fetchUserDataAPI } from '@/lib/api/userApi';
 import type { UserDetailType } from '@/types';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { calculateAge } from '@/utils/profileUtils';
 import { render, screen } from '@testing-library/react';
 import UserProfileDetailContent from '../UserProfileDetailContent';
@@ -57,7 +57,7 @@ describe('UserProfileDetailContent', () => {
     render(await UserProfileDetailContent());
 
     const avatar = screen.getByTestId('mock-profile-avatar');
-    expect(avatar).toHaveAttribute('data-src', `${BACKEND_URL}${mockUserData.profile_image}`);
+    expect(avatar).toHaveAttribute('data-src', `${IMAGE_URL}${mockUserData.profile_image}`);
     expect(avatar).toHaveAttribute('data-size', 'sm');
   });
 

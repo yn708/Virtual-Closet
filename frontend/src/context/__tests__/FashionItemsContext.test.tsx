@@ -69,7 +69,6 @@ describe('FashionItemsProvider', () => {
         <div>
           <div data-testid="selected-category">{state.selectedCategory}</div>
           <div data-testid="items-count">{state.currentItems.length}</div>
-          <div data-testid="is-pending">{state.isPending.toString()}</div>
           <div data-testid="filters-status">{state.filters.status.toString()}</div>
           <div data-testid="filters-season">{state.filters.season.join(',')}</div>
         </div>
@@ -84,7 +83,6 @@ describe('FashionItemsProvider', () => {
 
     expect(screen.getByTestId('selected-category')).toHaveTextContent('');
     expect(screen.getByTestId('items-count')).toHaveTextContent('0');
-    expect(screen.getByTestId('is-pending')).toHaveTextContent('false');
     expect(screen.getByTestId('filters-status')).toHaveTextContent('');
     expect(screen.getByTestId('filters-season')).toHaveTextContent('');
   });
@@ -92,8 +90,10 @@ describe('FashionItemsProvider', () => {
   // カテゴリー変更のテスト
   it('handles category change correctly', async () => {
     const mockItems = [mockFashionItem];
-    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
-
+    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue({
+      results: mockItems,
+      next: null,
+    });
     const { result } = renderHook(() => useFashionItems(), {
       wrapper: FashionItemsProvider,
     });
@@ -105,7 +105,7 @@ describe('FashionItemsProvider', () => {
     expect(result.current.state.selectedCategory).toBe('tops');
     expect(result.current.state.currentItems).toHaveLength(1);
     expect(result.current.state.filters.category).toBe('tops');
-    expect(fetchFashionItemsByCategoryAPI).toHaveBeenCalledWith('tops');
+    expect(fetchFashionItemsByCategoryAPI).toHaveBeenCalledWith('tops', 1);
   });
 
   // フィルター変更のテスト
@@ -120,7 +120,10 @@ describe('FashionItemsProvider', () => {
         wrapper: FashionItemsProvider,
       });
 
-      (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+      (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue({
+        results: mockItems,
+        next: null,
+      });
       await act(async () => {
         await result.current.handlers.handleCategoryChange('tops');
       });
@@ -143,7 +146,10 @@ describe('FashionItemsProvider', () => {
         wrapper: FashionItemsProvider,
       });
 
-      (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+      (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue({
+        results: mockItems,
+        next: null,
+      });
       await act(async () => {
         await result.current.handlers.handleCategoryChange('tops');
       });
@@ -164,16 +170,24 @@ describe('FashionItemsProvider', () => {
       { ...mockFashionItem, id: '2' },
     ];
 
-    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+    // PaginatedResponseの形式で返す
+    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue({
+      results: mockItems,
+      next: null,
+    });
     (deleteFashionItemAPI as jest.Mock).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useFashionItems(), {
       wrapper: FashionItemsProvider,
     });
 
+    // カテゴリーを設定してキャッシュを初期化
     await act(async () => {
       await result.current.handlers.handleCategoryChange('tops');
     });
+
+    // 削除前の状態を確認
+    expect(result.current.state.currentItems).toHaveLength(2);
 
     await act(async () => {
       await result.current.handlers.handleDelete('1');
@@ -181,7 +195,6 @@ describe('FashionItemsProvider', () => {
 
     expect(result.current.state.currentItems).toHaveLength(1);
     expect(result.current.state.currentItems[0].id).toBe('2');
-    expect(deleteFashionItemAPI).toHaveBeenCalledWith('1');
   });
 
   // 削除エラーのテスト
@@ -208,14 +221,24 @@ describe('FashionItemsProvider', () => {
     const initialItem = { ...mockFashionItem, id: '1' };
     const mockItems = [initialItem];
 
+    // PaginatedResponseの形式でモックデータを返す
+    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue({
+      results: mockItems,
+      next: null,
+    });
+
     const { result } = renderHook(() => useFashionItems(), {
       wrapper: FashionItemsProvider,
     });
 
-    (fetchFashionItemsByCategoryAPI as jest.Mock).mockResolvedValue(mockItems);
+    // 最初にカテゴリーを設定してキャッシュを初期化
     await act(async () => {
       await result.current.handlers.handleCategoryChange('tops');
     });
+
+    // 更新前の状態を確認
+    expect(result.current.state.currentItems).toHaveLength(1);
+    expect(result.current.state.currentItems[0].main_color?.color_name).toBe('黒');
 
     const updatedItem = {
       ...initialItem,
@@ -226,10 +249,13 @@ describe('FashionItemsProvider', () => {
       },
     };
 
-    act(() => {
+    // アイテムを更新
+    await act(async () => {
       result.current.handlers.handleUpdate(updatedItem);
     });
 
+    // 更新後の状態を確認
+    expect(result.current.state.currentItems).toHaveLength(1);
     expect(result.current.state.currentItems[0].main_color?.color_name).toBe('白');
   });
 

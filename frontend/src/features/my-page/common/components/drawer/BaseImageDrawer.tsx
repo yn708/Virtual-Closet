@@ -13,7 +13,7 @@ import EditItemDialog from '@/features/my-page/common/components/dialog/EditItem
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import type { FashionItem } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import type { ComponentType } from 'react';
 import type { UpdateItemTypes } from '../../types';
 import DeleteItemDialog from '../dialog/DeleteItemDialog';
@@ -35,11 +35,17 @@ const BaseImageDrawer = <T extends FashionItem | BaseCoordinate>({
   renderTrigger,
   DetailInfoComponent,
 }: BaseImageDrawerProps<T>) => {
-  const imageUrl = `${BACKEND_URL}${item.image.replace('http://backend:8000', '')}`;
+  const imageUrl = `${IMAGE_URL}${item.image.replace('http://backend:8000', '')}`;
+
   const { isOpen, onClose, onToggle } = useIsOpen();
 
   const handleUpdate = (updatedItem: T) => {
     onUpdate(updatedItem);
+    onClose();
+  };
+
+  const handleDelete = (id: string) => {
+    onDelete(id);
     onClose();
   };
 
@@ -77,7 +83,7 @@ const BaseImageDrawer = <T extends FashionItem | BaseCoordinate>({
                   type === 'coordinate' ? (selectedCategory as 'photo' | 'custom') : undefined
                 }
               />
-              <DeleteItemDialog onDelete={() => onDelete(item.id)} />
+              <DeleteItemDialog onDelete={() => handleDelete(item.id)} />
             </div>
             <DrawerClose asChild>
               <Button variant="link" type="button" className="w-full">

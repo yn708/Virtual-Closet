@@ -1,5 +1,4 @@
-import os
-
+from django.core.files.storage import default_storage
 from django.db import models
 
 from apps.accounts.models import CustomUser
@@ -36,6 +35,9 @@ class Brand(models.Model):
     brand_name = models.CharField(max_length=100, unique=True)
     brand_name_kana = models.CharField(max_length=100)
     is_popular = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["brand_name"]  # brand_name でソート
 
     def __str__(self):
         return self.brand_name
@@ -91,6 +93,9 @@ class FashionItem(TimestampMixin, models.Model):
     is_owned = models.BooleanField(default=True)
     is_old_clothes = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["-created_at"]  # 作成日時の降順でソート
+
     def __str__(self):
         brand_name = self.brand.brand_name if self.brand else "No Brand"
         sub_category_name = self.sub_category.subcategory_name if self.sub_category else "No Subcategory"
@@ -100,6 +105,7 @@ class FashionItem(TimestampMixin, models.Model):
     def delete(self, *args, **kwargs):
         # 画像ファイルを削除
         if self.image:
-            if os.path.isfile(self.image.path):
-                os.remove(self.image.path)
+            # ローカルパスの参照を削除し、storage経由で削除
+            if default_storage.exists(self.image.name):
+                default_storage.delete(self.image.name)
         super().delete(*args, **kwargs)

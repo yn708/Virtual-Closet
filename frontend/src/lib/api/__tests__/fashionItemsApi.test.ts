@@ -176,7 +176,7 @@ describe('Fashion Item APIs', () => {
       const result = await fetchFashionItemsByCategoryAPI(categoryId);
 
       expect(baseFetchAuthAPI).toHaveBeenCalledWith(
-        `${FASHION_ITEMS_BY_CATEGORY_ENDPOINT}${categoryId}`,
+        `${FASHION_ITEMS_BY_CATEGORY_ENDPOINT}${categoryId}&page=1`,
       );
       expect(result).toEqual(mockItems);
     });
