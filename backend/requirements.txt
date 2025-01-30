@@ -14,6 +14,8 @@ freezegun==1.5.1
 pillow==11.0.0
 drf-yasg==1.21.8
 rembg==2.0.59
+numba==0.61.0
+
 
 # ソーシャルログイン
 dj-rest-auth==6.0.0
@@ -32,3 +34,4 @@ django-storages==1.14.4
 # デプロイ用
 gunicorn==23.0.0
 dj-database-url==2.3.0
+
