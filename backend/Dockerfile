@@ -47,3 +47,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # アプリケーションコードのコピー
 COPY . .
+
+# サーバー起動コマンドを設定
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
