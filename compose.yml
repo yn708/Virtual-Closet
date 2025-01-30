@@ -27,16 +27,16 @@ services:
       backend:
         condition: service_started
 
-  # # テスト時に使用
-  # frontend-test:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile.test
-  #   volumes:
-  #     - ./frontend:/frontend
-  #     - node_modules:/frontend/node_modules
-  #   environment:
-  #     - NODE_ENV=test
+  # テスト時に使用
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test
+    volumes:
+      - ./frontend:/frontend
+      - node_modules:/frontend/node_modules
+    environment:
+      - NODE_ENV=test
 
   #バックエンド（Django）
   backend:
