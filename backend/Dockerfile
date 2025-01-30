@@ -16,10 +16,9 @@ RUN apt-get update && \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 容量が大きいため、使用時にダウンロードする方式に
-# # u2netモデルのダウンロード (rembg 用)
-# RUN mkdir -p /root/.u2net && \
-#     wget https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx -O /root/.u2net/u2net.onnx
+# u2netモデルのダウンロード (rembg 用)
+RUN mkdir -p /root/.u2net && \
+    wget https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx -O /root/.u2net/u2net.onnx
 
 # pipの最新バージョンにアップグレード
 RUN pip install --upgrade pip
@@ -41,7 +40,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # builderからの必要なファイルのコピー
-# COPY --from=builder /root/.u2net /root/.u2net
+COPY --from=builder /root/.u2net /root/.u2net
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
