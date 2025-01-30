@@ -22,8 +22,8 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isProcessing, setIsProcessing] = useState<boolean>(false); // 処理中の状態
 
   /*----------------------------------------------------------------------------
- すべての画像をクリアする関数
- ----------------------------------------------------------------------------*/
+すべての画像をクリアする関数
+----------------------------------------------------------------------------*/
   const clearImage = () => {
     if (preview) {
       URL.revokeObjectURL(preview);
@@ -34,11 +34,11 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
- 最小限のImageセット
- 1. clearImage（既存の画像を削除）
- 2. プレビューを作成
- 3. setImage・setPreviewで画像・プレビューを最新化
- ----------------------------------------------------------------------------*/
+最小限のImageセット
+1. clearImage（既存の画像を削除）
+2. プレビューを作成
+3. setImage・setPreviewで画像・プレビューを最新化
+----------------------------------------------------------------------------*/
   const minimumImageSet = async (file: File): Promise<File> => {
     clearImage();
     const newPreview = URL.createObjectURL(file);
@@ -48,13 +48,13 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
- 画像の最適化
- 1. clearImage（既存の画像を削除）
- 2. HEIC形式の場合、変換
- 3. 画像圧縮
- 4. プレビューを作成
- 5. setImage・setPreviewで画像・プレビューを最新化
- ----------------------------------------------------------------------------*/
+画像の最適化
+1. clearImage（既存の画像を削除）
+2. WebPに変換
+3. 画像圧縮
+4. プレビューを作成
+5. setImage・setPreviewで画像・プレビューを最新化
+----------------------------------------------------------------------------*/
   const optimizationProcess = async (file: File): Promise<File | null> => {
     // 1. clearImage（既存の画像を削除）
     clearImage();
@@ -64,10 +64,7 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { conversionImage, compressImage } = await loadImageUtils();
 
       // 2. HEIC形式の場合、変換
-      const convertedFile =
-        file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
-          ? await conversionImage(file)
-          : file;
+      const convertedFile = await conversionImage(file);
 
       // 3. 画像の圧縮
       const compressedImage = await compressImage(convertedFile);
@@ -87,72 +84,32 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
- 背景除去する場合
- 1. clearImage（既存の画像を削除）
- 2. HEIC形式の場合、変換
- 3. 画像の圧縮
- 4. 背景除去
- 5 .プレビューを作成
- 6. setImage・setPreviewで画像・プレビューを最新化
- ----------------------------------------------------------------------------*/
+背景除去する場合（WebPに変換、画像圧縮は別途行う必要がある）
+1. clearImage（既存の画像を削除）
+2. 背景除去
+3 .プレビューを作成
+4. setImage・setPreviewで画像・プレビューを最新化
+----------------------------------------------------------------------------*/
   const removeBgProcess = async (file: File): Promise<File | null> => {
-    // ファイル名から背景除去済みかどうかをチェック
-    const isAlreadyProcessed = file.name.includes('_removed_bg');
-
-    // すでに背景除去済みの場合は最適化のみを行う
-    if (isAlreadyProcessed) {
-      setIsProcessing(true);
-      try {
-        const { conversionImage, compressImage } = await loadImageUtils();
-
-        // HEIC変換と圧縮のみ実行
-        const convertedFile =
-          file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
-            ? await conversionImage(file)
-            : file;
-
-        const compressedImage = await compressImage(convertedFile);
-        const newPreview = URL.createObjectURL(compressedImage);
-
-        setImage(compressedImage);
-        setPreview(newPreview);
-        return compressedImage;
-      } catch (error) {
-        console.error('Error processing already removed background image:', error);
-        return null;
-      } finally {
-        setIsProcessing(false);
-      }
-    }
-
     // 1. clearImage（既存の画像を削除）
     clearImage();
     setIsProcessing(true);
     try {
-      const { conversionImage, compressImage, dataURLtoFile } = await loadImageUtils();
+      const { dataURLtoFile } = await loadImageUtils();
 
-      // 2. HEIC形式の場合、変換
-      const convertedFile =
-        file?.type === 'image/heic' || file?.name.toLowerCase().endsWith('.heic')
-          ? await conversionImage(file)
-          : file;
-
-      // 3. 画像の圧縮
-      const compressedImage = await compressImage(convertedFile);
-
-      // 4. 背景除去
       // FormDataオブジェクトを作成し、API通信
       const formData = new FormData();
-      formData.append('image', compressedImage);
+      formData.append('image', file);
+      // 2. プレビューを作成
       const result = await removeBackgroundAPI(formData);
 
       // もし成功した場合
       if (result.status === 'success' && result.image) {
-        const removedBgFileName = `${file.name.replace(/\.[^/.]+$/, '')}_removed_bg.png`;
+        const removedBgFileName = `${file.name.replace(/\.[^/.]+$/, '')}_removed_bg.webp`;
         const removedBg = dataURLtoFile(`data:image/png;base64,${result.image}`, removedBgFileName); // Base64画像データをFileオブジェクトに変換
-        // 5. プレビューを作成
+        // 3. プレビューを作成
         const newPreview = URL.createObjectURL(removedBg);
-        // 6. setImage・setPreviewで画像・プレビューを最新化
+        // 4. setImage・setPreviewで画像・プレビューを最新化
         setPreview(newPreview);
         setImage(removedBg);
         return removedBg;

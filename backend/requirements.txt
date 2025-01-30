@@ -25,6 +25,8 @@ cryptography==43.0.1
 django-filter==24.3
 django-environ==0.11.2
 
+# S3, CloudFront
+boto3==1.36.7
+django-storages==1.14.4
 
-# インフラ関係も後々インストール
 

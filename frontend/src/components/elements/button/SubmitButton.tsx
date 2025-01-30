@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { BaseButtonProps, LabelType, LoadingType } from '@/types';
+import { useFormStatus } from 'react-dom';
 import SubmitLoading from '../loading/SubmitLoading';
 
 const SubmitButton: React.FC<LoadingType & LabelType & BaseButtonProps> = ({
@@ -11,10 +12,12 @@ const SubmitButton: React.FC<LoadingType & LabelType & BaseButtonProps> = ({
   type = 'submit',
   ...props
 }) => {
+  const { pending } = useFormStatus();
+
   return (
     <Button
       type={type}
-      disabled={disabled || loading}
+      disabled={disabled || loading || pending}
       className={cn(
         `
         w-full rounded-lg py-5 border border-blue-500 font-semibold 

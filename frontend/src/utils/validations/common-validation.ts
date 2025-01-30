@@ -41,7 +41,7 @@ export const optionalImageSchema = z.union([
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+        message: 'JPEG, PNG, GIF、HEIC, WebP形式の画像のみがサポートされています。',
       });
     }
 
@@ -63,7 +63,7 @@ export const requiredImageSchema = z
     message: '画像を選択してください。',
   })
   .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.type), {
-    message: 'JPEG, PNG, GIF、HEIC形式の画像のみがサポートされています。',
+    message: 'JPEG, PNG, GIF、HEIC, WebP形式の画像のみがサポートされています。',
   })
   .refine((file) => file.size <= MAX_FILE_SIZE, {
     message: `画像サイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください。`,

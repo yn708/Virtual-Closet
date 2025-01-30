@@ -24,13 +24,17 @@ export interface CoordinatesState {
   coordinateCache: CoordinateCache;
   selectedCategory: CoordinateCategory | '';
   filters: CoordinateFilters;
-  isPending: boolean;
+  isInitialLoading: boolean;
+  isLoadingMore: boolean;
   currentItems: BaseCoordinate[];
+  hasMore: boolean;
+  currentPage: number;
 }
 
 export interface CoordinatesHandlers {
   handleCategoryChange: (categoryId: CoordinateCategory | '') => Promise<void>;
   handleFilterChange: (newFilters: Partial<CoordinateFilters>) => void;
+  handleLoadMore: () => void;
   handleDelete: (id: string) => Promise<void>;
   handleUpdate: (updatedCoordinate: BaseCoordinate) => void;
 }

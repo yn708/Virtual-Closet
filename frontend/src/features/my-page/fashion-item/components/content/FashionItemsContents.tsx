@@ -14,11 +14,11 @@ const FashionItemsContents: React.FC<OnSelectItemType & SelectedItemsType> = ({
   selectedItems,
 }) => {
   const { state, handlers } = useFashionItems();
-  const { selectedCategory, isPending, filters } = state;
+  const { selectedCategory, filters } = state;
   const { handleCategoryChange, handleFilterChange } = handlers;
 
   return (
-    <BaseContentsLayout selectedCategory={selectedCategory} isPending={isPending}>
+    <BaseContentsLayout selectedCategory={selectedCategory}>
       <CategorySelector<FashionItemFilters>
         onCategoryChange={handleCategoryChange}
         onFilterChange={handleFilterChange}

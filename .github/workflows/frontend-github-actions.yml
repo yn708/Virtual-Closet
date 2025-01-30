@@ -100,3 +100,4 @@ jobs:
           docker system prune -af
 
 # ＊リリース時にはデプロイの設定も
+# Vercelでmainブランチマージ時に自動デプロイするため、今回はデプロイに関するCI/CD構築は不要

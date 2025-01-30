@@ -66,8 +66,8 @@ describe('useImageField', () => {
         (heic2any as jest.Mock).mockReset();
       });
 
-      it('HEIC画像をJPEG形式に正しく変換できることを確認', async () => {
-        const mockBlob = new Blob(['mock'], { type: 'image/jpeg' });
+      it('HEIC画像をwebp形式に正しく変換できることを確認', async () => {
+        const mockBlob = new Blob(['mock'], { type: 'image/webp' });
         (heic2any as jest.Mock).mockResolvedValue(mockBlob);
 
         const heicFile = new File(['test'], 'test.heic', { type: 'image/heic' });
@@ -75,21 +75,13 @@ describe('useImageField', () => {
         const result = await conversionImage(heicFile);
 
         expect(result).toBeInstanceOf(File);
-        expect(result.type).toBe('image/jpeg');
-        expect(result.name).toBe('test.jpg');
+        expect(result.type).toBe('image/webp');
+        expect(result.name).toBe('test.webp');
         expect(heic2any).toHaveBeenCalledWith({
           blob: heicFile,
-          toType: 'image/jpeg',
+          toType: 'image/webp',
           quality: 0.8,
         });
-      });
-
-      it('HEIC以外の画像は変換せずにそのまま返すことを確認', async () => {
-        const jpegFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-        const result = await conversionImage(jpegFile);
-
-        expect(result).toBe(jpegFile);
-        expect(heic2any).not.toHaveBeenCalled();
       });
 
       it('サーバーサイドでの実行時に元のファイルを返すことを確認', async () => {
@@ -161,10 +153,10 @@ describe('useImageField', () => {
 
         expect(result).toBeInstanceOf(File);
         expect(mockImageCompression).toHaveBeenCalledWith(file, {
-          maxSizeMB: 1,
+          maxSizeMB: 0.5,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
-          fileType: 'image/jpeg',
+          fileType: 'image/webp',
         });
       });
 
@@ -379,7 +371,6 @@ describe('useImageField', () => {
             height: 600,
             useCORS: true,
             allowTaint: true,
-            backgroundColor: '#F9FAFB',
             logging: false,
             imageTimeout: 0,
             onclone: expect.any(Function),

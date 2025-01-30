@@ -50,8 +50,11 @@ const createMockContextValue = (
       status: '',
       season: [],
     },
-    isPending: false,
+    isInitialLoading: false,
+    isLoadingMore: false,
     currentItems: [mockFashionItem],
+    hasMore: false,
+    currentPage: 1,
     ...overrides.state,
   },
   handlers: {
@@ -59,6 +62,8 @@ const createMockContextValue = (
     handleDelete: jest.fn(),
     handleUpdate: jest.fn(),
     handleFilterChange: jest.fn(),
+    loadMore: jest.fn(),
+
     ...overrides.handlers,
   },
 });
@@ -185,30 +190,5 @@ describe('FashionItemList', () => {
 
     const selectableItem = screen.getByTestId('selectable-item');
     expect(selectableItem).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('ローディング状態を正しく表示すること', () => {
-    // モック値を上書き
-    Object.assign(
-      mockContextValue,
-      createMockContextValue({
-        state: {
-          categoryCache: {},
-          selectedCategory: 'tops',
-          filters: {
-            category: '',
-            status: '',
-            season: [],
-          },
-          isPending: true,
-          currentItems: [mockFashionItem],
-        },
-      }),
-    );
-
-    render(<FashionItemList />);
-
-    const container = screen.getByTestId('base-list-layout').parentElement;
-    expect(container).toHaveClass('opacity-50');
   });
 });

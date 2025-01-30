@@ -12,14 +12,16 @@ import CoordinateDetailInfo from './CoordinateDetailInfo';
 
 const CoordinateContents = () => {
   const { state, handlers } = useCoordinates();
-  const { selectedCategory, currentItems, isPending, filters } = state;
-  const { handleCategoryChange, handleDelete, handleUpdate, handleFilterChange } = handlers;
+  const { selectedCategory, currentItems, isInitialLoading, filters, hasMore, isLoadingMore } =
+    state;
+  const { handleCategoryChange, handleDelete, handleUpdate, handleFilterChange, handleLoadMore } =
+    handlers;
 
   return (
-    <BaseContentsLayout selectedCategory={selectedCategory} isPending={isPending}>
+    <BaseContentsLayout selectedCategory={selectedCategory}>
       <CategorySelector<CoordinateFilters>
         onCategoryChange={(categoryId: string) => {
-          handleCategoryChange(categoryId as CoordinateCategory | ''); // ここで型を変換してhandleCategoryChangeに渡す
+          handleCategoryChange(categoryId as CoordinateCategory | '');
         }}
         onFilterChange={handleFilterChange}
         selectedCategory={selectedCategory}
@@ -29,7 +31,10 @@ const CoordinateContents = () => {
       {selectedCategory && (
         <BaseListLayout
           items={currentItems}
-          isLoading={isPending}
+          isInitialLoading={isInitialLoading}
+          isLoadingMore={isLoadingMore}
+          hasMore={hasMore}
+          onLoadMore={handleLoadMore}
           renderItem={(item) => (
             <BaseImageDrawer<BaseCoordinate>
               type="coordinate"

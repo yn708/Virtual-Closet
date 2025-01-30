@@ -15,16 +15,19 @@ export interface FashionItemListProps {
 
 const FashionItemList: React.FC<FashionItemListProps> = ({ selection }) => {
   const { state, handlers } = useFashionItems();
-  const { isPending, currentItems } = state;
-  const { handleDelete, handleUpdate } = handlers;
+  const { isInitialLoading, isLoadingMore, currentItems, hasMore } = state;
+  const { handleDelete, handleUpdate, loadMore } = handlers;
 
   return (
     <div
-      className={`transition-opacity duration-300 ease-in-out ${isPending ? 'opacity-50' : 'opacity-100'}`}
+      className={`transition-opacity duration-300 ease-in-out ${isInitialLoading ? 'opacity-50' : 'opacity-100'}`}
     >
       <BaseListLayout
         items={currentItems}
-        isLoading={isPending}
+        isInitialLoading={isInitialLoading}
+        isLoadingMore={isLoadingMore}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
         renderItem={(item) => {
           if (selection) {
             const { onSelectItem, selectedItems } = selection;

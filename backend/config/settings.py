@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -10,7 +11,7 @@ env = environ.Env()
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
-DEBUG = env("DJANGO_DEBUG") == "True"
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 
@@ -38,6 +39,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     # drf-yasg(swagger)
     "drf_yasg",
+    # AWS関連
+    "storages",
     # 作成app
     "apps.accounts",
     "apps.image_processing",
@@ -89,6 +92,8 @@ REST_AUTH = {
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": ("dj_rest_auth.jwt_auth.JWTCookieAuthentication",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 15,  # 1ページあたりの件数
 }
 
 # -------------------- Simple JWT設定 --------------------
@@ -141,8 +146,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-CORS_ALLOW_ALL_ORIGINS = True  # 開発時のみ。本番環境では具体的なオリジンを指定してください。
-# CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+CORS_ALLOWED_ORIGINS = json.loads(env("CORS_ALLOWED_ORIGINS"))
 
 
 DATABASES = {
@@ -202,12 +207,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = "static/"
-STATIC_ROOT = f"/{BASE_DIR.name}/static"
-MEDIA_URL = "/media/"
-MEDIA_ROOT = f"/{BASE_DIR.name}/media"
-
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # -------------------- Email設定 --------------------
@@ -223,3 +222,42 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
 LINE_CHANNEL_ACCESS_TOKEN = env("LINE_CHANNEL_ACCESS_TOKEN")
 LINE_CHANNEL_SECRET = env("LINE_CHANNEL_SECRET")
 LINE_USER_ID = env("LINE_USER_ID")
+
+# --------------- AWS S3、CloudFront設定 --------------
+# 開発環境と本番環境で分ける
+if DEBUG:  # 開発環境
+    # ローカルのメディアファイル設定
+    STATIC_URL = "static/"
+    STATIC_ROOT = f"/{BASE_DIR.name}/static"
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = f"/{BASE_DIR.name}/media"
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+else:  # 本番環境
+    # AWS S3とCloudFrontの設定
+    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    AWS_CLOUDFRONT_DOMAIN = env("AWS_CLOUDFRONT_DOMAIN")
+
+    # S3用のストレージバックエンド設定
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+    # 静的ファイルとメディアファイルのURL設定
+    STATIC_URL = "static/"
+    STATIC_ROOT = f"/{BASE_DIR.name}/static"
+    MEDIA_URL = f"https://{AWS_CLOUDFRONT_DOMAIN}/media/"
+    MEDIA_ROOT = f"/{BASE_DIR.name}/media"
+
+
+# --------------- super-ser --------------
+SUPERUSER_NAME = env("SUPERUSER_NAME")
+SUPERUSER_EMAIL = env("SUPERUSER_EMAIL")
+SUPERUSER_PASSWORD = env("SUPERUSER_PASSWORD")
+
+
+# --------------- NextAuth認証用設定 --------------
+SOCIAL_AUTH_GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
+SOCIAL_AUTH_GOOGLE_SECRET = env("GOOGLE_CLIENT_SECRET")
+SITE_DOMAIN = env("SITE_DOMAIN", default="example.com")

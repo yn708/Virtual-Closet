@@ -19,6 +19,7 @@ document.elementFromPoint = () => null;
 jest.mock('react-dom', () => ({
   ...jest.requireActual('react-dom'),
   useFormState: jest.fn((initialState: FormState) => [initialState, jest.fn()]),
+  useFormStatus: () => ({ pending: false }),
 }));
 
 // 全行前のグローバルモックのセットアップ

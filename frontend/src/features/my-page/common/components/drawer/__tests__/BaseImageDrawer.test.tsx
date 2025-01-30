@@ -1,7 +1,7 @@
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import type { FashionItem } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import BaseImageDrawer from '../BaseImageDrawer';
@@ -170,7 +170,7 @@ describe('BaseImageDrawer', () => {
 
     render(<BaseImageDrawer {...defaultProps} />);
 
-    const expectedImageUrl = `${BACKEND_URL}${mockFashionItem.image}`;
+    const expectedImageUrl = `${IMAGE_URL}${mockFashionItem.image}`;
     const triggerImage = screen.getAllByTestId('item-image')[0];
     expect(triggerImage).toHaveAttribute('src', expectedImageUrl);
   });
@@ -184,7 +184,7 @@ describe('BaseImageDrawer', () => {
 
     render(<BaseImageDrawer {...defaultProps} renderTrigger={customTrigger} />);
 
-    const expectedImageUrl = `${BACKEND_URL}${mockFashionItem.image}`;
+    const expectedImageUrl = `${IMAGE_URL}${mockFashionItem.image}`;
     const trigger = screen.getByTestId('custom-trigger');
     expect(trigger).toHaveAttribute('data-url', expectedImageUrl);
   });
@@ -243,7 +243,7 @@ describe('BaseImageDrawer', () => {
 
     render(<BaseImageDrawer {...defaultProps} item={itemWithBackendUrl} />);
 
-    const expectedImageUrl = `${BACKEND_URL}/images/test.jpg`;
+    const expectedImageUrl = `${IMAGE_URL}/images/test.jpg`;
     const itemImage = screen.getAllByTestId('item-image')[0];
     expect(itemImage).toHaveAttribute('src', expectedImageUrl);
   });

@@ -130,7 +130,7 @@ describe('useImageSelection', () => {
       selectionResult = await result.current.handleFileChange(event);
     });
 
-    expect(selectionResult).toEqual({ file });
+    expect(selectionResult).toEqual({ file: null });
     expect(mockToast).toHaveBeenCalledWith({
       variant: 'destructive',
       title: validationError,

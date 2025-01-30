@@ -3,7 +3,6 @@ import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
 import type { CoordinateMetaDataType } from '@/types/coordinate';
 import { useMemo } from 'react';
-import { useFormStatus } from 'react-dom';
 import { useCustomCoordinateForm } from '../../hooks/useCustomCoordinateForm';
 import { usePreviewGeneration } from '../../hooks/usePreviewGeneration';
 import type { CoordinateEditTypes } from '../../types';
@@ -26,7 +25,6 @@ const CustomCoordinateEditorForm = ({
     initialData,
     onSuccess,
   });
-  const { pending } = useFormStatus();
   // 現在のアイテムデータを生成
   const itemsData = useMemo(
     () => ({
@@ -49,7 +47,7 @@ const CustomCoordinateEditorForm = ({
       <input type="hidden" name="items" value={itemsJSON} />
       <CoordinateEditorSelectFormFields
         metaData={metaData}
-        isProcessing={isProcessing || pending}
+        isProcessing={isProcessing}
         state={state}
         initialData={initialData}
       />

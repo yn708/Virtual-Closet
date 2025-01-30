@@ -4,7 +4,7 @@ describe('Form Handlers', () => {
   describe('handleImage', () => {
     it('Fileオブジェクトが渡された場合、FormDataに追加してtrueを返す', () => {
       const apiFormData = new FormData();
-      const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const mockFile = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
       const appendSpy = jest.spyOn(apiFormData, 'append');
 
       const result = handleImage(apiFormData, mockFile);

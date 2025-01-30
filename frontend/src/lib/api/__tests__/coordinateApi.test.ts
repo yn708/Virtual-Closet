@@ -177,7 +177,7 @@ describe('Coordinate APIs', () => {
 
       const result = await fetchCoordinateListAPI('photo');
 
-      expect(baseFetchAuthAPI).toHaveBeenCalledWith(COORDINATE_CREATE_PHOTO_ENDPOINT);
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(`${COORDINATE_CREATE_PHOTO_ENDPOINT}?page=1`);
       expect(result).toEqual(mockResponse);
     });
   });

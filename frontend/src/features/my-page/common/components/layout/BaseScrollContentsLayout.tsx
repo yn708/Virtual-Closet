@@ -7,20 +7,19 @@ import { useEffect } from 'react';
 
 interface BaseContentsLayoutProps extends ChildrenType {
   selectedCategory?: string;
-  isPending?: boolean;
 }
 
-const BaseContentsLayout = ({ selectedCategory, isPending, children }: BaseContentsLayoutProps) => {
+const BaseContentsLayout = ({ selectedCategory, children }: BaseContentsLayoutProps) => {
   const { showScrollButton, scrollToTop, elementRef } = useScroll();
 
   useEffect(() => {
-    if (selectedCategory && !isPending) {
+    if (selectedCategory) {
       elementRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
     }
-  }, [selectedCategory, elementRef, isPending]);
+  }, [selectedCategory, elementRef]);
 
   return (
     <div ref={elementRef} className="min-h-screen w-full">

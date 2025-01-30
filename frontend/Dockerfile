@@ -1,8 +1,5 @@
-# oven/bun:latest を使用すると
-# jest実行でエラーになるため、nodeを使用してそこにbunをインストールして使用
-
 # 外部イメージをbaseステージとして扱う
-FROM oven/bun:latest AS base
+FROM oven/bun:1.2.1 AS base
 
 # baseステージをもとにbuilderステージを開始
 FROM base AS builder

@@ -163,8 +163,6 @@ export function customCoordinateFormData(
   const apiFormData = new FormData();
   let hasChanges = false;
 
-  // 画像の処理
-  // hasChanges = handleImage(apiFormData, validatedData.image) || hasChanges;
   // 画像の変更検知と処理
   if (validatedData.image instanceof File) {
     // 新規作成時は必ずアペンド
@@ -172,11 +170,8 @@ export function customCoordinateFormData(
       apiFormData.append('image', validatedData.image);
       hasChanges = true;
     } else {
-      // 更新時は、ファイル名が変更された場合にのみアペンド
-      const currentFileName = validatedData.image.name;
-      const initialFileName = initialData.image.split('/').pop(); // URLから最後のパスを取得
-
-      if (currentFileName !== initialFileName) {
+      // 更新時は画像サイズが0以上の場合を変更とみなしアペンド
+      if (validatedData.image.size > 0) {
         apiFormData.append('image', validatedData.image);
         hasChanges = true;
       }

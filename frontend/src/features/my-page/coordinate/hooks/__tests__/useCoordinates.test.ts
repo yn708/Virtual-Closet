@@ -32,7 +32,11 @@ describe('useCoordinates', () => {
       scenes: [],
       tastes: [],
     });
-    expect(result.current.state.isPending).toBe(false);
+
+    expect(result.current.state.currentPage).toEqual(1);
+    expect(result.current.state.isInitialLoading).toBe(false);
+    expect(result.current.state.isLoadingMore).toBe(false);
+    expect(result.current.state.hasMore).toBe(false);
     expect(result.current.state.currentItems).toEqual([]);
   });
 
@@ -40,21 +44,23 @@ describe('useCoordinates', () => {
     const mockNewItems: BaseCoordinate[] = [
       {
         id: '1',
-        image: 'initial.jpg',
+        image: 'initial.webp',
         seasons: [{ id: '1', season_name: 'Summer' }],
         scenes: [{ id: '1', scene: 'Casual' }],
         tastes: [{ id: '1', taste: 'Minimal' }],
       },
     ];
-    (fetchCoordinateListAPI as jest.Mock).mockResolvedValue(mockNewItems);
+    (fetchCoordinateListAPI as jest.Mock).mockResolvedValue({
+      results: mockNewItems, // 期待するデータ
+      next: null,
+    });
 
     const { result } = renderHook(() => useCoordinates());
 
     await act(async () => {
       await result.current.handlers.handleCategoryChange('photo');
     });
-
-    expect(fetchCoordinateListAPI).toHaveBeenCalledWith('photo');
+    expect(fetchCoordinateListAPI).toHaveBeenCalledWith('photo', 1);
     expect(result.current.state.coordinateCache.photo).toEqual(mockNewItems);
   });
 

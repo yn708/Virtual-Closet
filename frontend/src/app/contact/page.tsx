@@ -1,6 +1,11 @@
 import StepContactForm from '@/features/contact/components/StepContactForm';
 import { authOptions } from '@/lib/next-auth';
+import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
+
+export const metadata: Metadata = {
+  title: 'お問い合わせ',
+};
 
 export default async function ContactPage() {
   const session = await getServerSession(authOptions);

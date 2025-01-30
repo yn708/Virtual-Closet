@@ -38,8 +38,17 @@ export async function registerFashionItemAPI(formData: FormData) {
 /* ----------------------------------------------------------------
 カテゴリー別アイテムの取得
 ------------------------------------------------------------------ */
-export async function fetchFashionItemsByCategoryAPI(categoryId: string): Promise<FashionItem[]> {
-  const endpoint = `${FASHION_ITEMS_BY_CATEGORY_ENDPOINT}${categoryId}`;
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+export async function fetchFashionItemsByCategoryAPI(
+  categoryId: string,
+  page: number = 1,
+): Promise<PaginatedResponse<FashionItem>> {
+  const endpoint = `${FASHION_ITEMS_BY_CATEGORY_ENDPOINT}${categoryId}&page=${page}`;
   return await baseFetchAuthAPI(endpoint);
 }
 

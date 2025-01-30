@@ -43,6 +43,7 @@ class BrandSearchView(generics.ListAPIView):
 
     serializer_class = BrandSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None  # ページネーションを無効化
 
     def get_queryset(self):
         query = self.request.query_params.get("query", "")
@@ -80,21 +81,17 @@ class FashionItemViewSet(viewsets.ModelViewSet):
             recent_items = (
                 self.get_queryset()
                 .filter(created_at__gte=timezone.now() - timezone.timedelta(days=30))
-                .order_by("-created_at")[:15]  # 最大15件
+                .order_by("-created_at")
             )
-            serializer = self.get_serializer(recent_items, many=True)
-            return Response(serializer.data)
+            page = self.paginate_queryset(recent_items)
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         # 通常のカテゴリー処理
         items = self.get_queryset().filter(sub_category__category_id=category_id).order_by("-created_at")
         page = self.paginate_queryset(items)
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(items, many=True)
-        return Response(serializer.data)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     # 特定アイテムの編集
     def update(self, request, *args, **kwargs):

@@ -11,8 +11,8 @@ const nextConfig = {
     formats: ['image/webp'],
     domains:
       process.env.NODE_ENV === 'production'
-        ? ['bucket-name.s3.amazonaws.com'] // 本番環境での画像ドメイン（仮）
-        : ['localhost'], // 開発環境での画像ドメイン
+        ? ['d317u35a9lh557.cloudfront.net']
+        : ['localhost', '127.0.0.1'], // 開発環境では両方必要
     unoptimized: process.env.NODE_ENV === 'development', // 開発環境では画像最適化をスキップ
   },
   output: 'standalone',

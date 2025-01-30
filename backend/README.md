@@ -1,37 +1,14 @@
-# 初期データについて
+# 初回実行コマンド
 
-1. 初期データファイル（JSON）作成コマンド（作成時、変更時のみ実行）:
-
-```bash
-python scripts/fashion_items/generate_brand_fixtures.py
-python scripts/fashion_items/generate_category_fixtures.py
-python scripts/fashion_items/generate_color_fixtures.py
-python scripts/fashion_items/generate_design_fixtures.py
-python scripts/fashion_items/generate_pricerange_fixtures.py
-python scripts/fashion_items/generate_season_fixtures.py
-python scripts/fashion_items/generate_subcategory_fixtures.py
-
-python scripts/coordinate/generate_scene_fixtures.py
-python scripts/coordinate/generate_taste_fixtures.py
-```
-
-2. 投入コマンド:
-   すでにデータがある場合には以下を先に実行（データがクリアされるので注意）
+1. migrate
+2. superuser：スーパーユーザーの作成コマンド
+3. social_auth_setup：NextAuth 用のソーシャルアプリケーション作成コマンド
+4. load_fashion_fixtures & load_coordinate_fixtures 初期データ投入コマンド
 
 ```bash
-python manage.py flush
-
-```
-
-```bash
-python manage.py loaddata initial_brand_data.json
-python manage.py loaddata initial_category_data.json
-python manage.py loaddata initial_subcategory_data.json
-python manage.py loaddata initial_design_data.json
-python manage.py loaddata initial_pricerange_data.json
-python manage.py loaddata initial_color_data.json
-python manage.py loaddata initial_season_data.json
-
-python manage.py loaddata initial_scene_data.json
-python manage.py loaddata initial_taste_data.json
+python manage.py migrate
+python manage.py superuser
+python manage.py social_auth_setup
+python manage.py load_fashion_fixtures
+python manage.py load_coordinate_fixtures
 ```

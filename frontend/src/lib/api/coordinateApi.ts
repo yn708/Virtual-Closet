@@ -32,9 +32,18 @@ export async function fetchCustomCoordinateInitialDataAPI(id: string): Promise<I
   return baseFetchAuthAPI(getEndpoint('custom', id));
 }
 
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
 // コーディネート一覧取得
-export async function fetchCoordinateListAPI(type: CoordinateType): Promise<BaseCoordinate[]> {
-  return baseFetchAuthAPI(getEndpoint(type));
+export async function fetchCoordinateListAPI(
+  type: CoordinateType,
+  page: number = 1,
+): Promise<PaginatedResponse<BaseCoordinate>> {
+  return baseFetchAuthAPI(`${getEndpoint(type)}?page=${page}`);
 }
 
 /* ----------------------------------------------------------------

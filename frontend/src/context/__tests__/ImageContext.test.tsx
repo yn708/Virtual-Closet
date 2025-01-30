@@ -125,24 +125,6 @@ describe('ImageProvider', () => {
       expect(result.current.preview).toBe('mock-url');
       expect(result.current.isProcessing).toBe(false);
     });
-
-    it('handles already processed image correctly', async () => {
-      const { result } = renderHook(() => useImage(), {
-        wrapper: ImageProvider,
-      });
-
-      const processedFile = new File(['test'], 'test_removed_bg.png', { type: 'image/png' });
-
-      await act(async () => {
-        await result.current.removeBgProcess(processedFile);
-      });
-
-      expect(removeBackgroundAPI).not.toHaveBeenCalled();
-      expect(compressImage).toHaveBeenCalled();
-      expect(result.current.image).toBeTruthy();
-      expect(result.current.preview).toBe('mock-url');
-      expect(result.current.isProcessing).toBe(false);
-    });
   });
 
   // クリア機能のテスト

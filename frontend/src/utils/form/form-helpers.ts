@@ -3,7 +3,7 @@
 ---------------------––––––---------------------------*/
 // 画像の処理
 export function handleImage(apiFormData: FormData, image: unknown): boolean {
-  if (image instanceof File) {
+  if (image instanceof File && image.size > 0) {
     apiFormData.append('image', image);
     return true;
   }
