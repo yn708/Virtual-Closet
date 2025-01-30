@@ -1,10 +1,12 @@
 name: backend CI/CD
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - develop
+      - feature/**
     paths:
       - 'backend/**'
   pull_request:
@@ -18,19 +20,114 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Build and run Docker containers
+      - name: System cleanup
+        run: |
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt clean
+          docker system prune -af
+          echo "System status before test:"
+          df -h
+          free -h
+
+      - name: Create .env file
+        run: |
+
+          # ルートの .env ファイルを生成
+          cat > .env << EOF
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          EOF
+
+          # 空のfrontend/.env.local ファイルを生成（エラー回避のため）
+          mkdir -p frontend
+          touch frontend/.env.local
+
+          # backendの .env ファイルを生成
+          cat > backend/.env << EOF
+          DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}
+          DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+          EMAIL_HOST=${{ secrets.EMAIL_HOST }}
+          EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
+          EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
+          DEFAULT_FROM_EMAIL=${{ secrets.EMAIL_HOST_USER }}
+          LINE_CHANNEL_ACCESS_TOKEN=${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_CHANNEL_SECRET=${{ secrets.LINE_CHANNEL_SECRET }}
+          LINE_USER_ID=${{ secrets.LINE_USER_ID }}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_STORAGE_BUCKET_NAME=${{ secrets.AWS_STORAGE_BUCKET_NAME }}
+          AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME }}
+          AWS_CLOUDFRONT_DOMAIN=${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
+          SUPERUSER_NAME=${{ secrets.SUPERUSER_NAME }}
+          SUPERUSER_EMAIL=${{ secrets.SUPERUSER_EMAIL }}
+          SUPERUSER_PASSWORD=${{ secrets.SUPERUSER_PASSWORD }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          SITE_DOMAIN=${{ secrets.SITE_DOMAIN }}
+          CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
+          EOF
+
+      - name: Build Docker images
         working-directory: ./backend
         run: |
-          docker compose build --no-cache
-          docker compose up -d
-          docker compose ps
+          echo "Building Docker images..."
+          docker compose build backend db
+          echo "Build complete. Image sizes:"
+          docker images
 
-      - name: Run migrations
+      - name: Start database container
         working-directory: ./backend
-        run: docker compose exec -T backend python manage.py migrate
+        run: |
+          docker compose up -d db
+          echo "Waiting for database to be ready..."
+          for i in {1..30}; do
+            if docker compose exec -T db pg_isready -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}; then
+              echo "Database is ready!"
+              break
+            fi
+            echo "Waiting for database... attempt $i/30"
+            sleep 1
+          done
+
+      - name: Start backend container
+        working-directory: ./backend
+        run: |
+          docker compose up -d backend
+          echo "Container status:"
+          docker compose ps
+          echo "Container logs:"
+          docker compose logs
+
+      - name: Debug container resources
+        working-directory: ./backend
+        run: |
+          echo "Memory usage:"
+          docker stats --no-stream
+          echo "Disk usage:"
+          df -h
+
+      - name: Run migrations with retry
+        working-directory: ./backend
+        run: |
+          for i in {1..3}; do
+            echo "Migration attempt $i/3..."
+            if docker compose exec -T backend python manage.py migrate --verbosity 2; then
+              echo "Migration successful!"
+              break
+            fi
+            echo "Migration failed, waiting before retry..."
+            sleep 5
+          done
 
       - name: Run Ruff linter
         working-directory: ./backend
@@ -42,9 +139,26 @@ jobs:
 
       - name: Run pytest
         working-directory: ./backend
-        run: docker compose exec -T backend pytest
+        run: |
+          docker compose exec -T backend pytest -v
 
-      - name: Stop and remove Docker containers
+      - name: Collect test logs
+        if: always()
         working-directory: ./backend
-        run: docker compose down
-# ＊リリース時にはデプロイの設定も
+        run: |
+          echo "Final container status:"
+          docker compose ps
+          echo "Final container logs:"
+          docker compose logs
+          echo "Final memory status:"
+          free -h
+
+      - name: Cleanup
+        if: always()
+        working-directory: ./backend
+        run: |
+          docker compose down -v
+          docker system prune -af
+
+  # ＊リリース時にはデプロイの設定も
+  # renderでmainブランチマージ時に自動デプロイするため、今回はデプロイに関するCI/CD構築は不要

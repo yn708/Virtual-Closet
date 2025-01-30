@@ -1,10 +1,12 @@
 name: Frontend CI/CD
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - develop
+      - feature/**
     paths:
       - 'frontend/**'
   pull_request:
@@ -21,36 +23,81 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: System cleanup
+        run: |
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt clean
+          docker system prune -af
+          echo "System status before test:"
+          df -h
+          free -h
+
+      - name: Create .env file
+        run: |
+
+          # ルートの .env ファイルを生成
+          cat > .env << EOF
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          EOF
+
+          # 空のbackend/.env ファイルを生成（エラー回避のため）
+          mkdir -p backend
+          touch backend/.env
+
+          # frontend/.env.local ファイルを生成
+          cat > frontend/.env.local << EOF
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV }}
+
       - name: Install bun and Dependencies
         working-directory: ./frontend
         run: |
           npm install -g bun
           bun install
 
-      - name: Build and run Docker containers
+      - name: Build and run frontend Docker container
         working-directory: ./frontend
         run: |
-          docker compose build --no-cache
-          docker compose up -d
+          docker compose build frontend-test
+          docker compose up -d frontend-test
           docker compose ps
 
       - name: Install Dependencies
-        run: docker compose exec -T frontend bun install
+        run: docker compose exec -T frontend-test bun install
         working-directory: ./frontend
 
       - name: Run format check
-        run: docker compose exec -T frontend bun run format
+        run: docker compose exec -T frontend-test bun run format
         working-directory: ./frontend
 
       - name: Run linter
-        run: docker compose exec -T frontend bun run lint
+        run: docker compose exec -T frontend-test bun run lint
         working-directory: ./frontend
 
       - name: Run Test
-        run: docker compose exec -T frontend bun run test
+        run: docker compose exec -T frontend-test bun run test
         working-directory: ./frontend
 
-      - name: Stop and remove Docker containers
-        run: docker compose down
+      - name: Collect test logs
+        if: always()
         working-directory: ./frontend
+        run: |
+          echo "Final container status:"
+          docker compose ps
+          echo "Final container logs:"
+          docker compose logs
+          echo "Final memory status:"
+          free -h
+
+      - name: Cleanup
+        if: always()
+        working-directory: ./frontend
+        run: |
+          docker compose down -v
+          docker system prune -af
+
 # ＊リリース時にはデプロイの設定も
+# Vercelでmainブランチマージ時に自動デプロイするため、今回はデプロイに関するCI/CD構築は不要

@@ -1,0 +1,16 @@
+# # oven/bunだとJestテストがうまくできないため、テスト用のdocker Fileを作成
+FROM node:23.6-slim AS deps
+WORKDIR /frontend
+
+RUN npm install -g bun && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY package.json bun.lockb ./
+RUN bun install --frozen-lockfile
+
+FROM deps AS runner
+ENV NODE_ENV=test
+COPY . .
+
+EXPOSE 4001
+CMD ["bun", "dev", "-p", "4001"]

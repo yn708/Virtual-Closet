@@ -1,0 +1,956 @@
+[
+  {
+    "model": "fashion_items.brand",
+    "pk": 1,
+    "fields": {
+      "brand_name": "Uniqlo",
+      "brand_name_kana": "ユニクロ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 2,
+    "fields": {
+      "brand_name": "GU",
+      "brand_name_kana": "ジーユー",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 3,
+    "fields": {
+      "brand_name": "Zara",
+      "brand_name_kana": "ザラ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 4,
+    "fields": {
+      "brand_name": "WEGO",
+      "brand_name_kana": "ウィゴー",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 5,
+    "fields": {
+      "brand_name": "H&M",
+      "brand_name_kana": "エイチアンドエム",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 6,
+    "fields": {
+      "brand_name": "GAP",
+      "brand_name_kana": "ギャップ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 7,
+    "fields": {
+      "brand_name": "無印良品",
+      "brand_name_kana": "ムジルシリョウヒン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 8,
+    "fields": {
+      "brand_name": "BEAMS",
+      "brand_name_kana": "ビームス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 9,
+    "fields": {
+      "brand_name": "FREAK'S STORE",
+      "brand_name_kana": "フリークスストア",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 10,
+    "fields": {
+      "brand_name": "BEAUTY & YOUTH",
+      "brand_name_kana": "ビューティアンドユース",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 11,
+    "fields": {
+      "brand_name": "H BEAUTY & YOUTH UNITED ARROWS",
+      "brand_name_kana": "エイチビューティアンドユースユナイテッドアローズ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 12,
+    "fields": {
+      "brand_name": "MONKEY TIME",
+      "brand_name_kana": "モンキータイム",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 13,
+    "fields": {
+      "brand_name": "ADAM ET ROPE'",
+      "brand_name_kana": "アダムエロペ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 14,
+    "fields": {
+      "brand_name": "UNITED ARROWS",
+      "brand_name_kana": "ユナイテッドアローズ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 15,
+    "fields": {
+      "brand_name": "URBAN RESEARCH",
+      "brand_name_kana": "アーバンリサーチ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 16,
+    "fields": {
+      "brand_name": "JOURNAL STANDARD",
+      "brand_name_kana": "ジャーナルスタンダード",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 17,
+    "fields": {
+      "brand_name": "nano・universe",
+      "brand_name_kana": "ナノユニバース",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 18,
+    "fields": {
+      "brand_name": "LOWRYS FARM",
+      "brand_name_kana": "ローリーズファーム",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 19,
+    "fields": {
+      "brand_name": "GLOBAL WORK",
+      "brand_name_kana": "グローバルワーク",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 20,
+    "fields": {
+      "brand_name": "STUDIOUS",
+      "brand_name_kana": "ステュディオス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 21,
+    "fields": {
+      "brand_name": "UNITED TOKYO",
+      "brand_name_kana": "ユナイテッドトウキョウ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 22,
+    "fields": {
+      "brand_name": "HARE",
+      "brand_name_kana": "ハレ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 23,
+    "fields": {
+      "brand_name": "SENSE OF PLACE",
+      "brand_name_kana": "センスオブプレイス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 24,
+    "fields": {
+      "brand_name": "niko and...",
+      "brand_name_kana": "ニコアンド",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 25,
+    "fields": {
+      "brand_name": "TOMMY HILFIGER",
+      "brand_name_kana": "トミーヒルフィガー",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 26,
+    "fields": {
+      "brand_name": "Calvin Klein",
+      "brand_name_kana": "カルバンクライン",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 27,
+    "fields": {
+      "brand_name": "DIESEL",
+      "brand_name_kana": "ディーゼル",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 28,
+    "fields": {
+      "brand_name": "A.P.C",
+      "brand_name_kana": "アーペーセー",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 29,
+    "fields": {
+      "brand_name": "EMMA CLOTHES",
+      "brand_name_kana": "エマクローズ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 30,
+    "fields": {
+      "brand_name": "CITEN",
+      "brand_name_kana": "シテン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 31,
+    "fields": {
+      "brand_name": "RAGEBLUE",
+      "brand_name_kana": "レイジブルー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 32,
+    "fields": {
+      "brand_name": "COLONY 2139",
+      "brand_name_kana": "コロニートゥーワンスリーナイン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 33,
+    "fields": {
+      "brand_name": "SHIPS",
+      "brand_name_kana": "シップス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 34,
+    "fields": {
+      "brand_name": "EDIFICE",
+      "brand_name_kana": "エディフィス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 35,
+    "fields": {
+      "brand_name": "CIAOPANIC",
+      "brand_name_kana": "チャオパニック",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 36,
+    "fields": {
+      "brand_name": "AVIREX",
+      "brand_name_kana": "アヴィレックス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 37,
+    "fields": {
+      "brand_name": "Supreme",
+      "brand_name_kana": "シュプリーム",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 38,
+    "fields": {
+      "brand_name": "STUSSY",
+      "brand_name_kana": "ステューシー",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 39,
+    "fields": {
+      "brand_name": "thisisneverthat",
+      "brand_name_kana": "ディスイズネバーザット",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 40,
+    "fields": {
+      "brand_name": "OFF-WHITE",
+      "brand_name_kana": "オフホワイト",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 41,
+    "fields": {
+      "brand_name": "KITH",
+      "brand_name_kana": "キス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 42,
+    "fields": {
+      "brand_name": "Carhartt",
+      "brand_name_kana": "カーハート",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 43,
+    "fields": {
+      "brand_name": "New Balance",
+      "brand_name_kana": "ニューバランス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 44,
+    "fields": {
+      "brand_name": "Nike",
+      "brand_name_kana": "ナイキ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 45,
+    "fields": {
+      "brand_name": "Adidas",
+      "brand_name_kana": "アディダス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 46,
+    "fields": {
+      "brand_name": "CONVERSE",
+      "brand_name_kana": "コンバース",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 47,
+    "fields": {
+      "brand_name": "VANS",
+      "brand_name_kana": "バンズ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 48,
+    "fields": {
+      "brand_name": "Champion",
+      "brand_name_kana": "チャンピオン",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 49,
+    "fields": {
+      "brand_name": "LACOSTE",
+      "brand_name_kana": "ラコステ",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 50,
+    "fields": {
+      "brand_name": "Puma",
+      "brand_name_kana": "プーマ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 51,
+    "fields": {
+      "brand_name": "REEBOK",
+      "brand_name_kana": "リーボック",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 52,
+    "fields": {
+      "brand_name": "FILA",
+      "brand_name_kana": "フィラ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 53,
+    "fields": {
+      "brand_name": "ASICS",
+      "brand_name_kana": "アシックス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 54,
+    "fields": {
+      "brand_name": "THE NORTH FACE",
+      "brand_name_kana": "ザノースフェイス",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 55,
+    "fields": {
+      "brand_name": "Patagonia",
+      "brand_name_kana": "パタゴニア",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 56,
+    "fields": {
+      "brand_name": "Columbia",
+      "brand_name_kana": "コロンビア",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 57,
+    "fields": {
+      "brand_name": "TATRAS",
+      "brand_name_kana": "タトラス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 58,
+    "fields": {
+      "brand_name": "GUCCI",
+      "brand_name_kana": "グッチ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 59,
+    "fields": {
+      "brand_name": "PRADA",
+      "brand_name_kana": "プラダ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 60,
+    "fields": {
+      "brand_name": "LOUIS VUITTON",
+      "brand_name_kana": "ルイヴィトン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 61,
+    "fields": {
+      "brand_name": "DIOR",
+      "brand_name_kana": "ディオール",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 62,
+    "fields": {
+      "brand_name": "BURBERRY",
+      "brand_name_kana": "バーバリー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 63,
+    "fields": {
+      "brand_name": "FENDI",
+      "brand_name_kana": "フェンディ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 64,
+    "fields": {
+      "brand_name": "BALENCIAGA",
+      "brand_name_kana": "バレンシアガ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 65,
+    "fields": {
+      "brand_name": "CELINE",
+      "brand_name_kana": "セリーヌ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 66,
+    "fields": {
+      "brand_name": "Saint Laurent",
+      "brand_name_kana": "サンローラン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 67,
+    "fields": {
+      "brand_name": "MAISON MARGIELA",
+      "brand_name_kana": "メゾンマルジェラ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 68,
+    "fields": {
+      "brand_name": "MARNI",
+      "brand_name_kana": "マルニ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 69,
+    "fields": {
+      "brand_name": "JIL SANDER",
+      "brand_name_kana": "ジルサンダー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 70,
+    "fields": {
+      "brand_name": "COACH",
+      "brand_name_kana": "コーチ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 71,
+    "fields": {
+      "brand_name": "HERMES",
+      "brand_name_kana": "エルメス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 72,
+    "fields": {
+      "brand_name": "CHANEL",
+      "brand_name_kana": "シャネル",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 73,
+    "fields": {
+      "brand_name": "BOTTEGA VENETA",
+      "brand_name_kana": "ボッテガヴェネタ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 74,
+    "fields": {
+      "brand_name": "LOEWE",
+      "brand_name_kana": "ロエベ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 75,
+    "fields": {
+      "brand_name": "GIVENCHY",
+      "brand_name_kana": "ジバンシィ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 76,
+    "fields": {
+      "brand_name": "VERSACE",
+      "brand_name_kana": "ヴェルサーチ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 77,
+    "fields": {
+      "brand_name": "MONCLER",
+      "brand_name_kana": "モンクレール",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 78,
+    "fields": {
+      "brand_name": "Ray-Ban",
+      "brand_name_kana": "レイバン",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 79,
+    "fields": {
+      "brand_name": "A.D.S.R",
+      "brand_name_kana": "エーディーエスアール",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 80,
+    "fields": {
+      "brand_name": "FRED PERRY",
+      "brand_name_kana": "フレッドペリー",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 81,
+    "fields": {
+      "brand_name": "Dr. Martens",
+      "brand_name_kana": "ドクターマーチン",
+      "is_popular": true
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 82,
+    "fields": {
+      "brand_name": "COMME des GARCONS",
+      "brand_name_kana": "コムデギャルソン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 83,
+    "fields": {
+      "brand_name": "YOHJI YAMAMOTO",
+      "brand_name_kana": "ヨウジヤマモト",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 84,
+    "fields": {
+      "brand_name": "ISSEY MIYAKE",
+      "brand_name_kana": "イッセイミヤケ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 85,
+    "fields": {
+      "brand_name": "KENZO",
+      "brand_name_kana": "ケンゾー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 86,
+    "fields": {
+      "brand_name": "UNDERCOVER",
+      "brand_name_kana": "アンダーカバー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 87,
+    "fields": {
+      "brand_name": "WETTEMPT",
+      "brand_name_kana": "ウィテンプト",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 88,
+    "fields": {
+      "brand_name": "SINSS",
+      "brand_name_kana": "シンス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 89,
+    "fields": {
+      "brand_name": "YOEL",
+      "brand_name_kana": "ヨエル",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 90,
+    "fields": {
+      "brand_name": "soerte",
+      "brand_name_kana": "ソエルテ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 91,
+    "fields": {
+      "brand_name": "ONCILY",
+      "brand_name_kana": "オンシェリー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 92,
+    "fields": {
+      "brand_name": "RUUBON",
+      "brand_name_kana": "ルーボン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 93,
+    "fields": {
+      "brand_name": "Snap club",
+      "brand_name_kana": "スナップクラブ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 94,
+    "fields": {
+      "brand_name": "Perushu",
+      "brand_name_kana": "ペルーシュ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 95,
+    "fields": {
+      "brand_name": "WYM LIDNM",
+      "brand_name_kana": "ウィム バイ リドム",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 96,
+    "fields": {
+      "brand_name": "MAISON SPECIAL",
+      "brand_name_kana": "メゾンスペシャル",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 97,
+    "fields": {
+      "brand_name": "BROKEN BASE",
+      "brand_name_kana": "ブロークンベース",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 98,
+    "fields": {
+      "brand_name": "O",
+      "brand_name_kana": "オー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 99,
+    "fields": {
+      "brand_name": "MASONPRINCE",
+      "brand_name_kana": "メイソンプリンス",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 100,
+    "fields": {
+      "brand_name": "kutir",
+      "brand_name_kana": "クティール",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 101,
+    "fields": {
+      "brand_name": "LMC",
+      "brand_name_kana": "",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 102,
+    "fields": {
+      "brand_name": "WHO's WHO gallery",
+      "brand_name_kana": "フーズフーギャラリー",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 103,
+    "fields": {
+      "brand_name": "Jieda",
+      "brand_name_kana": "ジエダ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 104,
+    "fields": {
+      "brand_name": "NEONSIGN",
+      "brand_name_kana": "ネオンサイン",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 105,
+    "fields": {
+      "brand_name": "MOMA",
+      "brand_name_kana": "モマ",
+      "is_popular": false
+    }
+  },
+  {
+    "model": "fashion_items.brand",
+    "pk": 106,
+    "fields": {
+      "brand_name": "NEW ERA",
+      "brand_name_kana": "ニューエラ",
+      "is_popular": false
+    }
+  }
+]
