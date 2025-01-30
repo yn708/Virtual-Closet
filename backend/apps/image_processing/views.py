@@ -5,7 +5,7 @@ import time
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  #
 from PIL import Image
-from rembg import remove
+from rembg import new_session, remove
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -29,7 +29,8 @@ def remove_bg(request):
                 input_image = Image.open(image_file)
 
                 # 背景除去処理
-                output_image = remove(input_image)
+                session = new_session(model_name="u2netp")
+                output_image = remove(input_image, session=session)
 
                 # 透明部分を除いた実際の被写体の範囲を取得
                 bbox = output_image.getbbox()
@@ -39,7 +40,7 @@ def remove_bg(request):
 
                 # バイトバッファを作成し、処理後の画像をPNG形式でバッファに保存
                 buffered = io.BytesIO()
-                cropped_image.save(buffered, format="PNG")
+                cropped_image.save(buffered, format="PNG", optimize=True)
 
                 # バッファ内の画像データをBase64形式にエンコードし、文字列として取得
                 img_str = base64.b64encode(buffered.getvalue()).decode()
