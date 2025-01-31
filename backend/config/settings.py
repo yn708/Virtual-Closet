@@ -123,6 +123,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -236,6 +237,7 @@ if DEBUG:  # 開発環境
     MEDIA_URL = "/media/"
     MEDIA_ROOT = f"/{BASE_DIR.name}/media"
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 else:  # 本番環境
     # AWS S3とCloudFrontの設定
     AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
