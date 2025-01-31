@@ -46,4 +46,4 @@ COPY . .
 # build.shに実行権限を付与
 RUN chmod +x build.sh
 
-CMD ["sh", "-c", "./build.sh && gunicorn config.wsgi:application"]
+CMD ["sh", "-c", "./build.sh && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
