@@ -3,6 +3,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -149,25 +150,29 @@ WSGI_APPLICATION = "config.wsgi.application"
 CORS_ALLOWED_ORIGINS = json.loads(env("CORS_ALLOWED_ORIGINS"))
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": env("POSTGRES_DB"),
-        "HOST": env("POSTGRES_HOST", default="db"),
-        "PORT": env("POSTGRES_PORT", default=5432),
-        "USER": env("POSTGRES_USER"),
-        "PASSWORD": env("POSTGRES_PASSWORD"),
-        "ATOMIC_REQUESTS": True,
-        "TIME_ZONE": env("TZ", default="Asia/Tokyo"),
-        "TEST": {
-            "NAME": env("POSTGRES_DB") + "_test",  # テスト用DBの名前
-            "CHARSET": "UTF8",
-            # テスト時のみの設定
-            "MIRROR": "default",  # デフォルトDBの設定をミラー
-            "SERIALIZE": False,  # テストの高速化
-        },
+# 開発環境と本番環境で分ける
+if DEBUG:  # 開発環境
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": env("POSTGRES_DB"),
+            "HOST": env("POSTGRES_HOST", default="db"),
+            "PORT": env("POSTGRES_PORT", default=5432),
+            "USER": env("POSTGRES_USER"),
+            "PASSWORD": env("POSTGRES_PASSWORD"),
+            "ATOMIC_REQUESTS": True,
+            "TIME_ZONE": env("TZ", default="Asia/Tokyo"),
+            "TEST": {
+                "NAME": env("POSTGRES_DB") + "_test",  # テスト用DBの名前
+                "CHARSET": "UTF8",
+                # テスト時のみの設定
+                "MIRROR": "default",  # デフォルトDBの設定をミラー
+                "SERIALIZE": False,  # テストの高速化
+            },
+        }
     }
-}
+else:  # 本番環境
+    DATABASES = {"default": dj_database_url.parse(env("DATABASE_URL"))}
 
 
 AUTH_PASSWORD_VALIDATORS = [
