@@ -14,3 +14,9 @@ Dockerfile
 .dockerignore
 .coverage
 htmlcov/
+media/
+static/
+*.sqlite3
+requirements/development.txt
+tests/
+docs/
