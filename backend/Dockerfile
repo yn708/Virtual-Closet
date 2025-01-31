@@ -16,9 +16,6 @@ RUN apt-get update && \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# u2netモデルのダウンロード (rembg 用)
-RUN mkdir -p /root/.u2net && \
-    wget https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx -O /root/.u2net/u2net.onnx
 
 # pipの最新バージョンにアップグレード
 RUN pip install --upgrade pip
@@ -40,12 +37,13 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # builderからの必要なファイルのコピー
-COPY --from=builder /root/.u2net /root/.u2net
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # アプリケーションコードのコピー
 COPY . .
 
-# サーバー起動コマンドを設定
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+# build.shに実行権限を付与
+RUN chmod +x build.sh
+
+CMD ["sh", "-c", "./build.sh && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]

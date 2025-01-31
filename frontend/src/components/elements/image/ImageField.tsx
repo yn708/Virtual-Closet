@@ -6,6 +6,7 @@ import ImageUploadArea from '@/components/elements/image/ImageUploadArea';
 import LoadingElements from '@/components/elements/loading/LoadingElements';
 import { useImageField } from '@/features/fashion-items/hooks/useImageField';
 import type { ImageFieldProps } from '@/types';
+import RemoveBgHintDialog from '../dialog/RemoveBgHintDialog';
 import ImageActions from './ImageActions';
 
 const ImageField = ({ preview, isProcessing, error }: ImageFieldProps) => {
@@ -42,6 +43,8 @@ const ImageField = ({ preview, isProcessing, error }: ImageFieldProps) => {
             />
           </div>
         )}
+        {/* 背景除去ヒント */}
+        <RemoveBgHintDialog />
       </div>
 
       {error && <p className="text-sm text-destructive mt-2">{error[0]}</p>}

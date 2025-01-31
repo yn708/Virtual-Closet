@@ -84,11 +84,12 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   /*----------------------------------------------------------------------------
-背景除去する場合（WebPに変換、画像圧縮は別途行う必要がある）
+背景除去する場合
 1. clearImage（既存の画像を削除）
 2. 背景除去
-3 .プレビューを作成
-4. setImage・setPreviewで画像・プレビューを最新化
+3. 圧縮、変換を行う
+4 .プレビューを作成
+5. setImage・setPreviewで画像・プレビューを最新化
 ----------------------------------------------------------------------------*/
   const removeBgProcess = async (file: File): Promise<File | null> => {
     // 1. clearImage（既存の画像を削除）
@@ -100,19 +101,21 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // FormDataオブジェクトを作成し、API通信
       const formData = new FormData();
       formData.append('image', file);
-      // 2. プレビューを作成
+      // 2. 背景除去
       const result = await removeBackgroundAPI(formData);
-
-      // もし成功した場合
+      // 成功した場合
       if (result.status === 'success' && result.image) {
         const removedBgFileName = `${file.name.replace(/\.[^/.]+$/, '')}_removed_bg.webp`;
         const removedBg = dataURLtoFile(`data:image/png;base64,${result.image}`, removedBgFileName); // Base64画像データをFileオブジェクトに変換
-        // 3. プレビューを作成
-        const newPreview = URL.createObjectURL(removedBg);
-        // 4. setImage・setPreviewで画像・プレビューを最新化
+        const { compressImage } = await loadImageUtils();
+        // 3. 圧縮、変換を行う
+        const compressedImage = await compressImage(removedBg);
+        // 4. プレビューを作成
+        const newPreview = URL.createObjectURL(compressedImage);
+        // 5. setImage・setPreviewで画像・プレビューを最新化
         setPreview(newPreview);
-        setImage(removedBg);
-        return removedBg;
+        setImage(compressedImage);
+        return compressedImage;
       } else {
         throw new Error(result.message || '被写体抽出に失敗しました');
       }

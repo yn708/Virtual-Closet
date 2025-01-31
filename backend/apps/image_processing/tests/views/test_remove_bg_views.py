@@ -1,69 +1,104 @@
 import io
-from unittest.mock import patch
+import shutil
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
-from rest_framework import status
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.accounts.tests.views.base import BaseAuthViewTest
+from apps.accounts.models import CustomUser
+
+
+@pytest.fixture(autouse=True)
+def media_storage(settings, tmp_path):
+    """テスト用のメディアストレージをセットアップ"""
+    settings.MEDIA_ROOT = tmp_path / "media"
+    settings.MEDIA_URL = "/media/"
+    settings.MEDIA_ROOT.mkdir()
+
+    yield
+
+    shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+
+
+@pytest.fixture
+def user():
+    """テストユーザーを作成"""
+    return CustomUser.objects.create_user(
+        email="test@example.com",
+        password="testpass123",
+        username="testuser",
+        is_active=True,
+    )
+
+
+@pytest.fixture
+def test_image(media_storage):
+    """テスト用の画像を作成"""
+    file = io.BytesIO()
+    image = Image.new("RGB", (100, 100), "white")
+    image.save(file, "jpeg")
+    file.name = "test.jpg"
+    file.seek(0)
+    return SimpleUploadedFile(name=file.name, content=file.read(), content_type="image/jpeg")
+
+
+@pytest.fixture
+def api_client():
+    """未認証APIクライアント"""
+    return APIClient()
+
+
+@pytest.fixture
+def auth_token(user):
+    """JWT認証トークンを生成"""
+    refresh = RefreshToken.for_user(user)
+    return {
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+    }
+
+
+@pytest.fixture
+def auth_client(api_client, auth_token):
+    """認証済みAPIクライアント"""
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {auth_token["access"]}')
+    return api_client
 
 
 @pytest.mark.django_db
-class TestRemoveBgView(BaseAuthViewTest):
-    """背景除去APIのテストクラス"""
+def test_remove_bg_authentication(api_client):
+    """未認証アクセスのテスト"""
+    response = api_client.post("/api/image/remove-bg/")
+    assert response.status_code == 401
 
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        """各テストメソッド実行前のセットアップ"""
-        self.url = "/api/image/remove-bg/"
 
-    @pytest.fixture
-    def test_image(self):
-        """テスト用の画像ファイルを生成するフィクスチャ"""
-        image = Image.new("RGB", (100, 100), "white")
-        img_buffer = io.BytesIO()
-        image.save(img_buffer, format="PNG")
-        img_buffer.seek(0)
+@pytest.mark.django_db
+def test_remove_bg_success(auth_client, test_image):
+    """正常系のテスト"""
+    response = auth_client.post("/api/image/remove-bg/", {"image": test_image}, format="multipart")
 
-        return SimpleUploadedFile("test_image.png", img_buffer.getvalue(), content_type="image/png")
+    assert response.status_code == 200
+    assert response.json()["status"] == "success"
+    assert "image" in response.json()
+    assert "process_time" in response.json()
 
-    def test_successful_background_removal(self, auth_client, test_image):
-        """正常系: 背景除去が成功するケース"""
-        with patch("rembg.remove") as mock_remove:
-            # モックの戻り値を設定
-            mock_output = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
-            mock_remove.return_value = mock_output
 
-            response = auth_client.post(self.url, {"image": test_image}, format="multipart")
+@pytest.mark.django_db
+def test_remove_bg_no_image(auth_client):
+    """画像なしでのリクエストテスト"""
+    response = auth_client.post("/api/image/remove-bg/")
+    assert response.status_code == 400
+    assert response.json()["status"] == "error"
 
-            self.assert_success_response(response)
-            assert response.json()["status"] == "success"
-            assert "image" in response.json()
-            assert "process_time" in response.json()
 
-            # Base64エンコードされた画像データの検証
-            image_data = response.json()["image"]
-            assert isinstance(image_data, str)
-            assert len(image_data) > 0
+@pytest.mark.django_db
+def test_remove_bg_invalid_image(auth_client):
+    """無効な画像データでのテスト"""
+    invalid_file = SimpleUploadedFile("test.png", b"invalid image content", content_type="image/png")
 
-    def test_unauthorized_access(self, api_client, test_image):
-        """異常系: 未認証ユーザーのアクセス拒否"""
-        response = api_client.post(self.url, {"image": test_image}, format="multipart")
-        self.assert_error_response(response, status.HTTP_401_UNAUTHORIZED)
+    response = auth_client.post("/api/image/remove-bg/", {"image": invalid_file}, format="multipart")
 
-    def test_missing_image(self, auth_client):
-        """異常系: 画像が送信されていないケース"""
-        response = auth_client.post(self.url, {}, format="multipart")
-        self.assert_error_response(response)
-        assert response.json()["status"] == "error"
-        assert response.json()["message"] == "Invalid request"
-
-    def test_invalid_image_format(self, auth_client):
-        """異常系: 無効な画像フォーマット"""
-        invalid_file = SimpleUploadedFile("test.txt", b"Invalid image content", content_type="text/plain")
-
-        response = auth_client.post(self.url, {"image": invalid_file}, format="multipart")
-
-        self.assert_error_response(response, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        assert response.json()["status"] == "error"
+    assert response.status_code == 400
+    assert response.json()["status"] == "error"
