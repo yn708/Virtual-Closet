@@ -15,6 +15,8 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
+CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(",")
 
 # 自動的にURLにスラッシュを入れてくれる設定
 APPEND_SLASH = True
@@ -148,8 +150,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-CORS_ALLOWED_ORIGINS = json.loads(env("CORS_ALLOWED_ORIGINS"))
-
 
 # 開発環境と本番環境で分ける
 if DEBUG:  # 開発環境
@@ -267,6 +267,3 @@ SUPERUSER_PASSWORD = env("SUPERUSER_PASSWORD")
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_SECRET = env("GOOGLE_CLIENT_SECRET")
 SITE_DOMAIN = env("SITE_DOMAIN", default="example.com")
-
-
-CSRF_TRUSTED_ORIGINS = json.loads(env("CSRF_TRUSTED_ORIGINS"))
