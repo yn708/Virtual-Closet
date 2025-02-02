@@ -75,7 +75,7 @@ export const compressImage = async (
   const defaultOptions = {
     // 圧縮後の最大ファイルサイズ（MB）
     // 1MBを超える場合、品質を下げて0.5MB以下に抑える
-    maxSizeMB: 0.5,
+    maxSizeMB: 0.1,
 
     // 画像の最大幅または高さ（ピクセル）
     // 元の画像がこれより大きい場合、この値まで縮小される
@@ -234,7 +234,7 @@ export const generatePreviewImage = async (canvasRef: HTMLElement | null) => {
 
     // 圧縮オプションを設定
     const compressionOptions = {
-      maxSizeMB: 0.5,
+      maxSizeMB: 0.1,
       maxWidthOrHeight: 1024, // プレビュー用に適切なサイズに設定
       useWebWorker: true,
       fileType: 'image/webp',

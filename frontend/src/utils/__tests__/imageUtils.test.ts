@@ -153,7 +153,7 @@ describe('useImageField', () => {
 
         expect(result).toBeInstanceOf(File);
         expect(mockImageCompression).toHaveBeenCalledWith(file, {
-          maxSizeMB: 0.5,
+          maxSizeMB: 0.1,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
           fileType: 'image/webp',
@@ -166,7 +166,7 @@ describe('useImageField', () => {
         mockImageCompression.mockResolvedValue(compressedFile);
 
         const customOptions = {
-          maxSizeMB: 2,
+          maxSizeMB: 0.1,
           maxWidthOrHeight: 800,
           fileType: 'image/png',
         };
@@ -175,7 +175,7 @@ describe('useImageField', () => {
 
         expect(result).toBeInstanceOf(File);
         expect(mockImageCompression).toHaveBeenCalledWith(file, {
-          maxSizeMB: 2,
+          maxSizeMB: 0.1,
           maxWidthOrHeight: 800,
           useWebWorker: true,
           fileType: 'image/png',
