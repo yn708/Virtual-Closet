@@ -1,5 +1,6 @@
 'use client';
 
+import ItemCounter from '@/components/elements/utils/ItemCounter';
 import { useFashionItems } from '@/context/FashionItemsContext';
 import type { OnSelectItemType, SelectedItemsType } from '@/features/coordinate/types';
 import CategorySelector from '@/features/my-page/common/components/contents/CategorySelector';
@@ -19,6 +20,9 @@ const FashionItemsContents: React.FC<OnSelectItemType & SelectedItemsType> = ({
 
   return (
     <BaseContentsLayout selectedCategory={selectedCategory}>
+      {state.countData && state.countData.current_count > 0 && (
+        <ItemCounter countData={state.countData} />
+      )}
       <CategorySelector<FashionItemFilters>
         onCategoryChange={handleCategoryChange}
         onFilterChange={handleFilterChange}

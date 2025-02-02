@@ -1,3 +1,5 @@
+'use server';
+
 import { resendCodeAPI } from '@/lib/api/authApi';
 import type { FormState } from '@/types';
 import { loginFormSchema } from '@/utils/validations/auth-validation';
@@ -41,7 +43,7 @@ export async function resendCodeAction(
         errors: {
           email: [errorData.detail],
         },
-        message: null,
+        message: errorData.detail,
         success: false,
       };
     }

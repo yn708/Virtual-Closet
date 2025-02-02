@@ -9,6 +9,7 @@ import {
 } from '@/lib/actions/outfit/customCoordinateAction';
 import type { BaseCoordinate } from '@/types/coordinate';
 import { renderHook } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 import { useCustomCoordinateForm } from '../useCustomCoordinateForm';
 
 // モックの設定
@@ -33,6 +34,19 @@ jest.mock('react-dom', () => {
       return [{ message: null, errors: {}, success: false }, formAction];
     }),
   };
+});
+// useRouter をモックする
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+}));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+
+  // useRouter のモックを明示的に設定
+  (useRouter as jest.Mock).mockReturnValue({
+    push: jest.fn(), // ここで push を定義
+  });
 });
 
 describe('useCustomCoordinateForm', () => {

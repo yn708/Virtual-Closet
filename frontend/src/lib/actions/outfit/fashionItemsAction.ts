@@ -29,14 +29,31 @@ export async function fashionItemsCreateAction(
   }
 
   const { apiFormData } = fashionItemFormData(validatedFields.data);
-  await registerFashionItemAPI(apiFormData);
-  revalidatePath(ITEM_CREATE_URL);
+  try {
+    await registerFashionItemAPI(apiFormData);
+    revalidatePath(ITEM_CREATE_URL);
+    return {
+      message: null,
+      errors: null,
+      success: true,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const errorData = JSON.parse(error.message);
+      const errorMessage = errorData.non_field_errors?.[0];
 
-  return {
-    message: null,
-    errors: null,
-    success: true,
-  };
+      return {
+        message: errorMessage,
+        errors: null,
+        success: false,
+      };
+    }
+    return {
+      message: null,
+      errors: null,
+      success: false,
+    };
+  }
 }
 
 /* ----------------------------------------------------------------

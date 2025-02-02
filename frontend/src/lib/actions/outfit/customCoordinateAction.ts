@@ -4,7 +4,7 @@ import type { InitialItems } from '@/features/my-page/coordinate/types';
 import { registerCoordinateAPI, updateCoordinateAPI } from '@/lib/api/coordinateApi';
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { COORDINATE_CREATE_CANVAS_URL, TOP_URL } from '@/utils/constants';
+import { COORDINATE_CREATE_CANVAS_URL } from '@/utils/constants';
 import {
   customCoordinateFormData,
   getCustomCoordinateFormFields,
@@ -14,7 +14,6 @@ import {
   customCoordinateUpdateFormSchema,
 } from '@/utils/validations/coordinate-validation';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 /* ----------------------------------------------------------------
 カスタムコーディネート登録アクション
@@ -37,9 +36,31 @@ export async function customCoordinateCreateAction(
   }
 
   const { apiFormData } = customCoordinateFormData(validatedFields.data);
-  await registerCoordinateAPI('custom', apiFormData);
-  revalidatePath(COORDINATE_CREATE_CANVAS_URL);
-  redirect(TOP_URL);
+  try {
+    await registerCoordinateAPI('custom', apiFormData);
+    revalidatePath(COORDINATE_CREATE_CANVAS_URL);
+    return {
+      message: null,
+      errors: null,
+      success: true,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const errorData = JSON.parse(error.message);
+      const errorMessage = errorData.non_field_errors?.[0];
+
+      return {
+        message: errorMessage,
+        errors: null,
+        success: false,
+      };
+    }
+    return {
+      message: null,
+      errors: null,
+      success: false,
+    };
+  }
 }
 
 /* ----------------------------------------------------------------

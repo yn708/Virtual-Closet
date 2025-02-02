@@ -133,6 +133,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -226,6 +227,8 @@ else:  # 本番環境
 
     STATIC_URL = "/static/"
     STATIC_ROOT = BASE_DIR / "static"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # -------------------- その他環境依存しない設定 --------------------
 # LINE Messaging API設定

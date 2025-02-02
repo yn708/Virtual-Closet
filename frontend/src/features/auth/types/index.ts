@@ -34,7 +34,7 @@ export interface AuthFormProps {
   submitButtonLabel: string;
   mode: 'login' | 'signup' | 'email-only' | 'password';
   pending?: boolean;
-  state: FormState;
+  state?: FormState;
   passwordLabel?: string;
 }
 /* ----------------------------------------------------------------

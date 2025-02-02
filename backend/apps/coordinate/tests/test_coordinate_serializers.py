@@ -48,12 +48,12 @@ class TestPhotoCoordinateSerializer:
             "tastes": [taste.id],
         }
 
-    def test_valid_serializer(self, valid_data):
+    def test_valid_serializer(self, valid_data, dummy_request):
         """正常系: 有効なデータでのシリアライズテスト"""
-        serializer = PhotoCoordinateSerializer(data=valid_data)
+        serializer = PhotoCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert serializer.is_valid(), serializer.errors
 
-    def test_image_size_validation(self, valid_data):
+    def test_image_size_validation(self, valid_data, dummy_request):
         """異常系: 画像サイズ制限のテスト"""
         # MAX_IMAGE_SIZEより大きいサイズのダミーデータを作成
         large_image = SimpleUploadedFile(
@@ -61,33 +61,33 @@ class TestPhotoCoordinateSerializer:
         )
         valid_data["image"] = large_image
 
-        serializer = PhotoCoordinateSerializer(data=valid_data)
+        serializer = PhotoCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert not serializer.is_valid()
         assert "image" in serializer.errors
 
-    def test_scenes_limit(self, valid_data, scene):
+    def test_scenes_limit(self, valid_data, scene, dummy_request):
         """異常系: シーン数制限のテスト"""
         valid_data["scenes"] = [scene.id] * 4  # 4つのシーンを設定
-        serializer = PhotoCoordinateSerializer(data=valid_data)
+        serializer = PhotoCoordinateSerializer(data=valid_data, context={"request": dummy_request})
 
         assert not serializer.is_valid()
         assert "scenes" in serializer.errors
 
-    def test_tastes_limit(self, valid_data, taste):
+    def test_tastes_limit(self, valid_data, taste, dummy_request):
         """異常系: テイスト数制限のテスト"""
         valid_data["tastes"] = [taste.id] * 4  # 4つのテイストを設定
-        serializer = PhotoCoordinateSerializer(data=valid_data)
+        serializer = PhotoCoordinateSerializer(data=valid_data, context={"request": dummy_request})
 
         assert not serializer.is_valid()
         assert "tastes" in serializer.errors
 
-    def test_empty_list_handling(self, valid_data):
+    def test_empty_list_handling(self, valid_data, dummy_request):
         """正常系: 空リストの処理テスト"""
         valid_data["seasons"] = []
         valid_data["scenes"] = "[]"  # 文字列として送信
         valid_data["tastes"] = ""  # 空文字として送信
 
-        serializer = PhotoCoordinateSerializer(data=valid_data)
+        serializer = PhotoCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert serializer.is_valid(), serializer.errors
 
         processed_data = serializer.validated_data
@@ -95,12 +95,14 @@ class TestPhotoCoordinateSerializer:
         assert processed_data["scenes"] == []
         assert processed_data["tastes"] == []
 
-    def test_update_coordinate(self, photo_coordinate, season, scene, taste, test_image):
+    def test_update_coordinate(self, photo_coordinate, season, scene, taste, test_image, dummy_request):
         """正常系: コーディネート更新のテスト"""
         # test_imageフィクスチャを再利用
         update_data = {"image": test_image, "seasons": [season.id], "scenes": [scene.id], "tastes": [taste.id]}
 
-        serializer = PhotoCoordinateSerializer(photo_coordinate, data=update_data, partial=True)
+        serializer = PhotoCoordinateSerializer(
+            photo_coordinate, data=update_data, partial=True, context={"request": dummy_request}
+        )
         assert serializer.is_valid(), serializer.errors
 
         updated_coordinate = serializer.save()
@@ -150,50 +152,48 @@ class TestCustomCoordinateSerializer:
             "tastes": [taste.id],
         }
 
-    def test_valid_serializer(self, valid_data, user):
+    def test_valid_serializer(self, valid_data, dummy_request):
         """正常系: 有効なデータでのシリアライズテスト"""
-        context = {"request": type("Request", (), {"user": user})}
-        serializer = CustomCoordinateSerializer(data=valid_data, context=context)
-
+        serializer = CustomCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert serializer.is_valid(), serializer.errors
         instance = serializer.save()
 
-        assert instance.user == user
+        assert instance.user == dummy_request.user
         assert instance.image is not None
         assert instance.background == "bg-gray-100"
         assert instance.coordinate_item_set.count() == 2
 
-    def test_image_size_validation(self, valid_data):
+    def test_image_size_validation(self, valid_data, dummy_request):
         """異常系: 画像サイズ制限のテスト"""
         valid_data["image"] = SimpleUploadedFile(
             name="large.jpg", content=b"0" * (MAX_IMAGE_SIZE + 1), content_type="image/jpeg"
         )
 
-        serializer = CustomCoordinateSerializer(data=valid_data)
+        serializer = CustomCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert not serializer.is_valid()
         assert "image" in serializer.errors
 
-    def test_items_length_validation(self, valid_data):
+    def test_items_length_validation(self, valid_data, dummy_request):
         """異常系: アイテム数制限のテスト"""
         # 1つのアイテムだけを設定
         valid_data["items"] = valid_data["items"][:1]
-        serializer = CustomCoordinateSerializer(data=valid_data)
+        serializer = CustomCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert not serializer.is_valid()
         assert "items" in serializer.errors
 
         # 21個のアイテムを設定
         valid_data["items"] = valid_data["items"] * 21
-        serializer = CustomCoordinateSerializer(data=valid_data)
+        serializer = CustomCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert not serializer.is_valid()
         assert "items" in serializer.errors
 
-    def test_empty_list_handling(self, valid_data):
+    def test_empty_list_handling(self, valid_data, dummy_request):
         """正常系: 空リストの処理テスト"""
         valid_data["seasons"] = []
         valid_data["scenes"] = "[]"
         valid_data["tastes"] = ""
 
-        serializer = CustomCoordinateSerializer(data=valid_data)
+        serializer = CustomCoordinateSerializer(data=valid_data, context={"request": dummy_request})
         assert serializer.is_valid(), serializer.errors
 
         processed_data = serializer.validated_data
@@ -201,7 +201,7 @@ class TestCustomCoordinateSerializer:
         assert processed_data["scenes"] == []
         assert processed_data["tastes"] == []
 
-    def test_update_coordinate(self, custom_coordinate, valid_coordinate_item_data, test_image, user):
+    def test_update_coordinate(self, custom_coordinate, valid_coordinate_item_data, test_image, user, dummy_request):
         """正常系: コーディネート更新のテスト"""
         # 2つ目の新しいファッションアイテムを作成
         second_fashion_item = FashionItem.objects.create(
@@ -222,7 +222,9 @@ class TestCustomCoordinateSerializer:
             ],  # 2つのアイテムを指定
         }
 
-        serializer = CustomCoordinateSerializer(custom_coordinate, data=update_data, partial=True)
+        serializer = CustomCoordinateSerializer(
+            custom_coordinate, data=update_data, partial=True, context={"request": dummy_request}
+        )
         assert serializer.is_valid(), serializer.errors
 
         updated_coordinate = serializer.save()

@@ -53,7 +53,18 @@ class PhotoCoordinateViewSet(ModelViewSet):
         return PhotoCoordinate.objects.filter(user=self.request.user).order_by("-created_at")
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        photo_coordinate_count = PhotoCoordinate.objects.filter(user=user).count()
+        custom_coordinate_count = CustomCoordinate.objects.filter(user=user).count()
+        current_count = photo_coordinate_count + custom_coordinate_count
+
+        if current_count >= 100:
+            return Response(
+                {"error": "アップロードできるコーディネートは最大100件までです。"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.save(user=user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -224,3 +235,18 @@ class CustomCoordinateViewSet(ModelViewSet):
 
         self.perform_destroy(instance)
         return Response({"message": "コーディネートが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class CoordinateCountView(APIView):
+    """アイテムカウントビュー（制限までどのぐらいか）"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        max_items = 100  # 上限数
+        photo_coordinate_count = PhotoCoordinate.objects.filter(user=user).count()
+        custom_coordinate_count = CustomCoordinate.objects.filter(user=user).count()
+        current_count = photo_coordinate_count + custom_coordinate_count
+
+        return Response({"current_count": current_count, "max_items": max_items})

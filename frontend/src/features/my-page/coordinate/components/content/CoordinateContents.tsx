@@ -9,6 +9,7 @@ import type { BaseCoordinate } from '@/types/coordinate';
 import { useCoordinates } from '../../hooks/useCoordinates';
 import type { CoordinateCategory, CoordinateFilters } from '../../types';
 import CoordinateDetailInfo from './CoordinateDetailInfo';
+import ItemCounter from '@/components/elements/utils/ItemCounter';
 
 const CoordinateContents = () => {
   const { state, handlers } = useCoordinates();
@@ -19,6 +20,9 @@ const CoordinateContents = () => {
 
   return (
     <BaseContentsLayout selectedCategory={selectedCategory}>
+      {state.countData && state.countData.current_count > 0 && (
+        <ItemCounter countData={state.countData} />
+      )}
       <CategorySelector<CoordinateFilters>
         onCategoryChange={(categoryId: string) => {
           handleCategoryChange(categoryId as CoordinateCategory | '');

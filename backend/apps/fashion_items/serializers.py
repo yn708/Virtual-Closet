@@ -138,6 +138,15 @@ class FashionItemSerializer(ModelSerializer):
             "is_old_clothes",
         ]
 
+    def validate(self, data):
+        user = self.context["request"].user
+        item_count = FashionItem.objects.filter(user=user).count()
+
+        if item_count >= 100:
+            raise serializers.ValidationError("アップロードできるファッションアイテムは最大100件までです。")
+
+        return data
+
     def to_internal_value(self, data):
         if "seasons" in data:
             if hasattr(data, "getlist"):

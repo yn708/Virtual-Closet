@@ -7,8 +7,10 @@ import {
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
 import { initialState } from '@/utils/data/initialState';
+import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import type { CoordinateEditTypes } from '../types';
+import { TOP_URL } from '@/utils/constants';
 
 export const useCustomCoordinateForm = ({
   initialItems,
@@ -16,6 +18,7 @@ export const useCustomCoordinateForm = ({
   onSuccess,
 }: InitialItemsProps & CoordinateEditTypes) => {
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleFormAction = async (
     prevState: FormState | FormStateCoordinateUpdate,
@@ -55,6 +58,17 @@ export const useCustomCoordinateForm = ({
   // アイテム作成用アクション
   const handleCreateAction = async (prevState: FormState, formData: FormData) => {
     const result = await customCoordinateCreateAction(prevState, formData);
+    if (result.success) {
+      router.push(TOP_URL);
+    }
+    if (!result.success && result.message) {
+      toast({
+        variant: 'destructive',
+        title: 'エラー',
+        description: result.message,
+        duration: 3000,
+      });
+    }
     return result;
   };
 

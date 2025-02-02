@@ -3,6 +3,10 @@ import json
 import pytest
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIRequestFactory, force_authenticate
+
+from apps.coordinate.models import CustomCoordinate, PhotoCoordinate
+from apps.coordinate.views import CoordinateCountView
 
 
 @pytest.mark.django_db
@@ -108,3 +112,46 @@ class TestCustomCoordinateViewSet:
         response = auth_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
+def test_coordinate_count_view_empty(user):
+    """
+    ユーザーにコーディネートが1件もない場合のテスト
+    """
+    factory = APIRequestFactory()
+    request = factory.get("/coordinate-count/")
+    force_authenticate(request, user=user)
+
+    view = CoordinateCountView.as_view()
+    response = view(request)
+    response.render()  # レスポンスのレンダリングを実施
+
+    data = response.data
+    # ユーザーに関連する PhotoCoordinate と CustomCoordinate が無いので合計は 0
+    assert data["current_count"] == 0
+    assert data["max_items"] == 100
+    assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_coordinate_count_view_with_coordinates(user):
+    """
+    ユーザーにコーディネート（PhotoCoordinate, CustomCoordinate）がある場合のテスト
+    """
+    factory = APIRequestFactory()
+    request = factory.get("/coordinate-count/")
+    force_authenticate(request, user=user)
+
+    view = CoordinateCountView.as_view()
+    response = view(request)
+    response.render()
+
+    data = response.data
+    # ユーザーに関連する PhotoCoordinate と CustomCoordinate の合計件数が current_count に反映される
+    expected_count = (
+        PhotoCoordinate.objects.filter(user=user).count() + CustomCoordinate.objects.filter(user=user).count()
+    )
+    assert data["current_count"] == expected_count
+    assert data["max_items"] == 100
+    assert response.status_code == status.HTTP_200_OK

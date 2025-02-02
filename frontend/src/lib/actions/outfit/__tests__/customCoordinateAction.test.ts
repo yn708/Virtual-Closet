@@ -7,7 +7,6 @@ import {
   customCoordinateUpdateFormSchema,
 } from '@/utils/validations/coordinate-validation';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import {
   customCoordinateCreateAction,
   customCoordinateUpdateAction,
@@ -79,7 +78,6 @@ describe('Coordinate Actions', () => {
 
       expect(registerCoordinateAPI).toHaveBeenCalledWith('custom', mockApiFormData);
       expect(revalidatePath).toHaveBeenCalled();
-      expect(redirect).toHaveBeenCalled();
     });
 
     it('バリデーション失敗時にエラーを返す', async () => {

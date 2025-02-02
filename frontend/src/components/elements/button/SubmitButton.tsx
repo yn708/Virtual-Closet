@@ -28,7 +28,7 @@ const SubmitButton: React.FC<LoadingType & LabelType & BaseButtonProps> = ({
       )}
       {...props}
     >
-      {loading || disabled || pending ? (
+      {loading || pending ? (
         <>
           <SubmitLoading />
         </>

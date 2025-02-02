@@ -3,7 +3,7 @@
 import { registerCoordinateAPI, updateCoordinateAPI } from '@/lib/api/coordinateApi';
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { COORDINATE_CREATE_URL, TOP_URL } from '@/utils/constants';
+import { COORDINATE_CREATE_URL } from '@/utils/constants';
 import {
   getPhotoCoordinateFormFields,
   photoCoordinateFormData,
@@ -13,7 +13,6 @@ import {
   photoCoordinateUpdateFormSchema,
 } from '@/utils/validations/coordinate-validation';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 /* ----------------------------------------------------------------
 フォトコーディネート登録アクション
@@ -36,9 +35,31 @@ export async function photoCoordinateCreateAction(
   }
 
   const { apiFormData } = photoCoordinateFormData(validatedFields.data);
-  await registerCoordinateAPI('photo', apiFormData);
-  revalidatePath(COORDINATE_CREATE_URL);
-  redirect(TOP_URL);
+  try {
+    await registerCoordinateAPI('photo', apiFormData);
+    revalidatePath(COORDINATE_CREATE_URL);
+    return {
+      message: null,
+      errors: null,
+      success: true,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const errorData = JSON.parse(error.message);
+      const errorMessage = errorData.non_field_errors?.[0];
+
+      return {
+        message: errorMessage,
+        errors: null,
+        success: false,
+      };
+    }
+    return {
+      message: null,
+      errors: null,
+      success: false,
+    };
+  }
 }
 
 /* ----------------------------------------------------------------

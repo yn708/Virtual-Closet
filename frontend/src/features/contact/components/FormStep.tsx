@@ -3,10 +3,10 @@ import CheckboxField from '@/components/elements/form/checkbox/CheckboxFormField
 import FloatingLabelInput from '@/components/elements/form/input/FloatingLabelInput';
 import FloatingLabelTextarea from '@/components/elements/form/input/FloatingLabelTextarea';
 import FloatingLabelSelect from '@/components/elements/form/select/FloatingLabelSelect';
+import NormalLink from '@/components/elements/link/NormalLink';
 import { PRIVACY_URL } from '@/utils/constants';
 import { SUBJECT_OPTIONS } from '@/utils/data/selectData';
 import type { FormStepProps } from '../types';
-import NormalLink from '@/components/elements/link/NormalLink';
 
 const FormStep = ({
   isSession,

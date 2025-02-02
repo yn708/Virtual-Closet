@@ -1,9 +1,14 @@
 'use client';
 
 import { useToast } from '@/hooks/use-toast';
-import { deleteCoordinateAPI, fetchCoordinateListAPI } from '@/lib/api/coordinateApi';
+import {
+  deleteCoordinateAPI,
+  fetchCoordinateCountAPI,
+  fetchCoordinateListAPI,
+} from '@/lib/api/coordinateApi';
+import type { CountDataType } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type {
   CoordinateCache,
   CoordinateCategory,
@@ -42,7 +47,31 @@ export const useCoordinates = (): {
 
   const [isInitialLoading, setIsInitialLoading] = useState(false); // 初回データ取得Loading
   const [isLoadingMore, setIsLoadingMore] = useState(false); // 追加データ取得Loading
+  const [countData, setCountData] = useState<CountDataType | null>(null); // アイテムのカウント（残りの登録可能アイテムに使用）
+
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const response = await fetchCoordinateCountAPI();
+        setCountData(response);
+      } catch (error) {
+        console.error('アイテムカウント取得エラー:', error);
+      }
+    };
+    fetchCount();
+  }, []);
+
+  // カウント数の更新
+  const updateCount = async () => {
+    try {
+      const response = await fetchCoordinateCountAPI();
+      setCountData(response);
+    } catch (error) {
+      console.error('カウント更新エラー:', error);
+    }
+  };
 
   /**
    * フィルタリング関数
@@ -87,6 +116,7 @@ export const useCoordinates = (): {
     currentItems,
     hasMore: selectedCategory ? hasMore[selectedCategory] : false,
     currentPage: selectedCategory ? currentPage[selectedCategory] : 1,
+    countData,
   };
 
   const handlers: CoordinatesHandlers = {
@@ -181,7 +211,7 @@ export const useCoordinates = (): {
           ...prev,
           [selectedCategory]: prev[selectedCategory].filter((item) => item.id !== id),
         }));
-
+        await updateCount();
         toast({
           title: '削除完了',
           description: 'コーディネートを削除しました。',

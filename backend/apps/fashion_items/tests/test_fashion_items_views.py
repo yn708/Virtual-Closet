@@ -2,8 +2,10 @@ import pytest
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from apps.fashion_items.models import Brand, FashionItem
+from apps.fashion_items.views import FashionItemCountView
 
 
 @pytest.mark.django_db
@@ -195,3 +197,61 @@ class TestFashionItemViewSet:
         response = auth_client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not FashionItem.objects.filter(id=fashion_item.id).exists()
+
+
+@pytest.mark.django_db
+def test_fashion_item_count_view_empty(user):
+    """
+    テスト対象ユーザーにファッションアイテムが1件もない場合のテスト
+    """
+    factory = APIRequestFactory()
+    request = factory.get("/fashion-item-count/")
+    force_authenticate(request, user=user)
+
+    view = FashionItemCountView.as_view()
+    response = view(request)
+    response.render()  # レスポンスデータのレンダリングを実施
+
+    data = response.data
+    # ファッションアイテムがないので current_count は 0 であることを確認
+    assert data["current_count"] == 0
+    assert data["max_items"] == 100
+    assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_fashion_item_count_view_with_items(user, test_image, subcategory):
+    """
+    テスト対象ユーザーにファッションアイテムが存在する場合のテスト
+    """
+    # テスト用の FashionItem を2件作成
+    FashionItem.objects.create(
+        user=user,
+        sub_category=subcategory,
+        image=test_image,
+        is_owned=True,
+        is_old_clothes=False,
+    )
+    FashionItem.objects.create(
+        user=user,
+        sub_category=subcategory,
+        image=test_image,
+        is_owned=True,
+        is_old_clothes=False,
+    )
+
+    factory = APIRequestFactory()
+    request = factory.get("/fashion-item-count/")
+    force_authenticate(request, user=user)
+
+    view = FashionItemCountView.as_view()
+    response = view(request)
+    response.render()
+
+    data = response.data
+    expected_count = FashionItem.objects.filter(user=user).count()
+    # 作成した2件が current_count に反映されていることを確認
+    assert expected_count == 2
+    assert data["current_count"] == expected_count
+    assert data["max_items"] == 100
+    assert response.status_code == status.HTTP_200_OK
