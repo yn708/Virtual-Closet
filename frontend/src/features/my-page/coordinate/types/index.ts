@@ -1,3 +1,4 @@
+import type { CountDataType } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
 
 /*---------------------------------------------
@@ -29,6 +30,7 @@ export interface CoordinatesState {
   currentItems: BaseCoordinate[];
   hasMore: boolean;
   currentPage: number;
+  countData: CountDataType | null;
 }
 
 export interface CoordinatesHandlers {

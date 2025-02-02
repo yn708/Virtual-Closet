@@ -6,7 +6,6 @@ import {
   photoCoordinateUpdateFormSchema,
 } from '@/utils/validations/coordinate-validation';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { photoCoordinateCreateAction, photoCoordinateUpdateAction } from '../photoCoordinateAction';
 
 // モックの設定
@@ -74,7 +73,6 @@ describe('Photo Coordinate Actions', () => {
 
       expect(registerCoordinateAPI).toHaveBeenCalledWith('photo', mockApiFormData);
       expect(revalidatePath).toHaveBeenCalled();
-      expect(redirect).toHaveBeenCalled();
     });
 
     it('バリデーション失敗時にエラーを返す', async () => {

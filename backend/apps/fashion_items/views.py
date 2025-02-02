@@ -65,7 +65,15 @@ class FashionItemViewSet(viewsets.ModelViewSet):
 
     # ファッションアイテム作成
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        item_count = FashionItem.objects.filter(user=user).count()
+        if item_count >= 100:
+            return Response(
+                {"error": "アップロードできるファッションアイテムは最大100件までです。"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.save(user=user)
 
     # カテゴリーごとのアイテム取得
     @action(detail=False, methods=["GET"])
@@ -128,3 +136,16 @@ class FashionItemViewSet(viewsets.ModelViewSet):
 
         self.perform_destroy(instance)
         return Response({"message": "アイテムが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class FashionItemCountView(APIView):
+    """アイテムカウントビュー（制限までどのぐらいか）"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        max_items = 100  # 上限数
+        current_count = FashionItem.objects.filter(user=user).count()
+
+        return Response({"current_count": current_count, "max_items": max_items})

@@ -4,6 +4,7 @@ import TitleLayout from '@/components/layout/TitleLayout';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { resendCodeAction } from '@/lib/actions/auth/resendCodeAction';
+import type { FormState } from '@/types';
 import { initialState } from '@/utils/data/initialState';
 import { useState } from 'react';
 import { useFormState } from 'react-dom';
@@ -15,7 +16,7 @@ const ConfirmContent = ({ email }: { email: string }) => {
   const { toast } = useToast();
 
   // Server Actionに現在のemailを渡す
-  const wrappedResendCodeAction = async (prevState: typeof initialState, formData: FormData) => {
+  const wrappedResendCodeAction = async (prevState: FormState, formData: FormData) => {
     const result = await resendCodeAction(email, prevState, formData);
     if (result.success) {
       setView('input');
@@ -24,10 +25,20 @@ const ConfirmContent = ({ email }: { email: string }) => {
         description: 'メールアドレスをご確認ください。',
       });
     }
+
+    if (!result.success && result.message) {
+      toast({
+        variant: 'destructive',
+        title: 'エラー',
+        description: result.message,
+        duration: 3000,
+      });
+    }
+
     return result;
   };
 
-  const [state, formAction] = useFormState(wrappedResendCodeAction, initialState);
+  const [_state, formAction] = useFormState(wrappedResendCodeAction, initialState);
 
   const viewContents = {
     input: {
@@ -42,12 +53,7 @@ const ConfirmContent = ({ email }: { email: string }) => {
       description: '',
       subDescription: '',
       content: (
-        <AuthForm
-          state={state}
-          submitButtonLabel="認証コードを再送信"
-          mode="login"
-          formAction={formAction}
-        />
+        <AuthForm submitButtonLabel="認証コードを再送信" mode="login" formAction={formAction} />
       ),
       buttonLabel: '戻る',
     },

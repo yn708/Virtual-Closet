@@ -29,12 +29,14 @@ const DeleteItemDialog = ({ onDelete }: { onDelete: () => void }) => {
       description="このアイテムを削除してもよろしいですか？この操作は取り消せません。"
     >
       <DialogFooter>
-        <DialogClose>
-          <Button>キャンセル</Button>
-        </DialogClose>
-        <Button onClick={handleSuccess} className="bg-red-600 hover:bg-red-700">
-          削除
-        </Button>
+        <div className="flex items-start justify-center gap-4">
+          <DialogClose>
+            <Button>キャンセル</Button>
+          </DialogClose>
+          <Button onClick={handleSuccess} className="bg-red-600 hover:bg-red-700">
+            削除
+          </Button>
+        </div>
       </DialogFooter>
     </BaseDialog>
   );

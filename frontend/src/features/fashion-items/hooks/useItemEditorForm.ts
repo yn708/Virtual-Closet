@@ -55,6 +55,14 @@ export const useItemEditorForm = ({ initialData, onSuccess }: UseItemEditorFormP
       clearImage();
       router.push(TOP_URL);
     }
+    if (!result.success && result.message) {
+      toast({
+        variant: 'destructive',
+        title: 'エラー',
+        description: result.message,
+        duration: 3000,
+      });
+    }
     return result;
   };
 

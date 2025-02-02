@@ -6,13 +6,16 @@ import {
 } from '@/lib/actions/outfit/photoCoordinateAction';
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
+import { TOP_URL } from '@/utils/constants';
 import { initialState } from '@/utils/data/initialState';
+import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import type { CoordinateEditTypes } from '../types';
 
 export const usePhotoCoordinateForm = ({ initialData, onSuccess }: CoordinateEditTypes) => {
   const { toast } = useToast();
   const { isProcessing, preview, clearImage } = useImage();
+  const router = useRouter();
 
   const handleFormAction = async (
     prevState: FormState | FormStateCoordinateUpdate,
@@ -50,6 +53,15 @@ export const usePhotoCoordinateForm = ({ initialData, onSuccess }: CoordinateEdi
     const result = await photoCoordinateCreateAction(prevState, formData);
     if (result.success) {
       clearImage();
+      router.push(TOP_URL);
+    }
+    if (!result.success && result.message) {
+      toast({
+        variant: 'destructive',
+        title: 'エラー',
+        description: result.message,
+        duration: 3000,
+      });
     }
     return result;
   };

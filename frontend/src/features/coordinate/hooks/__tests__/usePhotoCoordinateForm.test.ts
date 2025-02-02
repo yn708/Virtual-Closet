@@ -9,9 +9,15 @@ import {
 } from '@/lib/actions/outfit/photoCoordinateAction';
 import type { BaseCoordinate } from '@/types/coordinate';
 import { renderHook } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 import { usePhotoCoordinateForm } from '../usePhotoCoordinateForm';
 
 // モックの設定
+// useRouter をモックする
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+}));
+
 jest.mock('@/context/ImageContext', () => ({
   useImage: jest.fn(),
 }));
@@ -37,6 +43,15 @@ jest.mock('react-dom', () => {
       return [initialState, formAction];
     }),
   };
+});
+
+beforeEach(() => {
+  jest.clearAllMocks();
+
+  // useRouter のモックを明示的に設定
+  (useRouter as jest.Mock).mockReturnValue({
+    push: jest.fn(), // ここで push を定義
+  });
 });
 
 describe('usePhotoCoordinateForm', () => {

@@ -71,6 +71,7 @@ export const BRAND_SEARCH_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}brands/searc
 export const FASHION_ITEM_METADATA_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}metadata/`;
 export const FASHION_ITEMS_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}items/`;
 export const FASHION_ITEMS_BY_CATEGORY_ENDPOINT = `${FASHION_ITEMS_ENDPOINT}by_category/?category_id=`;
+export const FASHION_ITEMS_COUNT_ENDPOINT = `${BASE_FASHION_ITEMS_ENDPOINT}count`;
 
 // コーディネート関連
 export const BASE_COORDINATE_ENDPOINT = '/api/coordinate/';
@@ -78,6 +79,7 @@ export const BASE_COORDINATE_ENDPOINT = '/api/coordinate/';
 export const COORDINATE_METADATA_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}metadata/`;
 export const COORDINATE_CREATE_PHOTO_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}photo-coordination/`;
 export const COORDINATE_CREATE_CUSTOM_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}custom-coordination/`;
+export const COORDINATE_COUNT_ENDPOINT = `${BASE_COORDINATE_ENDPOINT}count`;
 
 /* ----------------------------------------------------------------
 URL

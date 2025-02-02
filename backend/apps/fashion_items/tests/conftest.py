@@ -5,11 +5,22 @@ import uuid
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import CustomUser
 from apps.fashion_items.models import Brand, Category, Color, Design, FashionItem, PriceRange, Season, SubCategory
+
+
+@pytest.fixture
+def dummy_request(user):
+    """
+    ダミーのリクエストオブジェクトを生成し、userを設定して返すフィクスチャ
+    """
+    factory = APIRequestFactory()
+    request = factory.get("/")
+    request.user = user
+    return request
 
 
 @pytest.fixture(autouse=True)

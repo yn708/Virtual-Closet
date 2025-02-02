@@ -54,3 +54,16 @@ export interface OnSuccessType {
 export interface OnClickType {
   onClick?: () => void;
 }
+
+/* ----------------------------------------------------------------
+カウントAPI
+------------------------------------------------------------------ */
+// 登録済みアイテムのカウントと残りの登録可能数
+export interface CountDataType {
+  current_count: number;
+  max_items: number;
+}
+
+export interface CountData {
+  countData: CountDataType;
+}

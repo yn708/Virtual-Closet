@@ -1,10 +1,11 @@
 'use server';
 
-import type { Brand, FashionItem, MetaDataType } from '@/types';
+import type { Brand, CountDataType, FashionItem, MetaDataType } from '@/types';
 import {
   BRAND_SEARCH_ENDPOINT,
   FASHION_ITEM_METADATA_ENDPOINT,
   FASHION_ITEMS_BY_CATEGORY_ENDPOINT,
+  FASHION_ITEMS_COUNT_ENDPOINT,
   FASHION_ITEMS_ENDPOINT,
 } from '@/utils/constants';
 import { baseFetchAuthAPI } from './baseApi';
@@ -71,4 +72,11 @@ export async function deleteFashionItemAPI(id: string) {
   return await baseFetchAuthAPI(endpoint, {
     method: 'DELETE',
   });
+}
+
+/* ----------------------------------------------------------------
+ファッションアイテムの登録済み個数取得
+------------------------------------------------------------------ */
+export async function fetchFashionCountAPI(): Promise<CountDataType> {
+  return await baseFetchAuthAPI(FASHION_ITEMS_COUNT_ENDPOINT);
 }

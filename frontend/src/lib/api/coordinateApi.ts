@@ -1,8 +1,10 @@
 'use server';
 
 import type { InitialItems } from '@/features/my-page/coordinate/types';
+import type { CountDataType } from '@/types';
 import type { BaseCoordinate, CoordinateMetaDataType } from '@/types/coordinate';
 import {
+  COORDINATE_COUNT_ENDPOINT,
   COORDINATE_CREATE_CUSTOM_ENDPOINT,
   COORDINATE_CREATE_PHOTO_ENDPOINT,
   COORDINATE_METADATA_ENDPOINT,
@@ -76,4 +78,11 @@ export async function deleteCoordinateAPI(type: CoordinateType, id: string) {
   return baseFetchAuthAPI(getEndpoint(type, id), {
     method: 'DELETE',
   });
+}
+
+/* ----------------------------------------------------------------
+コーディネートの登録済み個数取得
+------------------------------------------------------------------ */
+export async function fetchCoordinateCountAPI(): Promise<CountDataType> {
+  return await baseFetchAuthAPI(COORDINATE_COUNT_ENDPOINT);
 }

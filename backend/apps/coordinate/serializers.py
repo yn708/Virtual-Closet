@@ -34,6 +34,18 @@ class BaseCoordinateSerializer(serializers.ModelSerializer):
     scenes = PrimaryKeyRelatedField(many=True, queryset=Scene.objects.all(), required=False)
     tastes = PrimaryKeyRelatedField(many=True, queryset=Taste.objects.all(), required=False)
 
+    def validate(self, data):
+        """全コーディネートの合計が100件を超えないようにバリデーション"""
+        user = self.context["request"].user
+        photo_coordinate_count = PhotoCoordinate.objects.filter(user=user).count()
+        custom_coordinate_count = CustomCoordinate.objects.filter(user=user).count()
+        current_count = photo_coordinate_count + custom_coordinate_count
+
+        if current_count >= 100:
+            raise serializers.ValidationError("アップロードできるコーディネートは最大100件までです。")
+
+        return data
+
     def validate_scenes(self, value):
         if len(value) > 3:
             raise serializers.ValidationError("シーンは最大3つまで選択可能です。")

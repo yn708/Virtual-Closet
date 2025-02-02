@@ -1,4 +1,4 @@
-import { Calendar, Heart, Plus, Sparkles, UserCog, Users, Wand2 } from 'lucide-react';
+import { Calendar, CheckCircle2, Heart, Plus, Sparkles, UserCog, Users } from 'lucide-react';
 
 /*------------------------------------------------------------------
 WELCOME Component
@@ -8,61 +8,61 @@ export const TUTORIAL_STEPS = [
     title: 'Virtual Closetへようこそ',
     description: 'まずは2つの簡単なステップから始めましょう',
     content: (
-      <div className="space-y-6 p-4">
+      <div className="space-y-8 p-6">
         {/* 利用可能な機能 */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
                 title: '1. アイテムを登録',
                 icon: <Plus className="size-6 text-blue-600" />,
-                description: 'お手持ちのアイテム登録',
+                description: 'お手持ちのアイテムをカメラまたはアルバムから登録できます',
               },
               {
                 title: '2. コーディネートを作成',
                 icon: <UserCog className="size-6 text-blue-600" />,
-                description: '登録したアイテムを組み合わせてコーディネートを作成（もしくは画像）',
+                description: '登録したアイテムを組み合わせて、あなただけのコーディネートを作成',
               },
             ].map((step, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-black p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded-lg shrink-0">
-                    {step.icon}
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-xl">{step.icon}</div>
+                  <div>
+                    <h4 className="font-medium text-lg mb-2">{step.title}</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {step.description}
+                    </p>
                   </div>
-                  <h4 className="font-medium">{step.title}</h4>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
+      </div>
+    ),
+  },
+  {
+    title: '画像アップロードに枚数制限があります',
 
-        {/* 開発中の機能 */}
-        <div className="mt-6">
-          <h3 className="font-medium text-slate-600 dark:text-slate-400 mb-3">
-            <span className="bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full text-sm">
-              追加予定の機能
-            </span>
-          </h3>
-          <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-900">
-            <div className="flex items-center gap-3">
-              <div className="p-1.5 bg-white dark:bg-black rounded-lg shrink-0">
-                <Wand2 className="size-5 text-slate-400" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-medium text-slate-700 dark:text-slate-300">
-                  AIコーディネート提案
-                </h4>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  最適なコーディネートを提案します
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+    content: (
+      <div className="w-full p-10">
+        {/* Free Plan */}
+        <ul className="space-y-4">
+          {['ファッションアイテムの登録（100枚まで）', 'コーディネート画像の保存（100枚まで）'].map(
+            (feature, index) => (
+              <li key={index} className="flex items-start gap-3">
+                <CheckCircle2 className="size-5 text-blue-500 shrink-0 mt-1" />
+                <span className="text-gray-600">{feature}</span>
+              </li>
+            ),
+          )}
+          <li className="text-gray-600">
+            ※ 無制限プランは今後追加予定。 内容変更がある可能性があります。
+          </li>
+        </ul>
       </div>
     ),
   },

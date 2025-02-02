@@ -1,5 +1,6 @@
 import type { ItemStyle } from '@/features/coordinate/types';
 import type { CategoryCache, FashionItemFilters } from '@/features/my-page/fashion-item/types';
+import type { CountDataType } from './common';
 import type { FashionItem } from './fashion-item';
 
 /* ----------------------------------------------------------------
@@ -35,6 +36,7 @@ export interface FashionItemsState {
   currentItems: FashionItem[];
   hasMore: boolean;
   currentPage: number;
+  countData: CountDataType | null;
 }
 
 // ハンドラーの型定義
