@@ -1,6 +1,5 @@
 import json
 
-from django.core.files.storage import default_storage
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -95,10 +94,11 @@ class PhotoCoordinateViewSet(ModelViewSet):
         if instance.user != request.user:
             return Response({"error": "このコーディネートを削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
 
-        # 画像の削除処理
+        # 画像の削除処理：ファイルフィールドのストレージ経由で実施
         if instance.image:
-            if default_storage.exists(instance.image.name):
-                default_storage.delete(instance.image.name)
+            storage = instance.image.storage
+            if storage.exists(instance.image.name):
+                storage.delete(instance.image.name)
 
         self.perform_destroy(instance)
         return Response({"message": "コーディネートが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)
@@ -216,10 +216,11 @@ class CustomCoordinateViewSet(ModelViewSet):
         if instance.user != request.user:
             return Response({"error": "このコーディネートを削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
 
-        # 画像の削除処理
+        # 画像の削除処理：ファイルフィールドのストレージ経由で実施
         if instance.image:
-            if default_storage.exists(instance.image.name):
-                default_storage.delete(instance.image.name)
+            storage = instance.image.storage
+            if storage.exists(instance.image.name):
+                storage.delete(instance.image.name)
 
         self.perform_destroy(instance)
         return Response({"message": "コーディネートが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)

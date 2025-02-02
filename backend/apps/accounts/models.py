@@ -6,6 +6,7 @@ from django.db import models
 from apps.accounts.managers.auth_manager import CustomUserManager
 from apps.accounts.mixins.confirmation_code_mixin import ConfirmationCodeMixin
 from core.mixins.timestamp_mixin import TimestampMixin
+from core.utils.storages import CustomStorage
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin, TimestampMixin, ConfirmationCodeMixin):
@@ -36,7 +37,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimestampMixin, Confirmatio
         null=True,
         blank=True,
     )
-    profile_image = models.ImageField("プロフィール画像", upload_to="profile_images/", null=True, blank=True)
+    profile_image = models.ImageField(
+        "プロフィール画像", upload_to="profile_images/", storage=CustomStorage(), null=True, blank=True
+    )
     height = models.PositiveIntegerField("身長(cm)", null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(

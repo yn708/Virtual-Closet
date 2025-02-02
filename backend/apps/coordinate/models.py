@@ -3,6 +3,7 @@ from django.db import models
 from apps.accounts.models import CustomUser
 from apps.fashion_items.models import FashionItem, Season
 from core.mixins.timestamp_mixin import TimestampMixin
+from core.utils.storages import CustomStorage
 
 
 # シーン（例：休日）
@@ -24,7 +25,7 @@ class Taste(models.Model):
 # 写真投稿用コーディネートモデル
 class PhotoCoordinate(TimestampMixin, models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="coordinations/photo")
+    image = models.ImageField(upload_to="coordinations/photo", storage=CustomStorage())
     seasons = models.ManyToManyField(Season, blank=True)
     scenes = models.ManyToManyField(Scene, blank=True)
     tastes = models.ManyToManyField(Taste, blank=True)
@@ -36,7 +37,10 @@ class PhotoCoordinate(TimestampMixin, models.Model):
 # コーディネートモデル（カスタマイズ用）
 class CustomCoordinate(TimestampMixin, models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="coordinations/custom/")
+    image = models.ImageField(
+        upload_to="coordinations/custom/",
+        storage=CustomStorage(),
+    )
     background = models.CharField(max_length=50, default="bg-white")
     seasons = models.ManyToManyField(Season, blank=True)
     scenes = models.ManyToManyField(Scene, blank=True)
