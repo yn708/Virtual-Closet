@@ -3,6 +3,7 @@ from django.db import models
 
 from apps.accounts.models import CustomUser
 from core.mixins.timestamp_mixin import TimestampMixin
+from core.utils.storages import CustomStorage
 
 """
 コーディネート自動提案において、
@@ -89,7 +90,7 @@ class FashionItem(TimestampMixin, models.Model):
     price_range = models.ForeignKey(PriceRange, on_delete=models.DO_NOTHING, null=True, blank=True)  # 価格未選択可能
     design = models.ForeignKey(Design, on_delete=models.DO_NOTHING, null=True, blank=True)  # デザイン未選択可能
     main_color = models.ForeignKey(Color, on_delete=models.DO_NOTHING, null=True, blank=True)  # カラー未選択可能
-    image = models.ImageField(upload_to="fashion_item/")
+    image = models.ImageField(upload_to="fashion_item/", storage=CustomStorage())
     is_owned = models.BooleanField(default=True)
     is_old_clothes = models.BooleanField(default=False)
 

@@ -11,7 +11,7 @@ const nextConfig = {
     formats: ['image/webp'],
     domains:
       process.env.NODE_ENV === 'production'
-        ? ['d317u35a9lh557.cloudfront.net']
+        ? ['d2omfeuzdtuar5.cloudfront.net']
         : ['localhost', '127.0.0.1'], // 開発環境では両方必要
     unoptimized: process.env.NODE_ENV === 'development', // 開発環境では画像最適化をスキップ
   },

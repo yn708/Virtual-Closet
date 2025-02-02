@@ -1,4 +1,3 @@
-from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, status, viewsets
@@ -120,10 +119,12 @@ class FashionItemViewSet(viewsets.ModelViewSet):
 
         if instance.user != request.user:
             return Response({"error": "このアイテムを削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
-        # 画像の削除処理
+
+        # 画像の削除処理（ファイルフィールドに設定されたストレージ経由で削除）
         if instance.image:
-            if default_storage.exists(instance.image.name):
-                default_storage.delete(instance.image.name)
+            storage = instance.image.storage
+            if storage.exists(instance.image.name):
+                storage.delete(instance.image.name)
 
         self.perform_destroy(instance)
         return Response({"message": "アイテムが正常に削除されました"}, status=status.HTTP_204_NO_CONTENT)

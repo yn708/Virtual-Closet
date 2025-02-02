@@ -1,4 +1,3 @@
-from django.core.files.storage import default_storage
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import (
@@ -177,10 +176,11 @@ class FashionItemSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         # 画像フィールドの処理
         if "image" in validated_data:
-            # 古い画像が存在し、新しい画像が異なる場合は古い画像を削除
+            # 既存の画像が存在し、新しい画像と異なる場合は古い画像を削除
             if instance.image and instance.image != validated_data["image"]:
-                if default_storage.exists(instance.image.name):
-                    default_storage.delete(instance.image.name)
+                storage = instance.image.storage
+                if storage.exists(instance.image.name):
+                    storage.delete(instance.image.name)
             instance.image = validated_data["image"]
 
         # 多対多フィールドの処理

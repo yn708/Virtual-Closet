@@ -28,9 +28,8 @@ const SubmitButton: React.FC<LoadingType & LabelType & BaseButtonProps> = ({
       )}
       {...props}
     >
-      {loading ? (
+      {loading || disabled || pending ? (
         <>
-          <div className="opacity-0">{label}</div>
           <SubmitLoading />
         </>
       ) : (

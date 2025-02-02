@@ -85,11 +85,8 @@ URL
 // バックエンド
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-// 開発環境では完全なURLが必要
-export const IMAGE_URL =
-  process.env.NODE_ENV === 'development'
-    ? BACKEND_URL
-    : `https://${process.env.AWS_CLOUDFRONT_DOMAIN}`;
+// 画像のパスを開発時はバックエンドURL、本番環境はS3,CF使用なので不要
+export const IMAGE_URL = process.env.NODE_ENV === 'development' ? BACKEND_URL : '';
 
 // トップ
 // 一旦my-closetをTOP_URLをmy-closetとして使用

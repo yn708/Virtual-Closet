@@ -1,4 +1,3 @@
-from django.core.files.storage import default_storage
 from rest_framework import serializers
 
 from apps.accounts.constants import IMAGE_SIZE_ERROR, MAX_IMAGE_SIZE
@@ -38,8 +37,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     def _handle_profile_image_deletion(self, instance):
         """プロフィール画像の削除処理"""
         if instance.profile_image:
-            if default_storage.exists(instance.profile_image.name):
-                default_storage.delete(instance.profile_image.name)
+            # ファイルの削除はモデルのフィールドで指定したストレージ経由で実施
+            instance.profile_image.storage.delete(instance.profile_image.name)
             instance.profile_image = None
 
     def update(self, instance, validated_data):
