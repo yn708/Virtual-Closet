@@ -1,8 +1,8 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
-import dj_database_url
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -206,7 +206,17 @@ if DEBUG:  # 開発環境
 
 else:  # 本番環境
     # -------------------- データベース設定（本番環境） --------------------
-    DATABASES = {"default": dj_database_url.parse(env("DATABASE_URL"))}
+    tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": tmpPostgres.path.replace("/", ""),
+            "USER": tmpPostgres.username,
+            "PASSWORD": tmpPostgres.password,
+            "HOST": tmpPostgres.hostname,
+            "PORT": 5432,
+        }
+    }
 
     # -------------------- Email設定（本番環境） --------------------
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

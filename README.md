@@ -107,4 +107,4 @@ Email・Google アカウントで簡単に作成できます。
 
 ## インフラ構成図
 
-![Image](https://github.com/user-attachments/assets/2be33336-2cd2-4fe0-9bf9-bb5ec73c7338)
+![Image](https://github.com/user-attachments/assets/57bf03a7-541a-4988-bdba-325f36e0f76c)
