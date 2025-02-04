@@ -68,6 +68,7 @@ describe('useFilterSheet', () => {
 
     expect(result.current.state.isOpen).toBe(false);
     expect(result.current.state.tempFilters).toEqual(mockProps.initialFilters);
+    expect(result.current.state.appliedFiltersCount).toBe(0);
   });
 
   it('シートを開閉した時に一時フィルターがリセットされること', () => {
@@ -154,7 +155,7 @@ describe('useFilterSheet', () => {
       result.current.handlers.handleApplyFilters();
     });
 
-    // カテゴリーが変更されているため、onCategoryChangeが呼ばれる
+    // カテゴリーが変更されているため onCategoryChange が呼ばれる
     expect(mockProps.onCategoryChange).toHaveBeenCalledWith('2');
     expect(mockProps.onFilterApply).toHaveBeenCalledWith({
       category: '2',
@@ -183,7 +184,7 @@ describe('useFilterSheet', () => {
     expect(mockProps.onFilterApply).toHaveBeenCalled();
   });
 
-  it('リセット時にデフォルト値が正しく適用されること', () => {
+  it('リセット時にデフォルト値が正しく適用され、コールバックは呼ばれないこと', () => {
     const mockProps = {
       initialFilters: { category: '1', colors: ['red'], sizes: ['small'] },
       onFilterApply: jest.fn(),
@@ -197,8 +198,44 @@ describe('useFilterSheet', () => {
       result.current.handlers.handleReset();
     });
 
-    expect(result.current.state.tempFilters).toEqual(mockConfig.filterHandlers.defaultFilters);
-    expect(mockProps.onFilterApply).toHaveBeenCalledWith(mockConfig.filterHandlers.defaultFilters);
-    expect(mockProps.onCategoryChange).toHaveBeenCalledWith('');
+    // defaultFilters の内容に、現在の category ('1') を維持していることを検証
+    expect(result.current.state.tempFilters).toEqual({
+      category: '1',
+      colors: [],
+      sizes: [],
+    });
+    // リセット時はコールバックは呼び出さない
+    expect(mockProps.onFilterApply).not.toHaveBeenCalled();
+    expect(mockProps.onCategoryChange).not.toHaveBeenCalled();
+  });
+
+  it('appliedFiltersCount がフィルター適用時に更新されること', () => {
+    const onClose = jest.fn();
+    (useIsOpen as jest.Mock).mockReturnValue({
+      isOpen: true,
+      onClose,
+      onToggle: jest.fn(),
+    });
+
+    const mockProps = {
+      initialFilters: { category: '1', colors: [], sizes: [] },
+      onFilterApply: jest.fn(),
+      onCategoryChange: jest.fn(),
+      config: mockConfig,
+    };
+
+    const { result } = renderHook(() => useFilterSheet(mockProps));
+
+    act(() => {
+      result.current.handlers.handleFilterChange('colors', ['blue']);
+      result.current.handlers.handleFilterChange('sizes', ['small']);
+    });
+
+    act(() => {
+      result.current.handlers.handleApplyFilters();
+    });
+
+    // category 以外のフィルターが両方 truthy になっているので count は 2 になる
+    expect(result.current.state.appliedFiltersCount).toBe(2);
   });
 });

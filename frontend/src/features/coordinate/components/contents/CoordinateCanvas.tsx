@@ -1,7 +1,7 @@
 'use client';
 
 import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { Maximize2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
@@ -42,7 +42,7 @@ const CoordinateCanvas = () => {
     >
       {selectedItems?.map((item) => {
         // アイテムごとの表示設定
-        const imageUrl = `${BACKEND_URL}${item.image.replace('http://backend:8000', '')}`;
+        const imageUrl = `${IMAGE_URL}${item.image.replace('http://backend:8000', '')}`;
         const style = itemStyles[item.id] || {
           zIndex: 0,
           scale: 1,

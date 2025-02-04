@@ -17,7 +17,7 @@ export async function resendCodeAction(
 
   if (!validatedFields.success) {
     return {
-      message: 'バリデーションエラー',
+      message: '入力内容に誤りがあります。',
       errors: validatedFields.error.flatten().fieldErrors,
       success: false,
     };

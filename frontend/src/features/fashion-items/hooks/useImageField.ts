@@ -1,15 +1,24 @@
+'use client';
 import { useImage } from '@/context/ImageContext';
 import { useImageSelection } from '@/hooks/image/useImageSelection';
+import { useToast } from '@/hooks/use-toast';
+import { useIsOpen } from '@/hooks/utils/useIsOpen';
+import { ERROR_DESCRIPTION_MESSAGE, ERROR_MESSAGE } from '@/utils/constants';
+import { createImagePreview } from '@/utils/imageUtils';
 import { useEffect, useRef, useState } from 'react';
 
 export const useImageField = () => {
-  const { image, minimumImageSet, optimizationProcess, removeBgProcess } = useImage();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [normalImage, setNormalImage] = useState<File | null>(null);
   const [removedBgImage, setRemovedBgImage] = useState<File | null>(null);
   const [isShowingRemovedBg, setIsShowingRemovedBg] = useState(false);
+  const [imageToEdit, setImageToEdit] = useState<string | null>(null);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { image, minimumImageSet, optimizationProcess, removeBgProcess } = useImage();
+  const { isOpen, onClose, onToggle } = useIsOpen();
   const { handleFileChange } = useImageSelection();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!image) return;
@@ -59,8 +68,17 @@ export const useImageField = () => {
 
     // まだ背景除去画像が生成されていない場合
     if (!removedBgImage) {
-      await removeBgProcess(normalImage);
-      setIsShowingRemovedBg(true);
+      const result = await removeBgProcess(normalImage);
+      if (result instanceof File) {
+        setIsShowingRemovedBg(true);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: '背景除去機能に' + ERROR_MESSAGE,
+          description: ERROR_DESCRIPTION_MESSAGE,
+        });
+        return false;
+      }
       return;
     }
 
@@ -74,11 +92,43 @@ export const useImageField = () => {
     }
   };
 
-  return {
+  const handleCropOpen = async () => {
+    const previewUrl = await createImagePreview(image as File);
+    setImageToEdit(previewUrl);
+    onToggle();
+  };
+
+  const handleCropComplete = async (croppedFile: File) => {
+    minimumImageSet(croppedFile);
+    onClose();
+    setImageToEdit(null);
+  };
+
+  const handleCropClose = async () => {
+    onClose();
+    setImageToEdit(null);
+  };
+
+  // state, handlersにまとめる
+  const state = {
     fileInputRef,
+    isShowingRemovedBg,
+    isOpen,
+    imageToEdit,
+  };
+
+  const handlers = {
     handleFileSelect,
     handleChangeClick,
     handleToggleImage,
-    isShowingRemovedBg,
+    handleCropComplete,
+    handleCropClose,
+    onToggle,
+    handleCropOpen,
+  };
+
+  return {
+    state,
+    handlers,
   };
 };

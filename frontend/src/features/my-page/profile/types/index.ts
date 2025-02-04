@@ -30,6 +30,7 @@ export interface UseImageCropProps {
   image: string;
   onCropComplete: (file: File) => void;
   onClose: () => void;
+  cropShape?: 'rect' | 'round';
 }
 
 /*--------------------------------------------------------
@@ -60,9 +61,12 @@ ImageCropDialog
 --------------------------------------------------------*/
 export interface ImageCropDialogProps {
   open: boolean; // ダイアログが開いているかどうかを示す
+  onToggle: (prev: boolean) => void;
   onClose: () => void; // ダイアログを閉じるための関数
   image: string; // クロップする画像のURL
   onCropComplete: (image: File) => void; // クロップ完了後に呼ばれるコールバック
+  aspect?: number; // アスペクト比指定
+  cropShape?: 'rect' | 'round'; // 形指定
 }
 
 export interface CroppedArea {

@@ -1,6 +1,7 @@
 import LinkWithText from '@/components/elements/link/LinkWithText';
 import DividerWithText from '@/components/elements/utils/DividerWithText';
 import SocialAuthButtons from '@/features/auth/components/elements/button/SocialAuthButtons';
+import LoginErrorMessage from '@/features/auth/components/elements/content/LoginErrorMessage';
 import LoginForm from '@/features/auth/components/elements/form/LoginForm';
 import AuthPageTemplate from '@/features/auth/components/layout/AuthPageTemplate';
 import { SIGN_UP_URL } from '@/utils/constants';
@@ -14,6 +15,8 @@ export default function LoginPage() {
   return (
     <AuthPageTemplate title="ログイン" description="ログインして、virtual closetを始めましょう。">
       <div>
+        <LoginErrorMessage />
+
         <SocialAuthButtons text="ログイン" />
         <DividerWithText className="text-sm font-medium py-4" text="または" />
         <LoginForm />

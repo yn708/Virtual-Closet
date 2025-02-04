@@ -1,8 +1,8 @@
+import { useImage } from '@/context/ImageContext';
 import type { UserDetailType } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { useProfileForm } from '../../../hooks/useProfileForm';
 import UserProfileForm from '../UserProfileForm';
-import { useImage } from '@/context/ImageContext';
 
 // useImageのモック作成
 jest.mock('@/context/ImageContext', () => ({
@@ -90,7 +90,7 @@ describe('UserProfileForm', () => {
 
   // 基本的なレンダリングテスト
   it('renders form with all required components', () => {
-    render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
+    render(<UserProfileForm userDetail={mockUserDetail} onClose={jest.fn()} />);
 
     // フォームの存在確認（data-testidを使用）
     expect(screen.getByTestId('profile-fields')).toBeInTheDocument();
@@ -108,7 +108,7 @@ describe('UserProfileForm', () => {
       formAction: mockFormAction,
     });
 
-    render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
+    render(<UserProfileForm userDetail={mockUserDetail} onClose={jest.fn()} />);
 
     // formActionが正しく設定されているかの確認
     const form = screen.getByTestId('profile-fields').closest('form');
@@ -123,7 +123,7 @@ describe('UserProfileForm', () => {
       handleDelete: mockHandleDelete,
     });
 
-    render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
+    render(<UserProfileForm userDetail={mockUserDetail} onClose={jest.fn()} />);
 
     // 画像削除ボタンのクリックテスト
     screen.getByTestId('image-delete-button').click();
@@ -148,7 +148,7 @@ describe('UserProfileForm', () => {
       state: mockState,
     });
 
-    render(<UserProfileForm userDetail={mockUserDetail} onSuccess={jest.fn()} />);
+    render(<UserProfileForm userDetail={mockUserDetail} onClose={jest.fn()} />);
 
     // ProfileFieldsにステートが正しく渡されているか確認
     const profileFields = screen.getByTestId('profile-fields');

@@ -1,6 +1,6 @@
 import ItemImage from '@/features/my-page/common/components/image/ItemImage';
 import type { FashionItem } from '@/types';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 
 interface SelectableItemProps {
   item: FashionItem;
@@ -9,7 +9,7 @@ interface SelectableItemProps {
 }
 
 const SelectableItem = ({ item, onSelectItem, isSelected }: SelectableItemProps) => {
-  const imageUrl = `${BACKEND_URL}${item.image.replace('http://backend:8000', '')}`;
+  const imageUrl = `${IMAGE_URL}${item.image.replace('http://backend:8000', '')}`;
 
   return (
     <div

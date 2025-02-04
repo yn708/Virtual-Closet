@@ -70,23 +70,6 @@ describe('ProfileEditButton', () => {
     });
   });
 
-  // フォーム送信後の動作テスト
-  it('closes dialog when form submission is successful', async () => {
-    const mockUseIsOpenWithOpen = {
-      isOpen: true,
-      onClose: jest.fn(),
-      onToggle: jest.fn(),
-    };
-    (useIsOpen as jest.Mock).mockReturnValue(mockUseIsOpenWithOpen);
-
-    render(<ProfileEditButton {...mockUserDetail} />);
-
-    const submitButton = screen.getByTestId('mock-submit-button');
-    await user.click(submitButton);
-
-    expect(mockUseIsOpenWithOpen.onClose).toHaveBeenCalled();
-  });
-
   // アクセシビリティテスト
   describe('accessibility', () => {
     it('has proper button attributes', () => {

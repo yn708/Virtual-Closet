@@ -2,7 +2,7 @@ import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import { useCoordinateCanvas } from '@/features/coordinate/hooks/useCoordinateCanvas';
 import type { ItemStyle } from '@/features/coordinate/types';
 import type { FashionItem } from '@/types';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ImageProps } from 'next/image';
 import CoordinateCanvas from '../CoordinateCanvas';
@@ -135,7 +135,7 @@ describe('CoordinateCanvas', () => {
 
   it('選択されたアイテムが表示されること', () => {
     render(<CoordinateCanvas />);
-    const imageUrl = `${BACKEND_URL}${mockItem.image}`;
+    const imageUrl = `${IMAGE_URL}${mockItem.image}`;
     const image = screen.getByAltText('item-image');
     expect(image).toHaveAttribute('src', expect.stringContaining(imageUrl));
   });

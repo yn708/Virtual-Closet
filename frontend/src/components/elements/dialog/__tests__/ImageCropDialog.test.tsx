@@ -1,10 +1,10 @@
+import { useImageCrop } from '@/hooks/image/useImageCrop';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImageCropDialog from '../ImageCropDialog';
-import { useImageCrop } from '../../../hooks/useImageCrop';
 
 // カスタムフックのモック
-jest.mock('../../../hooks/useImageCrop', () => ({
+jest.mock('@/hooks/image/useImageCrop', () => ({
   useImageCrop: jest.fn(),
 }));
 
@@ -81,6 +81,7 @@ describe('ImageCropDialog', () => {
 
   const mockProps = {
     open: true,
+    onToggle: jest.fn(),
     onClose: jest.fn(),
     image: 'test-image.jpg',
     onCropComplete: jest.fn(),

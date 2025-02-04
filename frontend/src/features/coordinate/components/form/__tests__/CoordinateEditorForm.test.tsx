@@ -1,7 +1,7 @@
 import { usePhotoCoordinateForm } from '@/features/coordinate/hooks/usePhotoCoordinateForm';
 import type { FormState } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { render, screen } from '@testing-library/react';
 import CoordinateEditorForm from '../CoordinateEditorForm';
 
@@ -128,7 +128,7 @@ describe('CoordinateEditorForm', () => {
       />,
     );
 
-    const expectedImageUrl = `${BACKEND_URL}/media/test.jpg`;
+    const expectedImageUrl = `${IMAGE_URL}/media/test.jpg`;
     expect(screen.getByTestId('image-form-field')).toHaveTextContent(
       `Preview: ${expectedImageUrl}`,
     );

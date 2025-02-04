@@ -14,6 +14,7 @@ describe('ImageActions', () => {
     isShowingRemovedBg: false,
     onChangeClick: jest.fn(),
     onToggleImage: jest.fn(),
+    onOpenCrop: jest.fn(),
   };
 
   beforeEach(() => {

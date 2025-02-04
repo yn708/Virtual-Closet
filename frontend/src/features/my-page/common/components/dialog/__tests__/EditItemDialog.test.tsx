@@ -17,6 +17,14 @@ jest.mock('next-auth/react', () => ({
   })),
 }));
 
+// useImage のモック（clearImage を含む）
+const mockClearImage = jest.fn();
+jest.mock('@/context/ImageContext', () => ({
+  useImage: jest.fn(() => ({
+    clearImage: mockClearImage,
+  })),
+}));
+
 // APIモックの設定
 jest.mock('@/lib/api/coordinateApi', () => ({
   fetchCoordinateMetaDataAPI: jest.fn(),
@@ -98,7 +106,7 @@ describe('EditItemDialog', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // デフォルトのモック実装
+    // useIsOpen のデフォルトモック実装
     (useIsOpen as jest.Mock).mockReturnValue({
       isOpen: false,
       onClose: jest.fn(),
@@ -120,7 +128,6 @@ describe('EditItemDialog', () => {
 
   it('ファッションアイテム編集モードでレンダリングされること', () => {
     render(<EditItemDialog type="fashion-item" item={mockFashionItem} onUpdate={jest.fn()} />);
-
     expect(screen.getByTestId('edit-button')).toBeInTheDocument();
     expect(screen.getByTestId('base-dialog')).toBeInTheDocument();
   });
@@ -134,7 +141,6 @@ describe('EditItemDialog', () => {
         onUpdate={jest.fn()}
       />,
     );
-
     expect(screen.getByTestId('edit-button')).toBeInTheDocument();
     expect(screen.getByTestId('base-dialog')).toBeInTheDocument();
   });
@@ -144,34 +150,27 @@ describe('EditItemDialog', () => {
     (fetchFashionMetaDataAPI as jest.Mock).mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve(mockMetaData), 100)),
     );
-
     (useIsOpen as jest.Mock).mockReturnValue({
       isOpen: true,
       onClose: jest.fn(),
       onToggle: jest.fn(),
     });
-
     render(<EditItemDialog type="fashion-item" item={mockFashionItem} onUpdate={jest.fn()} />);
-
     expect(screen.getByText('データを取得中...')).toBeInTheDocument();
   });
 
   it('APIエラーが適切に処理されること', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     (fetchFashionMetaDataAPI as jest.Mock).mockRejectedValue(new Error('API Error'));
-
     (useIsOpen as jest.Mock).mockReturnValue({
       isOpen: true,
       onClose: jest.fn(),
       onToggle: jest.fn(),
     });
-
     render(<EditItemDialog type="fashion-item" item={mockFashionItem} onUpdate={jest.fn()} />);
-
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch metadata:', expect.any(Error));
     });
-
     consoleErrorSpy.mockRestore();
   });
 
@@ -181,7 +180,6 @@ describe('EditItemDialog', () => {
       onClose: jest.fn(),
       onToggle: jest.fn(),
     });
-
     render(
       <EditItemDialog
         type="coordinate"
@@ -190,9 +188,23 @@ describe('EditItemDialog', () => {
         onUpdate={jest.fn()}
       />,
     );
-
     await waitFor(() => {
       expect(fetchCustomCoordinateInitialDataAPI).toHaveBeenCalledWith(mockCoordinate.id);
+    });
+  });
+
+  it('初回マウント時に clearImage が呼ばれること', async () => {
+    // useImage のモックで clearImage の呼び出しを監視する
+    const mockOnClose = jest.fn();
+    (useIsOpen as jest.Mock).mockReturnValue({
+      isOpen: false,
+      onClose: mockOnClose,
+      onToggle: jest.fn(),
+    });
+    render(<EditItemDialog type="fashion-item" item={mockFashionItem} onUpdate={jest.fn()} />);
+    // マウント時に一度 clearImage が呼ばれる
+    await waitFor(() => {
+      expect(mockClearImage).toHaveBeenCalledTimes(1);
     });
   });
 });
