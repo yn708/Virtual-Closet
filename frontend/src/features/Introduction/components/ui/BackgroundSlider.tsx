@@ -8,13 +8,19 @@ const BackgroundSlider = () => {
   const dimensionsRef = useRef(DEFAULT_DIMENSIONS);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // サイズ計算ロジックを単純化
+  // しきい値（px）：viewport の高さの変化がこれ未満なら更新しない
+  const HEIGHT_THRESHOLD = 50;
+
+  // サイズ計算ロジック
   const updateDimensions = useCallback(() => {
-    const screenHeight = window.innerHeight;
+    // visualViewport が使える場合はそちらを優先して利用する
+    const screenHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if (Math.abs(screenHeight - dimensionsRef.current.height) < HEIGHT_THRESHOLD) {
+      return;
+    }
     const scale = screenHeight / ORIGINAL_HEIGHT;
     const width = ORIGINAL_WIDTH * scale;
 
-    // DOMの直接操作でパフォーマンス改善
     if (containerRef.current) {
       containerRef.current.style.setProperty('--image-width', `${width}px`);
       const images = containerRef.current.querySelectorAll('.slider-image');
@@ -29,8 +35,11 @@ const BackgroundSlider = () => {
   // useLayoutEffectでちらつき防止
   useLayoutEffect(() => {
     updateDimensions();
+    // 初回レンダリング後、短いタイムアウトを設けて再計測
+    const timeoutId = setTimeout(() => {
+      updateDimensions();
+    }, 300); // 300ms 程度で UI の変化が落ち着くタイミングを狙う
 
-    // デバウンス関数を最適化
     let rafId: number;
     const handleResize = () => {
       cancelAnimationFrame(rafId);
@@ -39,6 +48,7 @@ const BackgroundSlider = () => {
 
     window.addEventListener('resize', handleResize);
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(rafId);
     };
@@ -55,9 +65,8 @@ const BackgroundSlider = () => {
                 alt="Fashion background"
                 fill
                 priority
-                quality={90}
+                unoptimized // 画像の劣化防止のため最適化は無効化
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
               />
             </div>
           ))}
@@ -66,4 +75,5 @@ const BackgroundSlider = () => {
     </div>
   );
 };
+
 export default BackgroundSlider;
