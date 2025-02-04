@@ -4,27 +4,35 @@ import Image from 'next/image';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 const BackgroundSlider = () => {
-  // 再レンダリングを避けるためのrefでサイズ管理
+  // 再レンダリングを避けるためにrefでサイズ管理
   const dimensionsRef = useRef(DEFAULT_DIMENSIONS);
   const containerRef = useRef<HTMLDivElement>(null);
-  // debouncing用のタイマーref
+  // debounce用タイマー
   const debounceTimeout = useRef<number | null>(null);
-  // 初回計測時に決定する画像枚数をstateに保持（その後は固定）
+  // 初回計測時に決定する画像枚数をstateで保持（その後は固定）
   const [imageCount, setImageCount] = useState<number>(0);
 
-  // しきい値：viewportの高さ変化が50px未満なら更新しない
+  // しきい値（タブバーの高さ程度＝50px程度）
   const HEIGHT_THRESHOLD = 50;
 
-  // サイズ計算ロジック（debounce対応）
+  // updateDimensions: 現在の viewport 高さ（visualViewportがあればそちら）とこれまでの最大高さを比較して安定値を求める
   const updateDimensions = useCallback(() => {
-    // visualViewportがあればそちらを利用、それ以外はwindow.innerHeight
-    const screenHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    if (Math.abs(screenHeight - dimensionsRef.current.height) < HEIGHT_THRESHOLD) {
-      return;
+    // 現在の高さ（タブバー隠れているときは大きく、表示時は小さくなる）
+    const rawHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    let stableHeight = dimensionsRef.current.height; // これまでの安定値
+
+    // もし rawHeight の方が大きければ（タブバーが隠れた状態）更新する
+    if (rawHeight > stableHeight) {
+      stableHeight = rawHeight;
+    } else if (stableHeight - rawHeight >= HEIGHT_THRESHOLD) {
+      // もし大幅に下がっている（デバイス回転などで実際に小さくなった場合）は更新する
+      stableHeight = rawHeight;
     }
-    const scale = screenHeight / ORIGINAL_HEIGHT;
+    // stableHeight を用いてスケール計算
+    const scale = stableHeight / ORIGINAL_HEIGHT;
     const width = ORIGINAL_WIDTH * scale;
 
+    // container の CSS 変数や子要素の width を更新
     if (containerRef.current) {
       containerRef.current.style.setProperty('--image-width', `${width}px`);
       const images = containerRef.current.querySelectorAll('.slider-image');
@@ -32,13 +40,12 @@ const BackgroundSlider = () => {
         (image as HTMLElement).style.width = `${width}px`;
       });
     }
-    // 更新後のサイズをrefに保存
-    dimensionsRef.current = { width, height: screenHeight, scale };
+    dimensionsRef.current = { width, height: stableHeight, scale };
 
-    // 初回計測時のみ、必要な画像枚数を計算してstateに固定する
+    // 初回のみ画像枚数を決定する
     if (imageCount === 0) {
-      // たとえば、画面幅を埋めるのに必要な枚数＋1（シームレスなスライド用）
       const viewportWidth = window.innerWidth;
+      // 画面幅に対して必要な画像枚数＋1（シームレス用）
       const count = Math.ceil(viewportWidth / width) + 1;
       setImageCount(count);
     }
@@ -46,12 +53,11 @@ const BackgroundSlider = () => {
 
   useLayoutEffect(() => {
     updateDimensions();
-    // 初回レンダリング後、300ms後に再計測（UIの変化が落ち着くタイミング）
+    // 初回レンダリング後300ms後に再計測（UI変化落ち着き用）
     const timeoutId = setTimeout(() => {
       updateDimensions();
     }, 300);
 
-    // リサイズイベントではdebounceを入れてupdateDimensionsを呼ぶ
     const handleResize = () => {
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
@@ -62,7 +68,6 @@ const BackgroundSlider = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    // visualViewportが利用可能ならそのresizeも監視
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
     }
@@ -78,12 +83,13 @@ const BackgroundSlider = () => {
     };
   }, [updateDimensions]);
 
-  // 画像枚数が未計算の場合は2枚とする
+  // 画像枚数は、計算結果があればその値、なければ2枚
   const count = imageCount > 0 ? imageCount : 2;
 
   return (
     <div className="fixed inset-0 overflow-hidden">
       <div ref={containerRef} className="fixed inset-0 overflow-hidden touch-pan-y">
+        {/* ハードウェアアクセラレーションを強制するため translate3d を指定 */}
         <div className="flex h-screen animate-slide" style={{ transform: 'translate3d(0,0,0)' }}>
           {Array.from({ length: count }).map((_, index) => (
             <div key={index} className="relative shrink-0 slider-image h-screen">
