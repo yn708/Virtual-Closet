@@ -54,8 +54,9 @@ const BackgroundSlider = () => {
               alt="Fashion background"
               fill
               priority={index === 0}
+              quality={90}
               className="object-cover"
-              sizes="100vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
             />
           </div>
         ))}
