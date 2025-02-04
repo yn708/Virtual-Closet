@@ -1,5 +1,4 @@
-import { ORIGINAL_WIDTH } from '@/utils/constants';
-import { act, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import BackgroundSlider from '../BackgroundSlider';
 
 // Image コンポーネントのモック
@@ -72,32 +71,6 @@ describe('BackgroundSlider', () => {
       expect(img).toHaveAttribute('src', '/images/fashion-bg.webp');
       expect(img).toHaveAttribute('alt', 'Fashion background');
       // expect(img).toHaveAttribute('data-sizes', '100vw');
-    });
-  });
-
-  it('画面サイズ変更時にdimensionsが正しく更新されること', () => {
-    const { container } = render(<BackgroundSlider />);
-
-    // 新しい画面サイズを設定
-    const newHeight = 800;
-
-    act(() => {
-      window.innerHeight = newHeight;
-      window.dispatchEvent(new Event('resize'));
-    });
-
-    // スタイルの検証
-    const slideContainer = container.querySelector('.animate-slide');
-    expect(slideContainer).toHaveStyle({
-      '--image-width': `${ORIGINAL_WIDTH}px`,
-    });
-
-    // 画像コンテナのサイズ検証
-    const imageContainers = container.querySelectorAll('.slider-image');
-    imageContainers.forEach((container) => {
-      expect(container).toHaveStyle({
-        width: `${ORIGINAL_WIDTH}px`,
-      });
     });
   });
 

@@ -78,10 +78,12 @@
 }
 
 @keyframes slide {
-  0% {
+  from {
     transform: translateX(0);
+    will-change: transform;
   }
-  100% {
+  to {
     transform: translateX(calc(var(--image-width) * -1));
+    will-change: transform;
   }
 }
