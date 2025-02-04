@@ -1,13 +1,11 @@
-// useImageCrop.test.ts
+import type { CroppedArea } from '@/features/my-page/profile/types';
 import { act, renderHook } from '@testing-library/react';
-import type { CroppedArea } from '../../types';
 import { useImageCrop } from '../useImageCrop';
 
 describe('useImageCrop', () => {
-  // キャンバス関連のモック設定
   let mockCanvasContext: Partial<CanvasRenderingContext2D>;
   let mockCanvas: Partial<HTMLCanvasElement>;
-  // テスト実行前の共通セットアップ
+
   beforeAll(() => {
     // キャンバスコンテキストのモック作成
     mockCanvasContext = {
@@ -23,7 +21,7 @@ describe('useImageCrop', () => {
       toDataURL: jest.fn().mockReturnValue('data:image/png;base64,mockedData'),
     };
 
-    // canvas要素生成のモック化
+    // document.createElement('canvas') のモック化
     const originalCreateElement = document.createElement.bind(document);
     jest.spyOn(document, 'createElement').mockImplementation((tagName: string): HTMLElement => {
       if (tagName === 'canvas') {
@@ -32,7 +30,7 @@ describe('useImageCrop', () => {
       return originalCreateElement(tagName);
     });
 
-    // Image要素のモック化
+    // Image 要素のモック化
     global.Image = class {
       public onload: (() => void) | null = null;
       public src: string = '';
@@ -55,86 +53,76 @@ describe('useImageCrop', () => {
     jest.clearAllMocks();
   });
 
-  // Mock props
+  // モック用の props（cropShape は 'round' を指定）
   const mockProps = {
     image: 'test-image.jpg',
     onCropComplete: jest.fn(),
     onClose: jest.fn(),
+    cropShape: 'round' as const,
   };
 
-  // 初期値の検証テスト
+  // 初期値の検証（crop と zoom）
   it('should initialize with default values', () => {
     const { result } = renderHook(() => useImageCrop(mockProps));
-
     expect(result.current.crop).toEqual({ x: 0, y: 0 });
     expect(result.current.zoom).toBe(1);
   });
 
-  // クロップ位置更新のテスト
+  // crop の更新テスト
   it('should update crop position', () => {
     const { result } = renderHook(() => useImageCrop(mockProps));
-
     act(() => {
       result.current.setCrop({ x: 10, y: 20 });
     });
-
     expect(result.current.crop).toEqual({ x: 10, y: 20 });
   });
 
-  // ズームレベル更新のテスト
+  // zoom の更新テスト
   it('should update zoom level', () => {
     const { result } = renderHook(() => useImageCrop(mockProps));
-
     act(() => {
       result.current.setZoom(2);
     });
-
     expect(result.current.zoom).toBe(2);
   });
 
-  // クロップ完了コールバックのテスト
-  it('should handle onCropCompleteCallback', () => {
-    const { result } = renderHook(() => useImageCrop(mockProps));
-    const mockCroppedArea: CroppedArea = { x: 0, y: 0, width: 100, height: 100 };
-    const mockCroppedAreaPixels: CroppedArea = { x: 0, y: 0, width: 200, height: 200 };
-
-    act(() => {
-      result.current.onCropCompleteCallback(mockCroppedArea, mockCroppedAreaPixels);
-    });
-  });
-
-  // 画像生成処理の正常系テスト
+  // onCropCompleteCallback の直接テストは行わず、createCroppedImage で副作用を確認
   it('should create cropped image and call callbacks', async () => {
     const { result } = renderHook(() => useImageCrop(mockProps));
+    const cropArea: CroppedArea = { x: 0, y: 0, width: 100, height: 100 };
 
-    // クロップエリアの設定
+    // onCropCompleteCallback を呼び出し、内部状態（croppedAreaPixels）を更新する
     act(() => {
-      result.current.onCropCompleteCallback(
-        { x: 0, y: 0, width: 100, height: 100 },
-        { x: 0, y: 0, width: 100, height: 100 },
-      );
+      result.current.onCropCompleteCallback(cropArea, cropArea);
     });
 
+    // createCroppedImage の呼び出し時に、内部で画像の描画や変換が行われ、onCropComplete と onClose が呼ばれることを確認
     await act(async () => {
       await result.current.createCroppedImage();
     });
 
+    // 円形クロップの場合、クリッピング処理が呼ばれているはず
     expect(mockCanvasContext.beginPath).toHaveBeenCalled();
-    expect(mockCanvasContext.arc).toHaveBeenCalled();
+    expect(mockCanvasContext.arc).toHaveBeenCalledWith(
+      50, // canvas.width / 2
+      50, // canvas.height / 2
+      50, // Math.min(canvas.width, canvas.height) / 2 (100 / 2)
+      0,
+      2 * Math.PI,
+    );
     expect(mockCanvasContext.clip).toHaveBeenCalled();
     expect(mockCanvasContext.drawImage).toHaveBeenCalled();
+    // コールバックの呼び出しを確認
     expect(mockProps.onCropComplete).toHaveBeenCalled();
     expect(mockProps.onClose).toHaveBeenCalled();
   });
 
-  // クロップエリアが未設定時のエラー処理テスト
+  // croppedAreaPixels が未設定の場合、createCroppedImage は何も実行しないことを確認
   it('should not create cropped image when croppedAreaPixels is null', async () => {
     const { result } = renderHook(() => useImageCrop(mockProps));
-
     await act(async () => {
       await result.current.createCroppedImage();
     });
-
     expect(mockProps.onCropComplete).not.toHaveBeenCalled();
     expect(mockProps.onClose).not.toHaveBeenCalled();
   });

@@ -1,5 +1,5 @@
 import { removeBackgroundAPI } from '@/lib/api/imageApi';
-import { compressImage, conversionImage } from '@/utils/imageUtils';
+import { compressImage, conversionImage, createImagePreview } from '@/utils/imageUtils';
 import { act, render, renderHook, screen } from '@testing-library/react';
 import { ImageProvider, useImage } from '../ImageContext';
 
@@ -18,6 +18,7 @@ jest.mock('@/utils/imageUtils', () => ({
   compressImage: jest.fn().mockImplementation((file) => Promise.resolve(file)),
   conversionImage: jest.fn().mockImplementation((file) => Promise.resolve(file)),
   dataURLtoFile: jest.fn().mockImplementation(() => new File([''], 'test_removed_bg.png')),
+  createImagePreview: jest.fn().mockImplementation(() => Promise.resolve('mock-url')),
 }));
 
 // URLユーティリティのモック
@@ -181,5 +182,39 @@ describe('ImageProvider', () => {
     }).toThrow('useImage must be used within an ImageProvider');
 
     consoleError.mockRestore();
+  });
+
+  // compressImageProcess のテスト
+  it('handles compressImageProcess correctly', async () => {
+    const { result } = renderHook(() => useImage(), { wrapper: ImageProvider });
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+
+    let returnedFile: File | null = null;
+    await act(async () => {
+      returnedFile = await result.current.compressImageProcess(testFile);
+    });
+
+    // compressImage のモック実装ではそのまま testFile を返す
+    expect(returnedFile).toBe(testFile);
+    expect(compressImage).toHaveBeenCalledWith(testFile);
+    expect(result.current.isProcessing).toBe(false);
+  });
+
+  // createImageUrl のテスト
+  it('handles createImageUrl correctly', async () => {
+    const { result } = renderHook(() => useImage(), { wrapper: ImageProvider });
+    const testFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+
+    let returnedUrl: string | null = null;
+    await act(async () => {
+      returnedUrl = await result.current.createImageUrl(testFile);
+    });
+
+    // conversionImage のモック実装ではそのまま testFile を返すため、
+    // createImagePreview には testFile が渡される（またはモック実装に合わせた値）
+    expect(returnedUrl).toBe('mock-url');
+    expect(conversionImage).toHaveBeenCalledWith(testFile);
+    expect(createImagePreview).toHaveBeenCalledWith(testFile);
+    expect(result.current.isProcessing).toBe(false);
   });
 });

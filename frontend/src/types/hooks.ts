@@ -8,11 +8,13 @@ useImage、context
 ------------------------------------------------------------------ */
 export interface UseImageType {
   image: File | null;
-  minimumImageSet: (file: File) => Promise<File>;
-  optimizationProcess: (file: File) => Promise<File | null>;
-  removeBgProcess: (file: File) => Promise<File | null>;
   preview: string | null;
   isProcessing: boolean;
+  minimumImageSet: (file: File) => Promise<File>;
+  compressImageProcess: (file: File) => Promise<File | null>;
+  createImageUrl: (file: File) => Promise<string | null>;
+  optimizationProcess: (file: File) => Promise<File | null>;
+  removeBgProcess: (file: File) => Promise<File | null>;
   clearImage: () => void;
 }
 

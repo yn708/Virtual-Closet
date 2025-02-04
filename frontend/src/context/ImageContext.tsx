@@ -6,11 +6,11 @@ import React, { createContext, useContext, useState } from 'react';
 
 // 画像処理関連の関数を動的インポート
 const loadImageUtils = async () => {
-  const { compressImage, conversionImage, dataURLtoFile } = await import(
+  const { compressImage, conversionImage, dataURLtoFile, createImagePreview } = await import(
     /* webpackChunkName: "imageUtils" */
     '@/utils/imageUtils'
   );
-  return { compressImage, conversionImage, dataURLtoFile };
+  return { compressImage, conversionImage, dataURLtoFile, createImagePreview };
 };
 
 // 画像コンテキストの作成
@@ -45,6 +45,60 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setImage(file);
     setPreview(newPreview);
     return file;
+  };
+
+  /*----------------------------------------------------------------------------
+画像圧縮のみ
+1. clearImage（既存の画像を削除）
+2. 画像圧縮
+----------------------------------------------------------------------------*/
+  const compressImageProcess = async (file: File): Promise<File | null> => {
+    // 1. clearImage（既存の画像を削除）
+    clearImage();
+    setIsProcessing(true);
+    try {
+      // 画像処理ユーティリティの動的ロード
+      const { compressImage } = await loadImageUtils();
+
+      // 2. 加工可能URL作成
+      const compressedImage = await compressImage(file);
+
+      return compressedImage;
+    } catch (error) {
+      console.error('Error processing image:', error);
+      return null;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  /*----------------------------------------------------------------------------
+画像の加工可能URLを作成する処理
+1. clearImage（既存の画像を削除）
+2. WebPに変換
+3. 加工可能URL作成
+----------------------------------------------------------------------------*/
+  const createImageUrl = async (file: File): Promise<string | null> => {
+    // 1. clearImage（既存の画像を削除）
+    clearImage();
+    setIsProcessing(true);
+    try {
+      // 画像処理ユーティリティの動的ロード
+      const { conversionImage, createImagePreview } = await loadImageUtils();
+
+      // 2. HEIC形式の場合、変換
+      const convertedFile = await conversionImage(file);
+
+      // 3. 加工可能URL作成
+      const createImageUrl = await createImagePreview(convertedFile);
+
+      return createImageUrl;
+    } catch (error) {
+      console.error('Error processing image:', error);
+      return null;
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   /*----------------------------------------------------------------------------
@@ -87,9 +141,8 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 背景除去する場合
 1. clearImage（既存の画像を削除）
 2. 背景除去
-3. 圧縮、変換を行う
-4 .プレビューを作成
-5. setImage・setPreviewで画像・プレビューを最新化
+3 .プレビューを作成
+4. setImage・setPreviewで画像・プレビューを最新化
 ----------------------------------------------------------------------------*/
   const removeBgProcess = async (file: File): Promise<File | null> => {
     // 1. clearImage（既存の画像を削除）
@@ -107,15 +160,12 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (result.status === 'success' && result.image) {
         const removedBgFileName = `${file.name.replace(/\.[^/.]+$/, '')}_removed_bg.webp`;
         const removedBg = dataURLtoFile(`data:image/png;base64,${result.image}`, removedBgFileName); // Base64画像データをFileオブジェクトに変換
-        const { compressImage } = await loadImageUtils();
-        // 3. 圧縮、変換を行う
-        const compressedImage = await compressImage(removedBg);
-        // 4. プレビューを作成
-        const newPreview = URL.createObjectURL(compressedImage);
-        // 5. setImage・setPreviewで画像・プレビューを最新化
+        // 3. プレビューを作成
+        const newPreview = URL.createObjectURL(removedBg);
+        // 4. setImage・setPreviewで画像・プレビューを最新化
         setPreview(newPreview);
-        setImage(compressedImage);
-        return compressedImage;
+        setImage(removedBg);
+        return removedBg;
       } else {
         throw new Error(result.message || '被写体抽出に失敗しました');
       }
@@ -132,6 +182,8 @@ export const ImageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       value={{
         image,
         minimumImageSet,
+        compressImageProcess,
+        createImageUrl,
         optimizationProcess,
         removeBgProcess,
         preview,

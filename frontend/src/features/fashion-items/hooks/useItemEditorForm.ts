@@ -55,7 +55,7 @@ export const useItemEditorForm = ({ initialData, onSuccess }: UseItemEditorFormP
       clearImage();
       router.push(TOP_URL);
     }
-    if (!result.success && result.message) {
+    if (!result.success && result.message && result.message !== 'バリデーションエラー') {
       toast({
         variant: 'destructive',
         title: 'エラー',

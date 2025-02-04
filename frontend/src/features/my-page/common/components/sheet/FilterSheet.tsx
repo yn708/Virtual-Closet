@@ -31,9 +31,16 @@ const FilterSheet = <T extends Record<string, unknown>>({
   return (
     <Sheet open={state.isOpen} onOpenChange={handlers.handleSheetOpenChange}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="gap-2">
+        <Button variant="ghost" className="gap-2 relative">
           <ListFilter className="size-4" />
           <span className="hidden sm:inline">絞り込み</span>
+
+          {/* フィルター数を適用後に表示 */}
+          {state.appliedFiltersCount > 0 && (
+            <span className="absolute -top-1 -right-2 bg-blue-600 text-white text-xs font-semibold rounded-full size-5 flex items-center justify-center">
+              {state.appliedFiltersCount}
+            </span>
+          )}
         </Button>
       </SheetTrigger>
 

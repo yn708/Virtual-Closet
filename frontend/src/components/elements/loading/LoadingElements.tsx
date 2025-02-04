@@ -1,7 +1,7 @@
 import './loading.css';
 
 interface LoadingElementsType {
-  message?: string; // メッセージを表示する場合のオプション
+  message?: string | React.ReactNode; // メッセージを表示する場合のオプション
   fullScreen?: boolean; // 画面全体に表示するかどうか
   containerClassName?: string; // カスタムコンテナクラス名を適用するオプション
 }
@@ -26,7 +26,7 @@ const LoadingElements = ({
         <div className="sk-chase-dot"></div>
         <div className="sk-chase-dot"></div>
       </div>
-      {message && <p className="mt-10 text-xs text-gray-500">{message}</p>}
+      {message && <p className="mt-10 text-xs text-gray-500 text-center">{message}</p>}
     </div>
   );
 };

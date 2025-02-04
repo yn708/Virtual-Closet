@@ -66,8 +66,8 @@ const BaseImageDrawer = <T extends FashionItem | BaseCoordinate>({
           </DrawerHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-            <div className="w-full max-h-[30vh] md:max-h-[60vh] overflow-hidden">
-              <ItemImage src={imageUrl} />
+            <div className="w-full max-h-[30vh] md:max-h-[60vh] overflow-hidden flex justify-center items-center">
+              <ItemImage src={imageUrl} className="max-w-full max-h-full object-contain" />
             </div>
             <div className="w-full">
               <DetailInfoComponent item={item} />

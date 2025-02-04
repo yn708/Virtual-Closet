@@ -2,6 +2,7 @@ import IconButton from '@/components/elements/button/IconButton';
 import BaseDialog from '@/components/elements/dialog/BaseDialog';
 import LoadingElements from '@/components/elements/loading/LoadingElements';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useImage } from '@/context/ImageContext';
 import CoordinateCanvasPageContent from '@/features/coordinate/components/contents/CoordinateCanvasPageContent';
 import CoordinateEditorForm from '@/features/coordinate/components/form/CoordinateEditorForm';
 import ItemEditorForm from '@/features/fashion-items/components/form/ItemEditorForm';
@@ -15,7 +16,7 @@ import { fetchFashionMetaDataAPI } from '@/lib/api/fashionItemsApi';
 import type { FashionItem, MetaDataType } from '@/types';
 import type { BaseCoordinate, CoordinateMetaDataType, CoordinateType } from '@/types/coordinate';
 import { Pen } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { UpdateItemTypes } from '../../types';
 
 interface EditItemDialogProps<T extends FashionItem | BaseCoordinate> extends UpdateItemTypes<T> {
@@ -32,6 +33,20 @@ const EditItemDialog = <T extends FashionItem | BaseCoordinate>({
   const [metaData, setMetaData] = useState<MetaDataType | CoordinateMetaDataType | null>(null);
   const [initialItems, setInitialItems] = useState<InitialItems>();
   const [isLoading, setIsLoading] = useState(false);
+
+  const { clearImage } = useImage();
+
+  const isInitialized = useRef(false);
+
+  // 初回マウント時のみclearImageを実行（previewに違う画像が表示されるのを防ぐため）
+  useEffect(() => {
+    if (!isInitialized.current) {
+      clearImage();
+      isInitialized.current = true;
+    }
+    // eslint警告無視（初回マウント時のみclearImageを実行したいだけのため）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSuccess = (updatedItem: T) => {
     onUpdate(updatedItem);

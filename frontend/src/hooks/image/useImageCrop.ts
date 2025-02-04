@@ -1,7 +1,7 @@
+import type { CroppedArea, UseImageCropProps } from '@/features/my-page/profile/types';
 import { useCallback, useState } from 'react';
-import type { CroppedArea, UseImageCropProps } from '../types';
 
-export const useImageCrop = ({ image, onCropComplete, onClose }: UseImageCropProps) => {
+export const useImageCrop = ({ image, onCropComplete, onClose, cropShape }: UseImageCropProps) => {
   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedArea | null>(null);
@@ -13,33 +13,19 @@ export const useImageCrop = ({ image, onCropComplete, onClose }: UseImageCropPro
     },
     [],
   );
-
   // データURLをBlobに変換する関数
   const dataURLToBlob = (dataUrl: string) => {
-    // データURLをコンマで分割。最初の部分はMIMEタイプ、2番目の部分はBase64エンコードされたデータ
-    const arr = dataUrl.split(',');
-
-    // MIMEタイプを取得（例: 'image/png'）
-    const mime = arr[0].match(/:(.*?);/)![1];
-
-    // Base64エンコードされたデータをデコードして、バイナリ文字列に変換
-    const bstr = atob(arr[1]);
-
-    // バイナリ文字列の長さを取得
-    let n = bstr.length;
-
-    // バイナリデータを格納するためのUint8Arrayを作成
-    const u8arr = new Uint8Array(n);
-
+    const arr = dataUrl.split(','); // データURLをコンマで分割。最初の部分はMIMEタイプ、2番目の部分はBase64エンコードされたデータ
+    const mime = arr[0].match(/:(.*?);/)![1]; // MIMEタイプを取得（例: 'image/png'）
+    const bstr = atob(arr[1]); // Base64エンコードされたデータをデコードして、バイナリ文字列に変換
+    let n = bstr.length; // バイナリ文字列の長さを取得
+    const u8arr = new Uint8Array(n); // バイナリデータを格納するためのUint8Arrayを作成
     // バイナリ文字列をUint8Arrayに変換
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);
     }
-
-    // Uint8ArrayからBlobを作成し、MIMEタイプを設定
-    return new Blob([u8arr], { type: mime });
+    return new Blob([u8arr], { type: mime }); // Uint8ArrayからBlobを作成し、MIMEタイプを設定
   };
-
   // クロップした画像をキャンバスに描画し、データURLとして取得する関数
   const createCroppedImage = async () => {
     if (!croppedAreaPixels) return; // クロップエリアのピクセル情報が存在しない場合は、処理を中断
@@ -47,29 +33,27 @@ export const useImageCrop = ({ image, onCropComplete, onClose }: UseImageCropPro
     const canvas = document.createElement('canvas'); // 新しいキャンバス要素を作成
     const ctx = canvas.getContext('2d'); // 2D描画コンテキストを取得（キャンバスに描画するためのオブジェクト）
     const newImage = new Image(); // 新しい画像オブジェクトを作成
-
     newImage.src = image; // 画像のソース（選択された画像）を設定
-
     // 画像の読み込みが完了するのを非同期で待つ
     await new Promise((resolve) => {
       newImage.onload = resolve; // 画像がロードされたらPromiseを解決
     });
 
-    // クロップエリアの幅と高さを基に、最小サイズの正方形を作成
-    const size = Math.min(croppedAreaPixels.width, croppedAreaPixels.height);
+    canvas.width = croppedAreaPixels.width;
+    canvas.height = croppedAreaPixels.height;
 
-    // キャンバスの幅と高さを正方形に設定
-    canvas.width = size;
-    canvas.height = size;
-
-    // 円形のクリッピングパスを作成（画像を円形に切り取るための準備）
-    ctx?.beginPath();
-
-    // キャンバスの中心に円を描画
-    ctx?.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
-
-    // 描画領域を円形にクリップ
-    ctx?.clip();
+    if (cropShape === 'round') {
+      ctx?.beginPath(); // 円形のクリッピングパスを作成（画像を円形に切り取るための準備）
+      // キャンバスの中心に円を描画
+      ctx?.arc(
+        canvas.width / 2,
+        canvas.height / 2,
+        Math.min(canvas.width, canvas.height) / 2,
+        0,
+        2 * Math.PI,
+      );
+      ctx?.clip(); // 描画領域を円形にクリップ
+    }
 
     // 画像を指定したクロップ領域でキャンバスに描画
     ctx?.drawImage(
@@ -80,26 +64,19 @@ export const useImageCrop = ({ image, onCropComplete, onClose }: UseImageCropPro
       croppedAreaPixels.height, // クロップエリアの高さ
       0, // キャンバスの描画開始位置（x座標）
       0, // キャンバスの描画開始位置（y座標）
-      size, // キャンバスの幅
-      size, // キャンバスの高さ
+      canvas.width, // キャンバスの幅
+      canvas.height, // キャンバスの高さ
     );
 
-    // キャンバスの内容をWebP形式のデータURLとして取得
-    const croppedImageDataUrl = canvas.toDataURL('image/webp');
-
-    // データURLをBlobに変換
-    const croppedImageBlob = dataURLToBlob(croppedImageDataUrl);
-
+    const croppedImageDataUrl = canvas.toDataURL('image/webp'); // キャンバスの内容をWebP形式のデータURLとして取得
+    const croppedImageBlob = dataURLToBlob(croppedImageDataUrl); // データURLをBlobに変換
     // BlobをFileとして扱う
-    const file = new File([croppedImageBlob], `profile-image-${Date.now()}.webp`, {
+    const file = new File([croppedImageBlob], `cropped-image-${Date.now()}.webp`, {
       type: 'image/webp',
     });
 
-    // クロップ完了後の処理として、onCropComplete関数にデータURLを渡す
-    onCropComplete(file);
-
-    // ダイアログを閉じる処理
-    onClose();
+    onCropComplete(file); // クロップ完了後の処理として、onCropComplete関数にデータURLを渡す
+    onClose(); // ダイアログを閉じる処理
   };
 
   return {

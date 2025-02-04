@@ -1,218 +1,119 @@
-import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
 import { useProfileImage } from '../../../hooks/useProfileImage';
-import type { ProfileImageFieldProps } from '../../../types';
 import ProfileImageField from '../ProfileImageField';
 
-// useProfileImageのデフォルト戻り値を定義
-const defaultMockUseProfileImage = {
-  dialogState: {
-    isOpen: false,
-    onClose: jest.fn(),
-  },
-  isProcessing: false,
-  imageToEdit: null,
-  currentPreviewImage: '/test-image.jpg',
-  preview: null,
-};
-
-// useProfileImageのモック化
-jest.mock('../../../hooks/useProfileImage', () => ({
-  useProfileImage: jest.fn(),
-}));
-
-// ResizeObserverのモック
-class ResizeObserverMock {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-global.ResizeObserver = ResizeObserverMock;
-
-// 依存コンポーネントのモック
-jest.mock('@/components/elements/form/input/HiddenFileInput', () => ({
-  __esModule: true,
-  default: ({
-    onChange,
-    name,
-  }: {
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    name: string;
-  }) => <input type="file" data-testid="file-input" name={name} onChange={onChange} />,
-}));
-
-jest.mock('@/components/elements/loading/LoadingElements', () => ({
-  __esModule: true,
-  default: ({ message }: { message: string }) => <div data-testid="loading">{message}</div>,
-}));
-
-jest.mock('@/components/elements/utils/ProfileAvatar', () => ({
-  __esModule: true,
-  default: ({ src, alt, size }: { src: string; alt: string; size: string }) => (
-    <img data-testid="profile-avatar" src={src} alt={alt} className={size} />
-  ),
-}));
-
-jest.mock('../../dialog/ImageCropDialog', () => ({
-  __esModule: true,
-  default: ({
-    open,
-    onCropComplete,
-  }: {
-    open: boolean;
-    onClose: () => void;
-    image: string;
-    onCropComplete: (croppedImage: File) => void;
-  }) => (
-    <div data-testid="crop-dialog" className={open ? 'visible' : 'hidden'}>
-      <button
-        onClick={() => onCropComplete(new File([], 'cropped.jpg'))}
-        data-testid="crop-complete"
-      >
-        Crop Complete
-      </button>
+// mock modules
+jest.mock('@/components/elements/image/ImageCropContests', () => {
+  const ImageCropContents = ({ children, ...props }: { children: React.ReactNode }) => (
+    <div data-testid="image-crop-contents" {...props}>
+      {children}
     </div>
-  ),
-}));
+  );
+  ImageCropContents.displayName = 'ImageCropContents';
+  return ImageCropContents;
+});
 
-jest.mock('../../dropdown-menu/ProfileImageDropdownMenu', () => ({
-  __esModule: true,
-  default: ({
+jest.mock('@/components/elements/utils/ProfileAvatar', () => {
+  const ProfileAvatar = ({ src, alt, size }: { src: string; alt: string; size: string }) => (
+    <div data-testid="profile-avatar" data-src={src} data-alt={alt} data-size={size} />
+  );
+  ProfileAvatar.displayName = 'ProfileAvatar';
+  return ProfileAvatar;
+});
+
+jest.mock('../../dropdown-menu/ProfileImageDropdownMenu', () => {
+  const ProfileImageDropdownMenu = ({
     onDeleteImage,
   }: {
     onDeleteImage: () => void;
     hasImage: boolean;
     hasPreview: boolean;
   }) => (
-    <button onClick={onDeleteImage} data-testid="delete-button">
-      Delete Image
-    </button>
-  ),
+    <div data-testid="profile-image-dropdown-menu">
+      {onDeleteImage && <button onClick={onDeleteImage}>Delete</button>}
+    </div>
+  );
+  ProfileImageDropdownMenu.displayName = 'ProfileImageDropdownMenu';
+  return ProfileImageDropdownMenu;
+});
+
+// モックの設定
+const mockUpdateFileInput = jest.fn();
+const mockHandleDelete = jest.fn();
+const mockHandleClear = jest.fn();
+
+jest.mock('../../../hooks/useProfileImage', () => ({
+  useProfileImage: jest.fn(() => ({
+    currentPreviewImage: 'test-image.jpg',
+    preview: null,
+    updateFileInput: mockUpdateFileInput,
+    handleDelete: mockHandleDelete,
+    handleClear: mockHandleClear,
+  })),
 }));
 
 describe('ProfileImageField', () => {
-  const mockProfileImage = '/test-image.jpg';
-  const mockOnDelete = jest.fn();
-  const mockState = {
-    errors: {},
-    message: '',
+  // FormState型に合わせて修正したデフォルトprops
+  const defaultProps = {
+    state: {
+      errors: {} as Record<string, string[]>,
+      message: '',
+    },
+    profileImage: 'profile.jpg',
+    onDelete: jest.fn(),
   };
 
-  const defaultProps: ProfileImageFieldProps = {
-    state: mockState,
-    profileImage: mockProfileImage,
-    onDelete: mockOnDelete,
-  };
-
-  beforeEach(() => {
+  afterEach(() => {
     jest.clearAllMocks();
-    (useProfileImage as jest.Mock).mockReturnValue(defaultMockUseProfileImage);
   });
 
-  // ProfileImageFieldが正しくレンダリングされるかを確認するテスト
-  it('renders profile image field correctly', () => {
+  it('renders ProfileAvatar with correct src, alt and size', () => {
     render(<ProfileImageField {...defaultProps} />);
-
-    expect(screen.getByTestId('file-input')).toBeInTheDocument();
-    expect(screen.getByTestId('profile-avatar')).toBeInTheDocument();
+    const avatar = screen.getByTestId('profile-avatar');
+    expect(avatar).toHaveAttribute('data-src', 'test-image.jpg');
+    expect(avatar).toHaveAttribute('data-alt', 'プロフィール画像');
+    expect(avatar).toHaveAttribute('data-size', 'sm');
   });
 
-  // 処理中の状態が正しく表示されるかを確認するテスト
-  it('shows loading state when processing', () => {
-    (useProfileImage as jest.Mock).mockReturnValue({
-      ...defaultMockUseProfileImage,
-      isProcessing: true,
+  it('passes handleDelete when preview is falsy', () => {
+    render(<ProfileImageField {...defaultProps} />);
+    const button = screen.getByRole('button', { name: /delete/i });
+    fireEvent.click(button);
+    expect(mockHandleDelete).toHaveBeenCalled();
+    expect(mockHandleClear).not.toHaveBeenCalled();
+  });
+
+  it('passes handleClear when preview is truthy', () => {
+    // useProfileImageのモック返却値を上書き
+    (useProfileImage as jest.Mock).mockReturnValueOnce({
+      currentPreviewImage: 'test-image.jpg',
+      preview: 'preview-image.jpg',
+      updateFileInput: mockUpdateFileInput,
+      handleDelete: mockHandleDelete,
+      handleClear: mockHandleClear,
     });
 
     render(<ProfileImageField {...defaultProps} />);
-
-    expect(screen.getByTestId('loading')).toBeInTheDocument();
-    expect(screen.getByText('画像を処理中...')).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: /delete/i });
+    fireEvent.click(button);
+    expect(mockHandleClear).toHaveBeenCalled();
+    expect(mockHandleDelete).not.toHaveBeenCalled();
   });
 
-  // ファイル選択時に正しくハンドリングされるかを確認するテスト
-  it('handles file selection', async () => {
-    const handleFileSelect = jest.fn();
-    (useProfileImage as jest.Mock).mockReturnValue({
-      ...defaultMockUseProfileImage,
-      handleFileSelect,
-    });
-
-    render(<ProfileImageField {...defaultProps} />);
-
-    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-    const fileInput = screen.getByTestId('file-input');
-
-    await waitFor(() => {
-      fireEvent.change(fileInput, { target: { files: [file] } });
-    });
-
-    expect(handleFileSelect).toHaveBeenCalled();
-  });
-
-  // 編集中の画像がある場合にクロップダイアログが正しく表示されるかを確認するテスト
-  it('shows crop dialog when image is being edited', () => {
-    (useProfileImage as jest.Mock).mockReturnValue({
-      ...defaultMockUseProfileImage,
-      imageToEdit: 'test-image-data',
-      dialogState: {
-        isOpen: true,
-        onClose: jest.fn(),
-      },
-    });
-
-    render(<ProfileImageField {...defaultProps} />);
-
-    expect(screen.getByTestId('crop-dialog')).toHaveClass('visible');
-  });
-
-  // エラーメッセージが正しく表示されるかを確認するテスト
-  it('displays error message when there are errors', () => {
-    const errorMessage = 'Invalid image format';
-    const propsWithError = {
-      ...defaultProps,
-      state: {
-        errors: {
-          profile_image: [errorMessage],
-        },
-        message: '',
-      },
+  it('renders error message if state.errors.profile_image exists', () => {
+    const errorState = {
+      errors: {
+        profile_image: ['エラーが発生しました'],
+      } as Record<string, string[]>,
+      message: '',
     };
-    render(<ProfileImageField {...propsWithError} />);
-
-    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    render(<ProfileImageField {...defaultProps} state={errorState} />);
+    expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
   });
 
-  // 画像削除のハンドリングが正しく動作するかを確認するテスト
-  it('handles image deletion', async () => {
-    const handleDelete = jest.fn();
-    (useProfileImage as jest.Mock).mockReturnValue({
-      ...defaultMockUseProfileImage,
-      handleDelete,
-    });
-
+  it('renders children within ImageCropContents', () => {
     render(<ProfileImageField {...defaultProps} />);
-
-    const deleteButton = screen.getByTestId('delete-button');
-    fireEvent.click(deleteButton);
-
-    expect(handleDelete).toHaveBeenCalled();
-  });
-
-  // プレビューのクリア処理が正しく動作するかを確認するテスト
-  it('handles preview clearing', async () => {
-    const handleClear = jest.fn();
-    (useProfileImage as jest.Mock).mockReturnValue({
-      ...defaultMockUseProfileImage,
-      preview: 'preview-image',
-      handleClear,
-    });
-
-    render(<ProfileImageField {...defaultProps} />);
-
-    const deleteButton = screen.getByTestId('delete-button');
-    fireEvent.click(deleteButton);
-
-    expect(handleClear).toHaveBeenCalled();
+    expect(screen.getByTestId('image-crop-contents')).toBeInTheDocument();
   });
 });

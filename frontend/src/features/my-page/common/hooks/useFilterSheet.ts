@@ -15,10 +15,19 @@ export function useFilterSheet<T extends Record<string, unknown>>({
 }: UseFilterSheetProps<T>) {
   const { isOpen, onClose, onToggle } = useIsOpen();
   const [tempFilters, setTempFilters] = useState<T>(initialFilters);
+  const [appliedFiltersCount, setAppliedFiltersCount] = useState(0); // フィルター数を管理
 
   const state = {
     isOpen,
     tempFilters,
+    appliedFiltersCount,
+  };
+
+  // フィルター数を計算する関数
+  const calculateAppliedFilters = () => {
+    return Object.entries(tempFilters).filter(([key, value]) => {
+      return key !== 'category' && value && (Array.isArray(value) ? value.length > 0 : value);
+    }).length;
   };
 
   const handlers = {
@@ -55,6 +64,9 @@ export function useFilterSheet<T extends Record<string, unknown>>({
      * カテゴリーが変更されている場合は、カテゴリーの更新も実行
      */
     handleApplyFilters: () => {
+      const count = calculateAppliedFilters(); // フィルター数を更新
+      setAppliedFiltersCount(count); // 数値を更新
+
       if (tempFilters.category !== initialFilters.category) {
         onCategoryChange(tempFilters.category as string);
       }
@@ -63,13 +75,13 @@ export function useFilterSheet<T extends Record<string, unknown>>({
     },
 
     /**
-     * すべてのフィルターをデフォルト値にリセット
+     * デフォルト値にリセット
      */
     handleReset: () => {
-      const defaultFilters = config.filterHandlers.defaultFilters as T;
-      setTempFilters(defaultFilters);
-      onFilterApply(defaultFilters);
-      onCategoryChange('');
+      setTempFilters((prev) => ({
+        ...(config.filterHandlers.defaultFilters as T),
+        category: prev.category, // 現在のカテゴリーを維持
+      }));
     },
   };
 

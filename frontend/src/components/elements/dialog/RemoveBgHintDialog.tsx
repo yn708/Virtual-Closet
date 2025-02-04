@@ -10,17 +10,17 @@ const RemoveBgHintDialog = () => {
       trigger={
         <IconButton
           Icon={Lightbulb}
-          label="背景除去ヒント"
-          size="sm_2"
-          className="text-primary hover:text-primary-foreground hover:bg-amber-500 transition-colors"
-          labelClassName="text-xs md:text-sm"
+          label="背景除去がうまくいかない方はこちら"
+          size="sm"
+          className="hover:text-primary-foreground hover:bg-amber-500 transition-colors text-yellow-500"
+          labelClassName="text-xs md:text-sm text-gray-700 dark:text-gray-300"
           type="button"
           variant="ghost"
-        >
-          背景除去がうまくいかない方はこちら
-        </IconButton>
+        />
       }
-      className="p-10"
+      className="p-6 sm:p-10"
+      title="背景除去について"
+      description="背景除去がうまくいかない方はこちらを参考にしてください。"
     >
       <div className="space-y-8 p-4">
         <section>

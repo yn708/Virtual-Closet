@@ -90,7 +90,7 @@ describe('resendCodeAction', () => {
 
     // バリデーションエラーの検証
     expect(result.success).toBe(false);
-    expect(result.message).toBe('バリデーションエラー');
+    expect(result.message).toBe('入力内容に誤りがあります。');
     expect(result.errors).toBeDefined();
 
     // APIは呼び出されないことを確認

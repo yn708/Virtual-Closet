@@ -1,52 +1,28 @@
 import { useImage } from '@/context/ImageContext';
-import { useImageSelection } from '@/hooks/image/useImageSelection';
-import { useToast } from '@/hooks/use-toast';
-import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import { IMAGE_URL } from '@/utils/constants';
-import { compressImage, conversionImage, createImagePreview } from '@/utils/imageUtils';
-import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { UseProfileImageProps } from '../types';
 
 export const useProfileImage = ({ profileImage, onDelete }: UseProfileImageProps) => {
-  const dialogState = useIsOpen();
-
   // 画像処理の状態管理
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [imageToEdit, setImageToEdit] = useState<string | null>(null);
   const [defaultProfileImage, setDefaultProfileImage] = useState(profileImage);
+  const { preview, clearImage } = useImage();
 
-  const { handleFileChange } = useImageSelection();
-  const { minimumImageSet, preview, clearImage } = useImage();
-  const { toast } = useToast();
+  const isInitialized = useRef(false);
+
+  // 初回マウント時のみclearImageを実行（previewに違う画像が表示されるのを防ぐため）
+  useEffect(() => {
+    if (!isInitialized.current) {
+      clearImage();
+      isInitialized.current = true;
+    }
+    // eslint警告無視（初回マウント時のみclearImageを実行したいだけのため）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 画像のプレビューURL生成
   const currentPreviewImage =
     preview || (defaultProfileImage ? `${IMAGE_URL}${defaultProfileImage}` : '');
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsProcessing(true);
-    try {
-      const result = await handleFileChange(e);
-      if (!result.file) return;
-
-      const processedFile = await conversionImage(result.file);
-      const compressedFile = await compressImage(processedFile);
-      const previewUrl = await createImagePreview(compressedFile);
-
-      setImageToEdit(previewUrl);
-      dialogState.onToggle();
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: 'エラー',
-        description: '画像の処理中にエラーが発生しました',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const updateFileInput = (file?: File) => {
     const fileInput = document.querySelector('input[name="profile_image"]') as HTMLInputElement;
@@ -57,12 +33,6 @@ export const useProfileImage = ({ profileImage, onDelete }: UseProfileImageProps
       dataTransfer.items.add(file);
     }
     fileInput.files = dataTransfer.files;
-  };
-
-  const handleCropComplete = (croppedImage: File) => {
-    updateFileInput(croppedImage);
-    minimumImageSet(croppedImage);
-    dialogState.onClose();
   };
 
   const handleDelete = () => {
@@ -79,14 +49,10 @@ export const useProfileImage = ({ profileImage, onDelete }: UseProfileImageProps
   };
 
   return {
-    dialogState,
-    isProcessing,
-    imageToEdit,
     currentPreviewImage,
     defaultProfileImage,
     preview,
-    handleFileSelect,
-    handleCropComplete,
+    updateFileInput,
     handleDelete,
     handleClear,
   };

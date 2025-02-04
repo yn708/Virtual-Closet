@@ -84,6 +84,8 @@ describe('FilterSheet', () => {
       category: '1',
       group1: ['1'],
     },
+    // 新たに appliedFiltersCount を追加（初期値は 0 とする）
+    appliedFiltersCount: 0,
   };
 
   const mockHandlers = {
@@ -199,5 +201,45 @@ describe('FilterSheet', () => {
 
     const filterText = screen.getByText('絞り込み');
     expect(filterText).toHaveClass('hidden sm:inline');
+  });
+
+  it('appliedFiltersCount が 0 の場合、フィルター数は表示されないこと', () => {
+    (useFilterSheet as jest.Mock).mockReturnValue({
+      state: { ...mockState, appliedFiltersCount: 0 },
+      handlers: mockHandlers,
+    });
+    render(
+      <FilterSheet
+        filters={{}}
+        onFilterChange={jest.fn()}
+        onCategoryChange={jest.fn()}
+        config={mockConfig}
+      />,
+    );
+
+    // 数字 "0" が表示されていなければOK
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+  });
+
+  it('appliedFiltersCount が 0 より大きい場合、フィルター数が表示されること', () => {
+    const appliedCount = 3;
+    (useFilterSheet as jest.Mock).mockReturnValue({
+      state: { ...mockState, appliedFiltersCount: appliedCount },
+      handlers: mockHandlers,
+    });
+    render(
+      <FilterSheet
+        filters={{}}
+        onFilterChange={jest.fn()}
+        onCategoryChange={jest.fn()}
+        config={mockConfig}
+      />,
+    );
+
+    // バッジ内に appliedFiltersCount の値が表示される
+    const badge = screen.getByText(String(appliedCount));
+    expect(badge).toBeInTheDocument();
+    // さらに、バッジのクラスが正しく設定されているか（必要に応じて）
+    expect(badge).toHaveClass('absolute');
   });
 });

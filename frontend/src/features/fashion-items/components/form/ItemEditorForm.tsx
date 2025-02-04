@@ -1,6 +1,6 @@
 'use client';
 
-import { BACKEND_URL } from '@/utils/constants';
+import { IMAGE_URL } from '@/utils/constants';
 import { useItemEditorForm } from '../../hooks/useItemEditorForm';
 import type { ItemEditorFormProps } from '../../types';
 import ImageFormField from './field/ImageFormField';
@@ -13,7 +13,7 @@ export default function ItemEditorForm({ metaData, initialData, onSuccess }: Ite
   });
 
   const initialImage = initialData?.image
-    ? `${BACKEND_URL}${initialData.image.replace('http://backend:8000', '')}`
+    ? `${IMAGE_URL}${initialData.image.replace('http://backend:8000', '')}`
     : undefined;
   const currentPreview = preview || initialImage; // previewがある場合に優先で表示
 

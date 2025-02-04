@@ -12,6 +12,8 @@ const ProfileEditButton = ({ userDetail }: UserDetailType) => {
 
   return (
     <BaseDialog
+      showClose={false}
+      preventOutsideClick
       isOpen={isOpen}
       onToggle={onToggle}
       trigger={
@@ -21,7 +23,7 @@ const ProfileEditButton = ({ userDetail }: UserDetailType) => {
       }
       className="max-w-[800px]"
     >
-      <UserProfileForm userDetail={userDetail} onSuccess={onClose} />
+      <UserProfileForm userDetail={userDetail} onClose={onClose} />
     </BaseDialog>
   );
 };

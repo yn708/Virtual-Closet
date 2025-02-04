@@ -18,6 +18,8 @@ interface BaseDialogProps {
   // 開閉制御プロパティ
   isOpen?: boolean;
   onToggle?: (open: boolean) => void;
+  showClose?: boolean;
+  preventOutsideClick?: boolean;
 }
 
 const BaseDialog: React.FC<BaseDialogProps> = ({
@@ -30,6 +32,8 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
   headerClassName,
   isOpen,
   onToggle,
+  showClose = true,
+  preventOutsideClick = false,
 }) => {
   // Headerセクションがいずれかのコンテンツがある場合のみ表示
   const showHeader = title || description || headerContent;
@@ -37,7 +41,17 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className={className}>
+      <DialogContent
+        className={className}
+        showClose={showClose}
+        onInteractOutside={
+          preventOutsideClick
+            ? (e) => {
+                e.preventDefault();
+              }
+            : undefined
+        }
+      >
         {showHeader ? (
           <DialogHeader className={headerClassName}>
             {/* DialogTitleが必須なので、非表示で配置 */}

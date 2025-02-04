@@ -50,6 +50,11 @@ export interface OnSuccessType {
   onSuccess?: () => void;
 }
 
+// Dialog等を閉じる際の型
+export interface OnCloseType {
+  onClose: () => void;
+}
+
 // 何か行う場合がある時の型（クリック時等）
 export interface OnClickType {
   onClick?: () => void;
