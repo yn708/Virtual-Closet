@@ -4,35 +4,33 @@ import Image from 'next/image';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 const BackgroundSlider = () => {
-  // 再レンダリングを避けるためにrefでサイズ管理
+  // 現在のサイズ情報を保持する ref
   const dimensionsRef = useRef(DEFAULT_DIMENSIONS);
+  // 最大の viewport 高さを記録する ref（タブバー表示による一時的な低下を無視）
+  const maxHeightRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  // debounce用タイマー
+  // リサイズ処理の debounce 用タイマー
   const debounceTimeout = useRef<number | null>(null);
-  // 初回計測時に決定する画像枚数をstateで保持（その後は固定）
+  // 初回計測時に決定する画像枚数を state で保持（その後は固定）
   const [imageCount, setImageCount] = useState<number>(0);
 
-  // しきい値（タブバーの高さ程度＝50px程度）
+  // タブバーによる変動はおおよそ50px前後なのでそのしきい値
   const HEIGHT_THRESHOLD = 50;
 
-  // updateDimensions: 現在の viewport 高さ（visualViewportがあればそちら）とこれまでの最大高さを比較して安定値を求める
+  // updateDimensions：現在の viewport 高さ(rawHeight)を測定し、maxHeightRef に記録された最大値を常に使用する
   const updateDimensions = useCallback(() => {
-    // 現在の高さ（タブバー隠れているときは大きく、表示時は小さくなる）
     const rawHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    let stableHeight = dimensionsRef.current.height; // これまでの安定値
-
-    // もし rawHeight の方が大きければ（タブバーが隠れた状態）更新する
-    if (rawHeight > stableHeight) {
-      stableHeight = rawHeight;
-    } else if (stableHeight - rawHeight >= HEIGHT_THRESHOLD) {
-      // もし大幅に下がっている（デバイス回転などで実際に小さくなった場合）は更新する
-      stableHeight = rawHeight;
+    // 最大値を記録（タブバーが隠れている状態の高さが取れた場合、その値が残る）
+    maxHeightRef.current = Math.max(maxHeightRef.current, rawHeight);
+    // もし一時的に大幅に低下している場合（デバイス自体が変わった場合など）は、しきい値を超える変化なら rawHeight にも更新する
+    if (dimensionsRef.current.height - rawHeight >= HEIGHT_THRESHOLD) {
+      maxHeightRef.current = rawHeight;
     }
-    // stableHeight を用いてスケール計算
+    const stableHeight = maxHeightRef.current;
+
     const scale = stableHeight / ORIGINAL_HEIGHT;
     const width = ORIGINAL_WIDTH * scale;
 
-    // container の CSS 変数や子要素の width を更新
     if (containerRef.current) {
       containerRef.current.style.setProperty('--image-width', `${width}px`);
       const images = containerRef.current.querySelectorAll('.slider-image');
@@ -42,10 +40,9 @@ const BackgroundSlider = () => {
     }
     dimensionsRef.current = { width, height: stableHeight, scale };
 
-    // 初回のみ画像枚数を決定する
+    // 初回計測時のみ、画面幅から必要な画像枚数を計算して state に固定する
     if (imageCount === 0) {
       const viewportWidth = window.innerWidth;
-      // 画面幅に対して必要な画像枚数＋1（シームレス用）
       const count = Math.ceil(viewportWidth / width) + 1;
       setImageCount(count);
     }
@@ -53,7 +50,7 @@ const BackgroundSlider = () => {
 
   useLayoutEffect(() => {
     updateDimensions();
-    // 初回レンダリング後300ms後に再計測（UI変化落ち着き用）
+    // 初回レンダリング後300ms後に再計測（UIの変化が落ち着いたタイミング）
     const timeoutId = setTimeout(() => {
       updateDimensions();
     }, 300);
@@ -83,13 +80,12 @@ const BackgroundSlider = () => {
     };
   }, [updateDimensions]);
 
-  // 画像枚数は、計算結果があればその値、なければ2枚
   const count = imageCount > 0 ? imageCount : 2;
 
   return (
     <div className="fixed inset-0 overflow-hidden">
       <div ref={containerRef} className="fixed inset-0 overflow-hidden touch-pan-y">
-        {/* ハードウェアアクセラレーションを強制するため translate3d を指定 */}
+        {/* ハードウェアアクセラレーション対策 */}
         <div className="flex h-screen animate-slide" style={{ transform: 'translate3d(0,0,0)' }}>
           {Array.from({ length: count }).map((_, index) => (
             <div key={index} className="relative shrink-0 slider-image h-screen">
