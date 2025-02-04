@@ -46,20 +46,22 @@ const BackgroundSlider = () => {
 
   return (
     <div className="fixed inset-0 overflow-hidden">
-      <div ref={containerRef} className="flex h-screen animate-slide">
-        {Array.from({ length: 2 }).map((_, index) => (
-          <div key={index} className="relative shrink-0 slider-image h-screen">
-            <Image
-              src="/images/fashion-bg.webp"
-              alt="Fashion background"
-              fill
-              priority={index === 0}
-              quality={90}
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-            />
-          </div>
-        ))}
+      <div ref={containerRef} className="fixed inset-0 overflow-hidden touch-pan-y">
+        <div className="flex h-screen animate-slide">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div key={index} className="relative shrink-0 slider-image h-screen">
+              <Image
+                src="/images/fashion-bg.webp"
+                alt="Fashion background"
+                fill
+                priority
+                quality={90}
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
