@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  .animate-slide {
-    animation: slide 60s linear infinite;
-    will-change: transform;
-  }
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -77,13 +67,18 @@
   }
 }
 
-@keyframes slide {
-  from {
-    transform: translateX(0);
+@layer utilities {
+  .animate-slide {
+    animation: slide 60s linear infinite;
     will-change: transform;
   }
-  to {
-    transform: translateX(calc(var(--image-width) * -1));
-    will-change: transform;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-1 * var(--image-width)));
   }
 }

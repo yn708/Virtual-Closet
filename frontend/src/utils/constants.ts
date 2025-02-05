@@ -145,7 +145,6 @@ export const DEFAULT_USER_IMAGE = '/images/default.webp';
 // 画面サイズ
 export const ORIGINAL_HEIGHT = 1080;
 export const ORIGINAL_WIDTH = 3840;
-export const DEFAULT_DIMENSIONS = { width: 1920, height: 1080, scale: 1 };
 
 /* ----------------------------------------------------------------
 SEARCH
