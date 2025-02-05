@@ -15,7 +15,7 @@ const nextConfig = {
         ? [
             {
               protocol: 'https',
-              hostname: 'd317u35a9lh557.cloudfront.net',
+              hostname: 'd2omfeuzdtuar5.cloudfront.net',
             },
           ]
         : [
@@ -31,6 +31,10 @@ const nextConfig = {
               protocol: 'http',
               hostname: 'backend',
             },
+            // {
+            //   protocol: 'https',
+            //   hostname: 'd2omfeuzdtuar5.cloudfront.net',
+            // },
           ],
   },
   output: 'standalone',
