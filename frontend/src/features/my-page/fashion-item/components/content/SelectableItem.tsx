@@ -1,6 +1,5 @@
 import ItemImage from '@/features/my-page/common/components/image/ItemImage';
 import type { FashionItem } from '@/types';
-import { IMAGE_URL } from '@/utils/constants';
 
 interface SelectableItemProps {
   item: FashionItem;
@@ -9,8 +8,6 @@ interface SelectableItemProps {
 }
 
 const SelectableItem = ({ item, onSelectItem, isSelected }: SelectableItemProps) => {
-  const imageUrl = `${IMAGE_URL}${item.image.replace('http://backend:8000', '')}`;
-
   return (
     <div
       className={`relative group w-full transition-all duration-300 cursor-pointer
@@ -42,7 +39,7 @@ const SelectableItem = ({ item, onSelectItem, isSelected }: SelectableItemProps)
       <div className="p-2 border-b border-l border-gray-400">
         <div className="relative">
           <div className="absolute inset-0 z-10" /> {/* ドラッグ防止のオーバーレイ */}
-          <ItemImage src={imageUrl} />
+          <ItemImage src={item.image} />
         </div>
       </div>
 

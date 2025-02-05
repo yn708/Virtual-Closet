@@ -234,17 +234,4 @@ describe('BaseImageDrawer', () => {
 
     expect(onDelete).toHaveBeenCalledWith(mockFashionItem.id);
   });
-
-  it('バックエンドURLが正しく処理されること', () => {
-    const itemWithBackendUrl = {
-      ...mockFashionItem,
-      image: 'http://backend:8000/images/test.jpg',
-    };
-
-    render(<BaseImageDrawer {...defaultProps} item={itemWithBackendUrl} />);
-
-    const expectedImageUrl = `${IMAGE_URL}/images/test.jpg`;
-    const itemImage = screen.getAllByTestId('item-image')[0];
-    expect(itemImage).toHaveAttribute('src', expectedImageUrl);
-  });
 });

@@ -1,6 +1,5 @@
 'use client';
 
-import { IMAGE_URL } from '@/utils/constants';
 import { useItemEditorForm } from '../../hooks/useItemEditorForm';
 import type { ItemEditorFormProps } from '../../types';
 import ImageFormField from './field/ImageFormField';
@@ -12,10 +11,7 @@ export default function ItemEditorForm({ metaData, initialData, onSuccess }: Ite
     onSuccess,
   });
 
-  const initialImage = initialData?.image
-    ? `${IMAGE_URL}${initialData.image.replace('http://backend:8000', '')}`
-    : undefined;
-  const currentPreview = preview || initialImage; // previewがある場合に優先で表示
+  const currentPreview = preview || initialData?.image; // previewがある場合に優先で表示
 
   return (
     <form action={formAction} className="max-w-7xl mx-auto p-6">

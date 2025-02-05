@@ -1,7 +1,6 @@
 'use client';
 
 import ImageFormField from '@/features/fashion-items/components/form/field/ImageFormField';
-import { IMAGE_URL } from '@/utils/constants';
 import { usePhotoCoordinateForm } from '../../hooks/usePhotoCoordinateForm';
 import type { CoordinateEditTypes, CoordinateMetaDataTypes } from '../../types';
 import CoordinateEditorSelectFormFields from './field/CoordinateEditorSelectFormFields';
@@ -16,10 +15,7 @@ const CoordinateEditorForm = ({
     onSuccess,
   });
 
-  const initialImage = initialData?.image
-    ? `${IMAGE_URL}${initialData.image.replace('http://backend:8000', '')}`
-    : undefined;
-  const currentPreview = preview || initialImage; // previewがある場合に優先で表示
+  const currentPreview = preview || initialData?.image; // previewがある場合に優先で表示
 
   return (
     <form action={formAction} className="max-w-7xl mx-auto p-6">
