@@ -145,6 +145,7 @@ export const DEFAULT_USER_IMAGE = '/images/default.webp';
 // 画面サイズ
 export const ORIGINAL_HEIGHT = 1080;
 export const ORIGINAL_WIDTH = 3840;
+export const HEIGHT_THRESHOLD = 200; // タブバーの高さを考慮した閾値(念のため大きめに)
 
 /* ----------------------------------------------------------------
 SEARCH

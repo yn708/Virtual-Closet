@@ -1,17 +1,30 @@
 'use client';
-import { ORIGINAL_HEIGHT, ORIGINAL_WIDTH } from '@/utils/constants';
+
+import { HEIGHT_THRESHOLD, ORIGINAL_HEIGHT, ORIGINAL_WIDTH } from '@/utils/constants';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 
 const BackgroundSlider = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastHeightRef = useRef<number>(0);
 
   useEffect(() => {
     const updateDimensions = () => {
       if (!containerRef.current) return;
 
       const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
+      const rawHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+      // 閾値を考慮した高さの計算
+      let viewportHeight = rawHeight;
+      if (lastHeightRef.current) {
+        const heightDiff = Math.abs(lastHeightRef.current - rawHeight);
+        if (heightDiff < HEIGHT_THRESHOLD) {
+          // 変更が閾値未満の場合は前回の高さを維持
+          viewportHeight = lastHeightRef.current;
+        }
+      }
+      lastHeightRef.current = viewportHeight;
 
       // アスペクト比を保持しながら、画面の高さに合わせてスケーリング
       const scale = viewportHeight / ORIGINAL_HEIGHT;
@@ -32,15 +45,30 @@ const BackgroundSlider = () => {
       });
     };
 
+    // 初回レンダリング時のサイズを記録
+    const initialUpdate = () => {
+      const initialHeight = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
+      lastHeightRef.current = initialHeight;
+      updateDimensions();
+    };
+
     const handleResize = () => {
       requestAnimationFrame(updateDimensions);
     };
 
-    updateDimensions();
+    initialUpdate();
     window.addEventListener('resize', handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
     };
   }, []);
 
