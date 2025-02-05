@@ -13,7 +13,6 @@ import EditItemDialog from '@/features/my-page/common/components/dialog/EditItem
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import type { FashionItem } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { IMAGE_URL } from '@/utils/constants';
 import type { ComponentType } from 'react';
 import type { UpdateItemTypes } from '../../types';
 import DeleteItemDialog from '../dialog/DeleteItemDialog';
@@ -35,8 +34,6 @@ const BaseImageDrawer = <T extends FashionItem | BaseCoordinate>({
   renderTrigger,
   DetailInfoComponent,
 }: BaseImageDrawerProps<T>) => {
-  const imageUrl = `${IMAGE_URL}${item.image.replace('http://backend:8000', '')}`;
-
   const { isOpen, onClose, onToggle } = useIsOpen();
 
   const handleUpdate = (updatedItem: T) => {
@@ -51,13 +48,13 @@ const BaseImageDrawer = <T extends FashionItem | BaseCoordinate>({
 
   const defaultTrigger = (
     <div className="relative group w-full bg-white dark:bg-gray-900 transition-all duration-300">
-      <ItemImage src={imageUrl} />
+      <ItemImage src={item.image} />
     </div>
   );
 
   return (
     <Drawer open={isOpen} onOpenChange={onToggle}>
-      <DrawerTrigger>{renderTrigger ? renderTrigger(imageUrl) : defaultTrigger}</DrawerTrigger>
+      <DrawerTrigger>{renderTrigger ? renderTrigger(item.image) : defaultTrigger}</DrawerTrigger>
       <DrawerContent className="h-[85vh] sm:h-[90vh]">
         <div className="max-w-3xl mx-auto w-full p-4 sm:p-6 overflow-y-auto">
           <DrawerHeader className="p-0">
@@ -67,7 +64,7 @@ const BaseImageDrawer = <T extends FashionItem | BaseCoordinate>({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             <div className="w-full max-h-[30vh] md:max-h-[60vh] overflow-hidden flex justify-center items-center">
-              <ItemImage src={imageUrl} className="max-w-full max-h-full object-contain" />
+              <ItemImage src={item.image} className="max-w-full max-h-full object-contain" />
             </div>
             <div className="w-full">
               <DetailInfoComponent item={item} />

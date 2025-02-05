@@ -87,6 +87,7 @@ const CoordinateCanvas = () => {
                 height={160}
                 className="object-contain select-none"
                 draggable={false}
+                unoptimized
               />
               {/* 選択時の操作UI */}
               {isSelected && (

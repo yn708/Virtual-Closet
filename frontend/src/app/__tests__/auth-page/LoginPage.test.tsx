@@ -112,6 +112,6 @@ describe('LoginPage', () => {
     render(<LoginPage />);
 
     // 'unauthorized' の場合、LoginErrorMessage は「申し訳ございませんが再度ログインしてください。」と表示する
-    expect(screen.getByText('申し訳ございませんが再度ログインしてください。')).toBeInTheDocument();
+    expect(screen.getByText('ログインしてください。')).toBeInTheDocument();
   });
 });

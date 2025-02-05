@@ -11,7 +11,7 @@ export default function LoginErrorMessage() {
   const getErrorMessage = (error: string) => {
     switch (error) {
       case 'unauthorized':
-        return '申し訳ございませんが再度ログインしてください。';
+        return 'ログインしてください。';
       case 'session_expired':
         return 'セッションの有効期限が切れました。再度ログインしてください。';
       default:

@@ -6,7 +6,6 @@ import {
   LOGIN_ERROR_URL,
   LOGIN_GOOGLE_ENDPOINT,
   LOGIN_URL,
-  TOKEN_REFRESH_ENDPOINT,
 } from '@/utils/constants';
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -152,37 +151,6 @@ export const authOptions: NextAuthOptions = {
         token.isNewUser = session.user.isNewUser;
       }
 
-      // アクセストークンの有効期限をチェック
-      if (token.backendTokens) {
-        const accessTokenExpiresAt = new Date(token.backendTokens.expires_at);
-        const now = new Date();
-
-        // トークンの期限切れが近い（5分前）の場合、リフレッシュを試みる
-        if (accessTokenExpiresAt.getTime() - now.getTime() < 29 * 60 * 1000) {
-          try {
-            const response = await fetch(BASE_URL + TOKEN_REFRESH_ENDPOINT, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                refresh: token.backendTokens.refresh,
-              }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-              token.backendTokens = data;
-            }
-          } catch (error) {
-            console.error('Token refresh failed:', error);
-            // リフレッシュに失敗した場合、セッションを無効化する可能性
-            delete token.backendTokens;
-          }
-        }
-      }
-
       return token;
     },
 
@@ -192,6 +160,7 @@ export const authOptions: NextAuthOptions = {
         session.user.isNewUser = token.isNewUser;
         session.backendTokens = token.backendTokens;
       }
+
       return session;
     },
   },
