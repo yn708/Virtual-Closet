@@ -371,29 +371,32 @@ describe('useImageField', () => {
             height: 600,
             useCORS: true,
             allowTaint: true,
-            logging: false,
-            imageTimeout: 0,
+            logging: true,
+            imageTimeout: 10000,
             onclone: expect.any(Function),
           }),
         );
         expect(result).toBe('mock-url');
       });
 
-      it('画像生成時にエラーが発生した場合はnullを返すこと', async () => {
+      it('画像生成時にエラーが発生した場合は例外をスローすること', async () => {
         (html2canvas as jest.Mock).mockRejectedValue(new Error('Canvas generation failed'));
 
         const mockElement = document.createElement('div');
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
-        const result = await generatePreviewImage(mockElement);
+        await expect(generatePreviewImage(mockElement)).rejects.toThrow(
+          '画像の生成に失敗しました。',
+        );
 
-        expect(result).toBeNull();
         expect(consoleSpy).toHaveBeenCalledWith('Preview generation failed:', expect.any(Error));
 
         consoleSpy.mockRestore();
       });
 
       it('onclone関数が要素のスタイルを正しく調整すること', async () => {
+        // テスト用の canvasRect を用意してグローバルに設定していたが、
+        // 実際は要素の getBoundingClientRect() の値が使用されるため、こちらをモックする
         const mockElement = document.createElement('div');
         mockElement.className = 'coordinate-canvas';
 
@@ -404,19 +407,38 @@ describe('useImageField', () => {
 
         // 画像要素の追加
         const img = document.createElement('img');
+        Object.defineProperty(img, 'complete', { configurable: true, value: true });
+        Object.defineProperty(img, 'naturalWidth', { configurable: true, value: 100 });
         mockElement.appendChild(img);
 
+        // ここで mockElement の getBoundingClientRect を期待のサイズにモック
+        Object.defineProperty(mockElement, 'getBoundingClientRect', {
+          value: () => ({
+            width: 300,
+            height: 150,
+            top: 0,
+            left: 0,
+            right: 300,
+            bottom: 150,
+          }),
+        });
+
+        // generatePreviewImage を呼び出す（内部で html2canvas のオプションに onclone が設定される）
         await generatePreviewImage(mockElement);
 
         const onclone = (html2canvas as jest.Mock).mock.calls[0][1].onclone;
         const clonedDoc = {
-          querySelector: () => mockElement,
-          getElementsByTagName: () => [img],
+          querySelector: (selector: string) =>
+            selector === '.coordinate-canvas' ? mockElement : null,
+          getElementsByTagName: (tagName: string) => (tagName === 'img' ? [img] : []),
         };
 
         await onclone(clonedDoc);
 
         // スタイルの検証
+        expect(mockElement.style.width).toBe('300px');
+        expect(mockElement.style.height).toBe('150px');
+
         const images = mockElement.getElementsByTagName('img');
         expect(images[0].style.imageRendering).toBe('high-quality');
 

@@ -33,6 +33,12 @@ jest.mock('../../form/CustomCoordinateEditorForm', () => {
   };
 });
 
+jest.mock('@/components/ui/dialog', () => ({
+  DialogClose: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dialog-close">{children}</div>
+  ),
+}));
+
 const mockUseCoordinateCanvasState = useCoordinateCanvasState as jest.MockedFunction<
   typeof useCoordinateCanvasState
 >;
@@ -135,12 +141,18 @@ describe('FormDialog', () => {
   it('BaseDialogのtriggerとして"次へ"ボタンが表示されること', () => {
     render(<FormDialog {...mockProps} />);
 
-    expect(screen.getByRole('button')).toHaveTextContent('次へ');
+    expect(screen.getByRole('button', { name: '次へ' })).toBeInTheDocument();
   });
 
   it('メタデータがnullの場合、CustomCoordinateEditorFormが表示されないこと', () => {
     render(<FormDialog {...mockProps} metaData={null} initialItems={mockInitialItems} />);
 
     expect(screen.queryByTestId('coordinate-editor-form')).not.toBeInTheDocument();
+  });
+
+  it('DialogCloseの戻るボタンが表示されること', () => {
+    render(<FormDialog {...mockProps} />);
+    expect(screen.getByTestId('dialog-close')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '戻る' })).toBeInTheDocument();
   });
 });

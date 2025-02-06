@@ -35,6 +35,11 @@ export const useItemEditorForm = ({ initialData, onSuccess }: UseItemEditorFormP
     const result = await fashionItemsUpdateAction(prevState, formData, initialData);
 
     if (result.success && result.hasChanges) {
+      // 開発環境のみをhttp://backend:8000追加(パスのみのレスポンス内容のため)
+      if (process.env.NODE_ENV === 'development' && result.updatedItem?.image) {
+        result.updatedItem.image = process.env.NEXT_PUBLIC_API_URL + result.updatedItem.image;
+      }
+
       clearImage();
       onSuccess?.(result.updatedItem as FashionItem);
     } else if (!result.hasChanges && !result.errors) {

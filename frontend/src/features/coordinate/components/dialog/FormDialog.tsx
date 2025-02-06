@@ -2,6 +2,8 @@ import IconButton from '@/components/elements/button/IconButton';
 import LoadingElements from '@/components/elements/loading/LoadingElements';
 
 import BaseDialog from '@/components/elements/dialog/BaseDialog';
+import { Button } from '@/components/ui/button';
+import { DialogClose } from '@/components/ui/dialog';
 import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
 import type { CoordinateMetaDataType } from '@/types/coordinate';
@@ -47,6 +49,11 @@ const FormDialog: React.FC<FormDialogProps> = ({
             initialItems={initialItems}
             onSuccess={onSuccess}
           />
+          <DialogClose className="mt-5">
+            <Button type="button" variant="link">
+              戻る
+            </Button>
+          </DialogClose>
         </div>
       ) : (
         isLoading && <LoadingElements message="データ取得中..." />

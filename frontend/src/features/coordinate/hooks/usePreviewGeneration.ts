@@ -1,4 +1,5 @@
 import type { InitialItems } from '@/features/my-page/coordinate/types';
+import { useToast } from '@/hooks/use-toast';
 import { generatePreviewImage } from '@/utils/imageUtils';
 import { useEffect, useMemo, useState } from 'react';
 import type { CoordinateEditTypes, ItemStyle } from '../types';
@@ -15,13 +16,14 @@ export const usePreviewGeneration = (
 ) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
+  const { toast } = useToast();
+
   // アイテムの配置が変更されたかチェック
   const hasChanges = useMemo(() => {
     if (!initialItems) return true;
-    // 背景の変更をチェック
-    if (itemsData.background !== initialItems.background) return true;
-    // アイテム数の変更をチェック
-    if (itemsData.items.length !== initialItems.items.length) return true;
+    if (itemsData.background !== initialItems.background) return true; // 背景の変更をチェック
+    if (itemsData.items.length !== initialItems.items.length) return true; // アイテム数の変更をチェック
+
     // 各アイテムの変更をチェック
     return itemsData.items.some((current, index) => {
       const initial = initialItems.items[index];
@@ -35,6 +37,7 @@ export const usePreviewGeneration = (
       );
     });
   }, [itemsData, initialItems]);
+
   // プレビュー画像生成処理
   useEffect(() => {
     const generatePreview = async () => {
@@ -55,13 +58,18 @@ export const usePreviewGeneration = (
         await generatePreviewImage(canvasElement);
       } catch (error) {
         console.error('Failed to generate preview:', error);
+
+        toast({
+          variant: 'destructive',
+          title: '予期せぬエラーが発生しました',
+        });
       } finally {
         setIsProcessing(false);
       }
     };
 
     generatePreview();
-  }, [hasChanges, initialData, setIsProcessing]);
+  }, [hasChanges, initialData, setIsProcessing, toast]);
 
   return { isProcessing };
 };
