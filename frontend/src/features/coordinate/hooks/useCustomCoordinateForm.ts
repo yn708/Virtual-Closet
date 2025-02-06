@@ -6,11 +6,11 @@ import {
 } from '@/lib/actions/outfit/customCoordinateAction';
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
+import { TOP_URL } from '@/utils/constants';
 import { initialState } from '@/utils/data/initialState';
 import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import type { CoordinateEditTypes } from '../types';
-import { TOP_URL } from '@/utils/constants';
 
 export const useCustomCoordinateForm = ({
   initialItems,
@@ -44,6 +44,11 @@ export const useCustomCoordinateForm = ({
     );
 
     if (result.success && result.hasChanges) {
+      // 開発環境のみをhttp://backend:8000追加(パスのみのレスポンス内容のため)
+      if (process.env.NODE_ENV === 'development' && result.updatedItem?.image) {
+        result.updatedItem.image = process.env.NEXT_PUBLIC_API_URL + result.updatedItem.image;
+      }
+
       onSuccess?.(result.updatedItem as BaseCoordinate);
     } else if (!result.hasChanges && !result.errors) {
       toast({
