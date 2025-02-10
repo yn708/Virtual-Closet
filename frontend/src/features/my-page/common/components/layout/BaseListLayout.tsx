@@ -32,7 +32,7 @@ const BaseListLayout = <T extends { id: string }>({
     <EmptyState />
   ) : (
     <div className="pb-16">
-      <div className="p-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4 max-w-screen-2xl mx-auto">
+      <div className="p-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4 max-w-screen-2xl mx-auto">
         {items.map((item) => renderItem(item))}
       </div>
 

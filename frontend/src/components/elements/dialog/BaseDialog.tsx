@@ -20,6 +20,7 @@ interface BaseDialogProps {
   onToggle?: (open: boolean) => void;
   showClose?: boolean;
   preventOutsideClick?: boolean;
+  isCloseButtonLeft?: boolean;
 }
 
 const BaseDialog: React.FC<BaseDialogProps> = ({
@@ -34,6 +35,7 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
   onToggle,
   showClose = true,
   preventOutsideClick = false,
+  isCloseButtonLeft = false,
 }) => {
   // Headerセクションがいずれかのコンテンツがある場合のみ表示
   const showHeader = title || description || headerContent;
@@ -44,6 +46,7 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
       <DialogContent
         className={className}
         showClose={showClose}
+        isCloseButtonLeft={isCloseButtonLeft}
         onInteractOutside={
           preventOutsideClick
             ? (e) => {

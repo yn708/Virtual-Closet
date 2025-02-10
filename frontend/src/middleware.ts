@@ -7,5 +7,5 @@ export default withAuth({
 });
 
 export const config = {
-  matcher: ['/outfit/:path*', '/my-closet/:path*'],
+  matcher: ['/outfit/:path*', '/'],
 };

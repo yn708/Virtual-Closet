@@ -37,7 +37,16 @@ export async function customCoordinateCreateAction(
   };
 
   try {
-    await registerCustomCoordinateAPI(coordinateData);
+    const response = await registerCustomCoordinateAPI(coordinateData);
+
+    // レスポンスの型を確認
+    if (response && (response.message === '作成完了' || response.status === 201)) {
+      return {
+        message: '作成が完了しました',
+        errors: null,
+        success: true,
+      };
+    }
 
     return {
       message: null,
@@ -45,30 +54,9 @@ export async function customCoordinateCreateAction(
       success: true,
     };
   } catch (error) {
-    if (error instanceof Error) {
-      try {
-        const errorData = JSON.parse(error.message);
-        const errorMessage = errorData.non_field_errors?.[0];
-
-        return {
-          message: errorMessage,
-          errors: null,
-          success: false,
-        };
-      } catch (parseError) {
-        console.error(parseError);
-
-        // JSONとしてパースできなかった場合
-        return {
-          message: 'エラーが発生しました。',
-          errors: null,
-          success: false,
-        };
-      }
-    }
-
+    console.error('Create error:', error);
     return {
-      message: '不明なエラーが発生しました。',
+      message: 'エラーが発生しました',
       errors: null,
       success: false,
     };

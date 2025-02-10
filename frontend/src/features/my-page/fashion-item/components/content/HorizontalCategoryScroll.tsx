@@ -45,7 +45,7 @@ const HorizontalCategoryScroll = ({
       className="w-full rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm pt-4 pb-8 px-3 md:px-8"
       ref={scrollContainerRef}
     >
-      <div className="mx-auto flex items-center justify-center gap-2">
+      <div className="mx-auto flex items-center justify-center gap-1">
         {FASHION_ITEMS_CATEGORY.map((category) => (
           <Button
             key={category.id}
