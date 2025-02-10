@@ -2,7 +2,11 @@
 
 import type { InitialItems } from '@/features/my-page/coordinate/types';
 import type { CountDataType } from '@/types';
-import type { BaseCoordinate, CoordinateMetaDataType } from '@/types/coordinate';
+import type {
+  BaseCoordinate,
+  CoordinateMetaDataType,
+  CustomCoordinateData,
+} from '@/types/coordinate';
 import {
   COORDINATE_COUNT_ENDPOINT,
   COORDINATE_CREATE_CUSTOM_ENDPOINT,
@@ -51,6 +55,22 @@ export async function fetchCoordinateListAPI(
 /* ----------------------------------------------------------------
 CREATE
 ------------------------------------------------------------------ */
+// カスタムコーディネートの登録
+export async function registerCustomCoordinateAPI(data: CustomCoordinateData) {
+  return baseFetchAuthAPI(COORDINATE_CREATE_CUSTOM_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      data: data.data,
+      seasons: data.seasons,
+      scenes: data.scenes,
+      tastes: data.tastes,
+    }),
+  });
+}
+
 // コーディネートの登録
 export async function registerCoordinateAPI(type: CoordinateType, formData: FormData) {
   return baseFetchAuthAPI(getEndpoint(type), {
@@ -62,6 +82,22 @@ export async function registerCoordinateAPI(type: CoordinateType, formData: Form
 /* ----------------------------------------------------------------
 UPDATE
 ------------------------------------------------------------------ */
+// コーディネートの更新
+export async function updateCustomCoordinateAPI(id: string, data: CustomCoordinateData) {
+  return baseFetchAuthAPI(`${COORDINATE_CREATE_CUSTOM_ENDPOINT}${id}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      data: data.data,
+      seasons: data.seasons,
+      scenes: data.scenes,
+      tastes: data.tastes,
+    }),
+  });
+}
+
 // コーディネートの更新
 export async function updateCoordinateAPI(type: CoordinateType, id: string, formData: FormData) {
   return baseFetchAuthAPI(getEndpoint(type, id), {

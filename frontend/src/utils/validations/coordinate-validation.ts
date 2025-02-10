@@ -21,9 +21,8 @@ const baseAttributeSchema = z
   ])
   .optional();
 
-const createBaseCoordinateSchema = (imageSchema: z.ZodType) =>
+const createBaseCoordinateSchema = () =>
   z.object({
-    image: imageSchema,
     seasons: baseSeasonSchema,
     tastes: baseAttributeSchema,
     scenes: z
@@ -36,28 +35,20 @@ const createBaseCoordinateSchema = (imageSchema: z.ZodType) =>
       .optional(),
   });
 
+export const baseCoordinateSchema = createBaseCoordinateSchema();
+
 /* ----------------------------------------------------------------
 コーディネート登録時詳細選択
 ------------------------------------------------------------------ */
-const baseCreateSchema = createBaseCoordinateSchema(requiredImageSchema);
-
 // 画像投稿コーディネートスキーマ
-export const photoCoordinateCreateFormSchema = baseCreateSchema;
-
-// カスタムコーディネートスキーマ
-export const customCoordinateCreateFormSchema = baseCreateSchema.extend({
-  items: z.string(), // JSON文字列として受け取るため、string型で定義
+export const photoCoordinateCreateFormSchema = baseCoordinateSchema.extend({
+  image: requiredImageSchema,
 });
 
 /* ----------------------------------------------------------------
 コーディネート更新時詳細選択
 ------------------------------------------------------------------ */
-const baseUpdateSchema = createBaseCoordinateSchema(optionalImageSchema);
-
 // 画像投稿コーディネートスキーマ
-export const photoCoordinateUpdateFormSchema = baseUpdateSchema;
-
-// カスタムコーディネートスキーマ
-export const customCoordinateUpdateFormSchema = baseUpdateSchema.extend({
-  items: z.string().nullable().optional(),
+export const photoCoordinateUpdateFormSchema = baseCoordinateSchema.extend({
+  image: optionalImageSchema,
 });

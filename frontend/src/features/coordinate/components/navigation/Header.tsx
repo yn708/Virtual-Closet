@@ -70,7 +70,7 @@ const Header: React.FC<InitialItemsProps & CoordinateEditTypes> = ({
           <>
             <div className="flex justify-center items-center gap-2 text-gray-500 dark:text-gray-300">
               <CircleAlert className="size-5" />
-              <p className="text-xs">アイテムは2個以上選択する必要があります（20個まで）</p>
+              <p className="text-xs">アイテムは2個以上選択する必要があります（10個まで）</p>
             </div>
           </>
         )}

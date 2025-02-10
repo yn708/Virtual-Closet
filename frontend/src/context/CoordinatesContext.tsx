@@ -1,26 +1,29 @@
 'use client';
-
-import { useToast } from '@/hooks/use-toast';
-import {
-  deleteCoordinateAPI,
-  fetchCoordinateCountAPI,
-  fetchCoordinateListAPI,
-} from '@/lib/api/coordinateApi';
-import type { CountDataType } from '@/types';
-import type { BaseCoordinate } from '@/types/coordinate';
-import { useEffect, useState } from 'react';
 import type {
   CoordinateCache,
   CoordinateCategory,
   CoordinateFilters,
+} from '@/features/my-page/coordinate/types';
+import { useToast } from '@/hooks/use-toast';
+import { deleteCoordinateAPI, fetchCoordinateListAPI } from '@/lib/api/coordinateApi';
+import type {
+  CoordinatesContextState,
+  CoordinatesContextValue,
   CoordinatesHandlers,
-  CoordinatesState,
-} from '../types';
+} from '@/types';
+import type { BaseCoordinate } from '@/types/coordinate';
+import { createContext, useContext, useState } from 'react';
 
-export const useCoordinates = (): {
-  state: CoordinatesState;
-  handlers: CoordinatesHandlers;
-} => {
+/**
+ * ファッションアイテムの表示、編集、削除に関するコンテキスト
+ *
+ * Sheet内での使用もあるため、（CustomCoordinate作成時のCanvas内でのアイテムセレクト時）
+ * カテゴリーの選択状態とキャッシュをContextで管理し、
+ * Sheet開閉時のデータ保持と不要なAPI通信を防止
+ */
+const CoordinatesContext = createContext<CoordinatesContextValue | undefined>(undefined);
+
+export const CoordinatesProvider = ({ children }: { children: React.ReactNode }) => {
   const [coordinateCache, setCoordinateCache] = useState<CoordinateCache>({
     photo: [], // photo Coordinate
     custom: [], // custom Coordinate
@@ -47,31 +50,8 @@ export const useCoordinates = (): {
 
   const [isInitialLoading, setIsInitialLoading] = useState(false); // 初回データ取得Loading
   const [isLoadingMore, setIsLoadingMore] = useState(false); // 追加データ取得Loading
-  const [countData, setCountData] = useState<CountDataType | null>(null); // アイテムのカウント（残りの登録可能アイテムに使用）
 
   const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const response = await fetchCoordinateCountAPI();
-        setCountData(response);
-      } catch (error) {
-        console.error('アイテムカウント取得エラー:', error);
-      }
-    };
-    fetchCount();
-  }, []);
-
-  // カウント数の更新
-  const updateCount = async () => {
-    try {
-      const response = await fetchCoordinateCountAPI();
-      setCountData(response);
-    } catch (error) {
-      console.error('カウント更新エラー:', error);
-    }
-  };
 
   /**
    * フィルタリング関数
@@ -107,7 +87,7 @@ export const useCoordinates = (): {
 
   const currentItems = selectedCategory ? filterItems(coordinateCache[selectedCategory]) : [];
 
-  const state: CoordinatesState = {
+  const state: CoordinatesContextState = {
     coordinateCache,
     selectedCategory,
     filters,
@@ -116,7 +96,6 @@ export const useCoordinates = (): {
     currentItems,
     hasMore: selectedCategory ? hasMore[selectedCategory] : false,
     currentPage: selectedCategory ? currentPage[selectedCategory] : 1,
-    countData,
   };
 
   const handlers: CoordinatesHandlers = {
@@ -211,7 +190,6 @@ export const useCoordinates = (): {
           ...prev,
           [selectedCategory]: prev[selectedCategory].filter((item) => item.id !== id),
         }));
-        await updateCount();
         toast({
           title: '削除完了',
           description: 'コーディネートを削除しました。',
@@ -244,5 +222,22 @@ export const useCoordinates = (): {
     },
   };
 
-  return { state, handlers };
+  return (
+    <CoordinatesContext.Provider
+      value={{
+        state,
+        handlers,
+      }}
+    >
+      {children}
+    </CoordinatesContext.Provider>
+  );
+};
+
+export const useCoordinates = () => {
+  const context = useContext(CoordinatesContext);
+  if (!context) {
+    throw new Error('useFashionItems must be used within FashionItemsProvider');
+  }
+  return context;
 };

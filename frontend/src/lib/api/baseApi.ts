@@ -34,9 +34,31 @@ export async function baseFetchAPI(endpoint: string, options: RequestInit = {}) 
 }
 
 /* ----------------------------------------------------------------
+認証付きのフェッチ関数
+------------------------------------------------------------------ */
+export async function baseFetchAuthAPI(endpoint: string, options: RequestInit = {}) {
+  // サーバーサイドセッションを取得
+  const session = await getServerSession(authOptions);
+
+  // セッションが存在しない（未認証）の場合、ログイン画面にリダイレクト
+  if (!session?.backendTokens) {
+    redirect(LOGIN_URL + '?error=unauthorized');
+  }
+
+  // 認証トークンを含めて基本フェッチ関数を呼び出し
+  return baseFetchAPI(endpoint, {
+    ...options, // 渡されたオプションをスプレッド
+    headers: {
+      ...options.headers, // 既存のヘッダーを保持
+      Authorization: `Bearer ${session.backendTokens?.access}`, // 認証トークンを追加
+    },
+  });
+}
+
+/* ----------------------------------------------------------------
 トークンリフレッシュ関数
 ------------------------------------------------------------------ */
-async function refreshToken(refreshToken: string) {
+export async function refreshToken(refreshToken: string) {
   try {
     const response = await fetch(BASE_URL + TOKEN_REFRESH_ENDPOINT, {
       method: 'POST',
@@ -57,75 +79,5 @@ async function refreshToken(refreshToken: string) {
     if (error) {
       throw new Error('セッションの更新に失敗しました。再度ログインしてください。');
     }
-  }
-}
-
-/* ----------------------------------------------------------------
-認証付きのフェッチ関数
------------------------------------------------------------------- */
-export async function baseFetchAuthAPI(endpoint: string, options: RequestInit = {}) {
-  // サーバーサイドセッションを取得
-  const session = await getServerSession(authOptions);
-  // セッションが存在しない（未認証）の場合、ログイン画面にリダイレクト
-  if (!session?.backendTokens) {
-    redirect(LOGIN_URL + '?error=unauthorized');
-  }
-
-  try {
-    // 認証トークンを含めて基本フェッチ関数を呼び出し
-    const response = await baseFetchAPI(endpoint, {
-      ...options, // 渡されたオプションをスプレッド
-      headers: {
-        ...options.headers, // 既存のヘッダーを保持
-        Authorization: `Bearer ${session.backendTokens.access}`, // アクセストークンを追加
-      },
-    });
-    return response;
-  } catch (error) {
-    const errorData = (() => {
-      if (typeof error === 'string') {
-        return JSON.parse(error);
-      }
-
-      if (error instanceof Error) {
-        if ('detail' in error) {
-          return error;
-        }
-        return JSON.parse(error.message);
-      }
-
-      if (typeof error === 'object' && error !== null && 'detail' in error) {
-        return error;
-      }
-
-      return null; // エラーを解析できない場合
-    })();
-
-    if (errorData.code === 'token_not_valid') {
-      try {
-        // トークンをリフレッシュ
-        const newTokens = await refreshToken(session.backendTokens.refresh);
-
-        // アクセストークン更新
-        session.backendTokens.access = newTokens;
-
-        // 新しいトークンで再リクエスト
-        const retryResponse = await baseFetchAPI(endpoint, {
-          ...options,
-          headers: {
-            ...options.headers,
-            Authorization: `Bearer ${newTokens.access}`,
-          },
-        });
-
-        return retryResponse;
-      } catch (error) {
-        console.error('トークンリフレッシュエラー:', error);
-        // リフレッシュに失敗した場合はログインページへリダイレクト
-        redirect(LOGIN_URL + '?error=session_expired');
-      }
-    }
-
-    throw error;
   }
 }

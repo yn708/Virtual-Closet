@@ -5,7 +5,7 @@ import { APP_ABOUT_URL, CONTACT_URL, PRIVACY_URL, TERMS_URL, TOP_URL } from '../
 フッター
 ------------------------------------------------------------------ */
 export const FOOTER_NAV_ITEMS = [
-  { href: APP_ABOUT_URL, label: 'このサイトについて' },
+  { href: APP_ABOUT_URL, label: 'はじめての方へ' },
   { href: CONTACT_URL, label: 'お問い合わせ' },
   { href: PRIVACY_URL, label: 'プライバシーポリシー' },
   { href: TERMS_URL, label: '利用規約' },

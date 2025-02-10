@@ -91,11 +91,8 @@ export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export const IMAGE_URL = process.env.NODE_ENV === 'development' ? BACKEND_URL : '';
 
 // トップ
-// 一旦my-closetをTOP_URLをmy-closetとして使用
-// export const MY_CLOSET_URL = '/my-closet';
-export const TOP_URL = '/my-closet';
-// export const TOP_URL = '/top';
-export const APP_ABOUT_URL = '/';
+export const TOP_URL = '/';
+export const APP_ABOUT_URL = '/about';
 
 // 認証系
 export const LOGIN_URL = '/auth/login';
@@ -110,10 +107,6 @@ export const TERMS_URL = '/legal/terms';
 
 // コンタクト
 export const CONTACT_URL = '/contact';
-
-// マイページ
-// export const MY_PAGE_URL = '/my-page';
-export const MY_PAGE_URL = '/my-closet';
 
 // ファッションアイテム
 export const ITEM_CREATE_URL = '/outfit/item/create';
@@ -159,3 +152,13 @@ CANVAS
 export const MOVEMENT_THRESHOLD = 15; // この距離（px）以上マウスを動かすまで回転しない
 export const SNAP_THRESHOLD = 2; // 指定された角度の±2度以内でスナップする
 export const SNAP_ANGLES = [0, 90, 180, 270, 360]; // スナップする角度のリスト（度）
+// バックエンドの出力画像サイズと一致させる
+export const REFERENCE_WIDTH = 600; // 出力画像の幅
+export const REFERENCE_HEIGHT = REFERENCE_WIDTH * 1.25; // 4:5のアスペクト比
+export const REFERENCE_ITEM_SIZE = 160; // 基準となるアイテムサイズ
+
+// スケールの制限値を更新
+export const SCALE_LIMITS = {
+  MIN: 0.5,
+  MAX: 2.0,
+};

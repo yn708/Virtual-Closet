@@ -8,7 +8,9 @@ import {
   fetchCoordinateMetaDataAPI,
   fetchCustomCoordinateInitialDataAPI,
   registerCoordinateAPI,
+  registerCustomCoordinateAPI,
   updateCoordinateAPI,
+  updateCustomCoordinateAPI,
 } from '@/lib/api/coordinateApi';
 import {
   COORDINATE_CREATE_CUSTOM_ENDPOINT,
@@ -16,7 +18,7 @@ import {
   COORDINATE_METADATA_ENDPOINT,
 } from '@/utils/constants';
 
-// baseFetchAuthAPIのモック
+// baseFetchAuthAPI のモック
 jest.mock('@/lib/api/baseApi', () => ({
   baseFetchAuthAPI: jest.fn(),
 }));
@@ -121,6 +123,83 @@ describe('Coordinate APIs', () => {
   });
 
   /**
+   * カスタムコーディネート登録APIのテスト
+   */
+  describe('registerCustomCoordinateAPI', () => {
+    it('正常なカスタムコーディネート登録リクエストを送信する', async () => {
+      const mockData = {
+        data: {
+          items: [
+            {
+              item: 'shirt',
+              position_data: {
+                zIndex: 1,
+                scale: 1,
+                rotate: 0,
+                xPercent: 50,
+                yPercent: 50,
+              },
+            },
+          ],
+          background: 'white',
+        },
+        seasons: ['spring', 'summer'],
+        scenes: ['casual', 'office'],
+        tastes: ['modern'],
+      };
+      const mockResponse = { success: true, id: 1 };
+      (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+      const result = await registerCustomCoordinateAPI(mockData);
+
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(COORDINATE_CREATE_CUSTOM_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: mockData.data,
+          seasons: mockData.seasons,
+          scenes: mockData.scenes,
+          tastes: mockData.tastes,
+        }),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('APIエラーを適切に処理する', async () => {
+      const mockData = {
+        data: {
+          items: [
+            {
+              item: 'shirt',
+              position_data: {
+                zIndex: 1,
+                scale: 1,
+                rotate: 0,
+                xPercent: 50,
+                yPercent: 50,
+              },
+            },
+          ],
+          background: 'white',
+        },
+        seasons: ['spring', 'summer'],
+        scenes: ['casual', 'office'],
+        tastes: ['modern'],
+      };
+      const errorResponse = { message: 'カスタムコーディネートの登録に失敗しました' };
+      (baseFetchAuthAPI as jest.Mock).mockRejectedValueOnce(
+        new Error(JSON.stringify(errorResponse)),
+      );
+
+      await expect(registerCustomCoordinateAPI(mockData)).rejects.toThrow(
+        JSON.stringify(errorResponse),
+      );
+    });
+  });
+
+  /**
    * コーディネート更新APIのテスト
    */
   describe('updateCoordinateAPI', () => {
@@ -140,6 +219,88 @@ describe('Coordinate APIs', () => {
         },
       );
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  /**
+   * カスタムコーディネート更新APIのテスト
+   */
+  describe('updateCustomCoordinateAPI', () => {
+    it('正常なカスタムコーディネート更新リクエストを送信する', async () => {
+      const mockId = '456';
+      const mockData = {
+        data: {
+          items: [
+            {
+              item: 'pants',
+              position_data: {
+                zIndex: 2,
+                scale: 1.1,
+                rotate: 10,
+                xPercent: 30,
+                yPercent: 60,
+              },
+            },
+          ],
+          background: 'black',
+        },
+        seasons: ['winter'],
+        scenes: ['formal'],
+        tastes: ['classic'],
+      };
+      const mockResponse = { success: true };
+      (baseFetchAuthAPI as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+      const result = await updateCustomCoordinateAPI(mockId, mockData);
+
+      expect(baseFetchAuthAPI).toHaveBeenCalledWith(
+        `${COORDINATE_CREATE_CUSTOM_ENDPOINT}${mockId}/`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            data: mockData.data,
+            seasons: mockData.seasons,
+            scenes: mockData.scenes,
+            tastes: mockData.tastes,
+          }),
+        },
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('APIエラーを適切に処理する', async () => {
+      const mockId = '456';
+      const mockData = {
+        data: {
+          items: [
+            {
+              item: 'pants',
+              position_data: {
+                zIndex: 2,
+                scale: 1.1,
+                rotate: 10,
+                xPercent: 30,
+                yPercent: 60,
+              },
+            },
+          ],
+          background: 'black',
+        },
+        seasons: ['winter'],
+        scenes: ['formal'],
+        tastes: ['classic'],
+      };
+      const errorResponse = { message: 'カスタムコーディネートの更新に失敗しました' };
+      (baseFetchAuthAPI as jest.Mock).mockRejectedValueOnce(
+        new Error(JSON.stringify(errorResponse)),
+      );
+
+      await expect(updateCustomCoordinateAPI(mockId, mockData)).rejects.toThrow(
+        JSON.stringify(errorResponse),
+      );
     });
   });
 

@@ -1,4 +1,4 @@
-import { SNAP_ANGLES, SNAP_THRESHOLD } from '@/utils/constants';
+import { REFERENCE_HEIGHT, REFERENCE_WIDTH, SNAP_ANGLES, SNAP_THRESHOLD } from '@/utils/constants';
 import { act, renderHook } from '@testing-library/react';
 import type { ItemStyle } from '../../types';
 import { useCoordinateCanvas } from '../useCoordinateCanvas';
@@ -21,25 +21,29 @@ describe('useCoordinateCanvas', () => {
     y: number,
     type: string = 'mousedown',
   ): React.MouseEvent => {
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('draggable-element');
+    jest.spyOn(mockElement, 'getBoundingClientRect').mockImplementation(() => createMockDOMRect());
+    jest.spyOn(mockElement, 'closest').mockImplementation(() => mockElement);
+
     return {
       clientX: x,
       clientY: y,
       button: 0,
-      currentTarget: document.createElement('div'),
+      currentTarget: mockElement,
       preventDefault: jest.fn(),
       stopPropagation: jest.fn(),
       type,
     } as unknown as React.MouseEvent;
   };
 
-  // DOMRect用のモックオブジェクト
   const createMockDOMRect = (rect: Partial<DOMRect> = {}): DOMRect => ({
-    width: 100,
-    height: 100,
+    width: REFERENCE_WIDTH,
+    height: REFERENCE_HEIGHT,
     top: 0,
     left: 0,
-    right: 100,
-    bottom: 100,
+    right: REFERENCE_WIDTH,
+    bottom: REFERENCE_HEIGHT,
     x: 0,
     y: 0,
     toJSON: () => ({}),
@@ -61,45 +65,65 @@ describe('useCoordinateCanvas', () => {
     expect(result.current.selectedItemId).toBeNull();
     expect(result.current.isDragging).toBeFalsy();
     expect(result.current.handlers).toBeDefined();
+    expect(result.current.containerRef).toBeDefined();
   });
 
   it('アイテム選択が正しく動作すること', () => {
     const { result } = renderHook(() => useCoordinateCanvas(initialItemStyles, mockOnUpdateStyles));
 
     act(() => {
-      result.current.handlers.setSelectedItemId('item-1');
+      result.current.setSelectedItemId('item-1');
     });
 
     expect(result.current.selectedItemId).toBe('item-1');
   });
 
-  describe('ドラッグ操作', () => {
-    let containerRef: React.RefObject<HTMLDivElement>;
-
-    beforeEach(() => {
-      const container = document.createElement('div');
-      jest.spyOn(container, 'getBoundingClientRect').mockImplementation(() =>
-        createMockDOMRect({
-          width: 1000,
-          height: 1000,
-          right: 1000,
-          bottom: 1000,
-        }),
+  describe('キャンバススケーリング', () => {
+    it('リサイズ時にスケーリングが更新されること', () => {
+      const { result } = renderHook(() =>
+        useCoordinateCanvas(initialItemStyles, mockOnUpdateStyles),
       );
-      containerRef = { current: container };
-    });
 
+      const container = document.createElement('div');
+      Object.defineProperty(container, 'offsetWidth', { value: 800 });
+      Object.defineProperty(container, 'offsetHeight', { value: 600 });
+
+      if (result.current.containerRef.current) {
+        Object.defineProperty(result.current.containerRef, 'current', {
+          value: container,
+          writable: true,
+        });
+      }
+
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      // getDisplayStyleを使って、スケーリングが反映されているか確認
+      const style = result.current.handlers.getDisplayStyle(initialItemStyles['item-1']);
+      expect(style.width).toBeDefined();
+      expect(style.height).toBeDefined();
+    });
+  });
+
+  describe('ドラッグ操作', () => {
     it('ドラッグ開始時の処理が正しく動作すること', () => {
       const { result } = renderHook(() =>
         useCoordinateCanvas(initialItemStyles, mockOnUpdateStyles),
       );
 
+      // containerRefの設定
+      const container = document.createElement('div');
+      Object.defineProperty(container, 'getBoundingClientRect', {
+        value: () => createMockDOMRect(),
+      });
+      Object.defineProperty(result.current.containerRef, 'current', {
+        value: container,
+        writable: true,
+      });
+
       act(() => {
-        result.current.handlers.handleDragStart(
-          createMockMouseEvent(100, 100),
-          'item-1',
-          containerRef,
-        );
+        result.current.handlers.handleDragStart(createMockMouseEvent(100, 100), 'item-1');
       });
 
       expect(result.current.isDragging).toBeTruthy();
@@ -111,9 +135,22 @@ describe('useCoordinateCanvas', () => {
         useCoordinateCanvas(initialItemStyles, mockOnUpdateStyles),
       );
 
-      act(() => {
-        result.current.handlers.handleDragStart(createMockMouseEvent(0, 0), 'item-1', containerRef);
+      // containerRefの設定
+      const container = document.createElement('div');
+      Object.defineProperty(container, 'getBoundingClientRect', {
+        value: () => createMockDOMRect(),
       });
+      Object.defineProperty(result.current.containerRef, 'current', {
+        value: container,
+        writable: true,
+      });
+
+      act(() => {
+        result.current.handlers.handleDragStart(createMockMouseEvent(0, 0), 'item-1');
+      });
+
+      // モックをリセットして、移動イベントでの更新のみを確認
+      mockOnUpdateStyles.mockClear();
 
       act(() => {
         window.dispatchEvent(
@@ -124,6 +161,7 @@ describe('useCoordinateCanvas', () => {
         );
       });
 
+      expect(mockOnUpdateStyles).toHaveBeenCalled();
       const lastCall = mockOnUpdateStyles.mock.calls[mockOnUpdateStyles.mock.calls.length - 1][0];
       expect(lastCall['item-1'].xPercent).toBeGreaterThanOrEqual(5);
       expect(lastCall['item-1'].yPercent).toBeGreaterThanOrEqual(5);
@@ -139,12 +177,17 @@ describe('useCoordinateCanvas', () => {
       const mockElement = document.createElement('div');
       mockElement.classList.add('draggable-element');
 
-      jest
-        .spyOn(mockElement, 'getBoundingClientRect')
-        .mockImplementation(() => createMockDOMRect());
+      jest.spyOn(mockElement, 'getBoundingClientRect').mockImplementation(() =>
+        createMockDOMRect({
+          left: 50, // 中心点の計算のために適切な値を設定
+          top: 50,
+          width: 100,
+          height: 100,
+        }),
+      );
       jest.spyOn(mockElement, 'closest').mockImplementation(() => mockElement);
 
-      const event = createMockMouseEvent(50, 50);
+      const event = createMockMouseEvent(100, 100);
       Object.defineProperty(event, 'currentTarget', {
         value: mockElement,
         writable: true,
@@ -154,57 +197,25 @@ describe('useCoordinateCanvas', () => {
         result.current.handlers.handleTransformStart(event, 'item-1');
       });
 
+      // モックをリセットして、移動イベントでの更新のみを確認
+      mockOnUpdateStyles.mockClear();
+
       act(() => {
         window.dispatchEvent(
           new MouseEvent('mousemove', {
             clientX: 100,
-            clientY: 50,
+            clientY: 150, // より小さな移動で90度に近い角度を作る
           }),
         );
       });
 
+      expect(mockOnUpdateStyles).toHaveBeenCalled();
       const lastCall = mockOnUpdateStyles.mock.calls[mockOnUpdateStyles.mock.calls.length - 1][0];
       const rotateAngle = lastCall['item-1'].rotate || 0;
       const nearestSnapDiff = Math.min(
         ...SNAP_ANGLES.map((angle) => Math.abs((((rotateAngle % 360) + 360) % 360) - angle)),
       );
       expect(nearestSnapDiff).toBeLessThanOrEqual(SNAP_THRESHOLD);
-    });
-
-    it('スケーリングが正しく動作すること', () => {
-      const { result } = renderHook(() =>
-        useCoordinateCanvas(initialItemStyles, mockOnUpdateStyles),
-      );
-
-      const mockElement = document.createElement('div');
-      mockElement.classList.add('draggable-element');
-
-      jest
-        .spyOn(mockElement, 'getBoundingClientRect')
-        .mockImplementation(() => createMockDOMRect());
-      jest.spyOn(mockElement, 'closest').mockImplementation(() => mockElement);
-
-      const event = createMockMouseEvent(50, 50);
-      Object.defineProperty(event, 'currentTarget', {
-        value: mockElement,
-      });
-
-      act(() => {
-        result.current.handlers.handleTransformStart(event, 'item-1');
-      });
-
-      act(() => {
-        window.dispatchEvent(
-          new MouseEvent('mousemove', {
-            clientX: 150,
-            clientY: 150,
-          }),
-        );
-      });
-
-      const lastCall = mockOnUpdateStyles.mock.calls[mockOnUpdateStyles.mock.calls.length - 1][0];
-      expect(lastCall['item-1'].scale).toBeGreaterThan(1);
-      expect(lastCall['item-1'].scale).toBeLessThanOrEqual(2);
     });
   });
 

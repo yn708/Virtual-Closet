@@ -10,6 +10,7 @@ import {
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
+import { refreshToken } from './api/baseApi';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -149,6 +150,33 @@ export const authOptions: NextAuthOptions = {
       // セッション更新時のisNewUser状態の反映
       if (trigger === 'update' && session?.user) {
         token.isNewUser = session.user.isNewUser;
+      }
+
+      // バックエンドトークンが存在し、有効期限情報がある場合
+      if (token.backendTokens && token.backendTokens.expires_at) {
+        const currentTime = Math.floor(Date.now() / 1000); // 現在時刻（秒）
+        const tokenExpiryTime = Math.floor(
+          new Date(token.backendTokens.expires_at).getTime() / 1000,
+        );
+
+        // 有効期限が過ぎている場合はリフレッシュ
+        if (currentTime > tokenExpiryTime) {
+          try {
+            // refreshToken 関数は、リフレッシュトークンを用いて新しいトークンを取得する
+            const refreshedTokens = await refreshToken(token.backendTokens.refresh);
+
+            // 新しいトークン情報に差し替え
+            token.backendTokens.access = refreshedTokens.access;
+            // 必要に応じて、リフレッシュトークンも更新
+            if (refreshedTokens.refresh) {
+              token.backendTokens.refresh = refreshedTokens.refresh;
+            }
+            // 有効期限も更新
+            token.backendTokens.expires_at = refreshedTokens.expires_at;
+          } catch (error) {
+            console.error('トークンのリフレッシュに失敗しました:', error);
+          }
+        }
       }
 
       return token;

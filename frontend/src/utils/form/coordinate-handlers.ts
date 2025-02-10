@@ -1,9 +1,9 @@
+import type { ItemStyle } from '@/features/coordinate/types';
 import type { InitialItems } from '@/features/my-page/coordinate/types';
-import type { BaseCoordinate } from '@/types/coordinate';
+import type { BaseCoordinate, CustomCoordinateData, ItemsData, ItemType } from '@/types/coordinate';
 import type { z } from 'zod';
 import type {
-  customCoordinateCreateFormSchema,
-  customCoordinateUpdateFormSchema,
+  baseCoordinateSchema,
   photoCoordinateCreateFormSchema,
   photoCoordinateUpdateFormSchema,
 } from '../validations/coordinate-validation';
@@ -13,36 +13,12 @@ type ValidatedPhotoData =
   | z.infer<typeof photoCoordinateCreateFormSchema>
   | z.infer<typeof photoCoordinateUpdateFormSchema>;
 
-type ValidatedCustomData =
-  | z.infer<typeof customCoordinateCreateFormSchema>
-  | z.infer<typeof customCoordinateUpdateFormSchema>;
-
-interface ItemsData {
-  items: Array<unknown>;
-  background: string;
-}
-
-interface currentItems {
-  item: string;
-  position_data: {
-    scale: number;
-    rotate: number;
-    zIndex: number;
-    xPercent: number;
-    yPercent: number;
-  };
-}
+type ValidatedCustomData = z.infer<typeof baseCoordinateSchema>;
 
 interface initialItems {
   item_id: string;
   image: string;
-  position_data: {
-    scale: number;
-    rotate: number;
-    zIndex: number;
-    xPercent: number;
-    yPercent: number;
-  };
+  position_data: ItemStyle;
 }
 
 /*---------------------––––––---------------------------
@@ -61,9 +37,6 @@ export function getPhotoCoordinateFormFields(formData: FormData) {
 // カスタムコーディネート
 export function getCustomCoordinateFormFields(formData: FormData) {
   return {
-    image: formData.get('image'),
-    items: formData.get('items'),
-    background: formData.get('background'),
     seasons: formData.getAll('seasons') || [],
     tastes: formData.getAll('tastes') || null,
     scenes: formData.getAll('scenes') || null,
@@ -72,27 +45,26 @@ export function getCustomCoordinateFormFields(formData: FormData) {
 /*---------------------––––––---------------------------
 アイテムデータの検証と処理
 ---------------------––––––---------------------------*/
-function validateAndProcessItems(itemsStr: string | null): {
+
+function validateAndProcessItems(data: ItemsData): {
   isValid: boolean;
   data?: ItemsData;
   error?: string;
 } {
-  if (!itemsStr) {
+  if (!data) {
     return { isValid: false, error: 'アイテムデータが必要です' };
   }
 
   try {
-    const itemsData = JSON.parse(itemsStr) as ItemsData;
-
-    if (!Array.isArray(itemsData.items) || itemsData.items.length < 2) {
+    if (!Array.isArray(data.items) || data.items.length < 2) {
       return { isValid: false, error: '最低2つのアイテムが必要です' };
     }
 
-    if (!itemsData.background) {
+    if (!data.background) {
       return { isValid: false, error: '背景データが必要です' };
     }
 
-    return { isValid: true, data: itemsData };
+    return { isValid: true, data };
   } catch (error) {
     console.error(error);
     return { isValid: false, error: 'アイテムデータの形式が不正です' };
@@ -100,7 +72,7 @@ function validateAndProcessItems(itemsStr: string | null): {
 }
 
 // アイテムの比較用ヘルパー関数
-function compareItems(currentItems: currentItems[], initialItems: initialItems[]): boolean {
+function compareItems(currentItems: ItemType[], initialItems: initialItems[]): boolean {
   if (currentItems.length !== initialItems.length) return true;
 
   return currentItems.some((current, index) => {
@@ -157,42 +129,32 @@ export function photoCoordinateFormData(
 // カスタムコーディネート用
 export function customCoordinateFormData(
   validatedData: ValidatedCustomData,
+  itemsData: ItemsData,
   initialData?: BaseCoordinate,
   initialItems?: InitialItems,
-): { apiFormData: FormData; hasChanges: boolean } {
-  const apiFormData = new FormData();
+): { hasChanges: boolean; changedFields: CustomCoordinateData } {
   let hasChanges = false;
-
-  // 画像の変更検知と処理
-  if (validatedData.image instanceof File) {
-    // 新規作成時は必ずアペンド
-    if (!initialData) {
-      apiFormData.append('image', validatedData.image);
-      hasChanges = true;
-    } else {
-      // 更新時は画像サイズが0以上の場合を変更とみなしアペンド
-      if (validatedData.image.size > 0) {
-        apiFormData.append('image', validatedData.image);
-        hasChanges = true;
-      }
-    }
-  }
+  const changedFields: Partial<CustomCoordinateData> = {};
 
   // アイテムデータの処理
-  if (typeof validatedData.items === 'string') {
-    const result = validateAndProcessItems(validatedData.items);
-    if (result.isValid && result.data) {
-      // 背景色の比較
-      if (!initialItems || result.data.background !== initialItems.background) {
-        apiFormData.append('background', result.data.background);
-        hasChanges = true;
-      }
+  const result = validateAndProcessItems(itemsData);
 
-      // アイテムの比較
-      if (!initialItems || compareItems(result.data.items as currentItems[], initialItems.items)) {
-        apiFormData.append('items', JSON.stringify(result.data.items));
-        hasChanges = true;
-      }
+  if (result.isValid && result.data) {
+    // 背景色の比較
+    if (!initialItems || result.data.background !== initialItems.background) {
+      hasChanges = true;
+    }
+
+    // アイテムの比較
+    if (!initialItems || compareItems(result.data.items as ItemType[], initialItems.items)) {
+      hasChanges = true;
+    }
+    // 背景、アイテムのどちらかでも変わっていれば両方含めて送信
+    if (hasChanges) {
+      changedFields.data = {
+        background: result.data.background ?? '',
+        items: result.data.items ?? [],
+      };
     }
   }
 
@@ -207,10 +169,18 @@ export function customCoordinateFormData(
 
   // 配列フィールドの処理
   const arrayFields = ['seasons', 'tastes', 'scenes'] as const;
+  // handleArrayField の結果で変更がある場合のみ追加
   arrayFields.forEach((key) => {
+    const apiFormData = new FormData();
+
     const value = validatedData[key];
-    hasChanges = handleArrayField(apiFormData, key, value, convertedInitialData) || hasChanges;
+    const hasFieldChange = handleArrayField(apiFormData, key, value, convertedInitialData);
+
+    if (hasFieldChange) {
+      hasChanges = true;
+      changedFields[key] = value;
+    }
   });
 
-  return { apiFormData, hasChanges };
+  return { hasChanges, changedFields: changedFields as CustomCoordinateData };
 }

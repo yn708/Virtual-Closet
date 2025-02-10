@@ -1,3 +1,4 @@
+import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
 import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -6,7 +7,7 @@ import {
 } from '@/lib/actions/outfit/customCoordinateAction';
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { TOP_URL } from '@/utils/constants';
+import { ERROR_MESSAGE, TOP_URL } from '@/utils/constants';
 import { initialState } from '@/utils/data/initialState';
 import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
@@ -17,8 +18,18 @@ export const useCustomCoordinateForm = ({
   initialData,
   onSuccess,
 }: InitialItemsProps & CoordinateEditTypes) => {
-  const { toast } = useToast();
   const router = useRouter();
+  const { toast } = useToast();
+  const { state: canvasState } = useCoordinateCanvasState();
+
+  // 現在のアイテムデータを生成
+  const itemsData = {
+    items: canvasState.selectedItems.map((item) => ({
+      item: item.id,
+      position_data: canvasState.itemStyles[item.id],
+    })),
+    background: canvasState.background,
+  };
 
   const handleFormAction = async (
     prevState: FormState | FormStateCoordinateUpdate,
@@ -40,6 +51,7 @@ export const useCustomCoordinateForm = ({
       prevState,
       formData,
       initialData,
+      itemsData,
       initialItems,
     );
 
@@ -62,15 +74,15 @@ export const useCustomCoordinateForm = ({
 
   // アイテム作成用アクション
   const handleCreateAction = async (prevState: FormState, formData: FormData) => {
-    const result = await customCoordinateCreateAction(prevState, formData);
+    const result = await customCoordinateCreateAction(prevState, formData, itemsData);
     if (result.success) {
       router.push(TOP_URL);
     }
-    if (!result.success && result.message) {
+    if (!result.success) {
       toast({
         variant: 'destructive',
         title: 'エラー',
-        description: result.message,
+        description: result.message || ERROR_MESSAGE,
         duration: 3000,
       });
     }

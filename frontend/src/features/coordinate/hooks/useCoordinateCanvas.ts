@@ -1,7 +1,15 @@
 'use client';
 
-import { MOVEMENT_THRESHOLD, SNAP_ANGLES, SNAP_THRESHOLD } from '@/utils/constants';
-import { useCallback, useRef, useState } from 'react';
+import {
+  MOVEMENT_THRESHOLD,
+  REFERENCE_HEIGHT,
+  REFERENCE_ITEM_SIZE,
+  REFERENCE_WIDTH,
+  SCALE_LIMITS,
+  SNAP_ANGLES,
+  SNAP_THRESHOLD,
+} from '@/utils/constants';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DragStart, ItemStyle, TransformStart } from '../types';
 
 /**
@@ -12,13 +20,52 @@ export const useCoordinateCanvas = (
   itemStyles: Record<string, ItemStyle>,
   onUpdateStyles: (styles: Record<string, ItemStyle>) => void,
 ) => {
+  // 状態管理
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null); // 選択中のアイテムID
   const [isDragging, setIsDragging] = useState(false); // ドラッグ操作中かどうか
+  // スケール係数とキャンバスサイズを管理する状態
+  const [canvasScaling, setCanvasScaling] = useState({
+    scaleFactor: 1,
+    containerWidth: 0,
+    containerHeight: 0,
+  });
 
+  // 参照用オブジェクト
   const dragStartRef = useRef<DragStart | null>(null); // ドラッグ開始時の情報
   const transformStartRef = useRef<TransformStart | null>(null); // 変形開始時の情報
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  //   回転角度を最も近いスナップ角度に調整する
+  // スケール係数の計算を改善
+  const calculateScaleFactors = (containerWidth: number, containerHeight: number) => {
+    const widthScale = containerWidth / REFERENCE_WIDTH;
+    const heightScale = containerHeight / REFERENCE_HEIGHT;
+    // アスペクト比を保ったまま、小さい方のスケールを使用
+    return Math.min(widthScale, heightScale);
+  };
+
+  // 座標変換ユーティリティ
+  const convertCoordinates = useMemo(
+    () => ({
+      // キャンバス座標からパーセンテージに
+      toPercent: (x: number, y: number, containerWidth: number, containerHeight: number) => ({
+        xPercent: (x / containerWidth) * 100,
+        yPercent: (y / containerHeight) * 100,
+      }),
+      // パーセンテージからキャンバス座標に
+      toPixels: (
+        xPercent: number,
+        yPercent: number,
+        containerWidth: number,
+        containerHeight: number,
+      ) => ({
+        x: (xPercent / 100) * containerWidth,
+        y: (yPercent / 100) * containerHeight,
+      }),
+    }),
+    [],
+  );
+
+  //   角度スナップ機能
   const snapToNearestAngle = useCallback((angle: number): number => {
     const normalizedAngle = ((angle % 360) + 360) % 360;
     for (const snapAngle of SNAP_ANGLES) {
@@ -29,7 +76,7 @@ export const useCoordinateCanvas = (
     return normalizedAngle;
   }, []);
 
-  //   アイテムの位置をキャンバス内に制限する
+  //   位置制約処理
   const constrainPosition = useCallback((xPercent: number, yPercent: number): [number, number] => {
     const margin = 5; // キャンバス端からのマージン（%）
     return [
@@ -38,7 +85,7 @@ export const useCoordinateCanvas = (
     ];
   }, []);
 
-  //   アイテムのz-indexを更新し、選択したアイテムを最前面に表示する
+  //   z-index更新処理
   const updateZIndex = useCallback(
     (itemId: string) => {
       // 現在表示されている全てのアイテムのz-indexを取得
@@ -67,13 +114,9 @@ export const useCoordinateCanvas = (
     [itemStyles, onUpdateStyles],
   );
 
-  //   アイテムのドラッグ開始時の処理
+  //   ドラッグ開始処理
   const handleDragStart = useCallback(
-    (
-      e: React.MouseEvent | React.TouchEvent,
-      itemId: string,
-      containerRef: React.RefObject<HTMLDivElement>,
-    ) => {
+    (e: React.MouseEvent | React.TouchEvent, itemId: string) => {
       e.stopPropagation();
       e.preventDefault();
       if ('button' in e && e.button !== 0) return; // 左クリックのみ許可
@@ -108,14 +151,30 @@ export const useCoordinateCanvas = (
 
         const movePoint = 'touches' in moveEvent ? moveEvent.touches[0] : moveEvent;
 
-        // マウスの移動量をパーセンテージに変換
-        const dx = ((movePoint.clientX - dragStart.mouseX) / dragStart.containerWidth) * 100;
-        const dy = ((movePoint.clientY - dragStart.mouseY) / dragStart.containerHeight) * 100;
+        // スケール係数を考慮した位置計算の改善
+        const dx = (movePoint.clientX - dragStart.mouseX) / canvasScaling.scaleFactor;
+        const dy = (movePoint.clientY - dragStart.mouseY) / canvasScaling.scaleFactor;
+
+        // 実座標での移動を計算（バックエンド基準のサイズを使用）
+        const startPos = convertCoordinates.toPixels(
+          dragStart.startXPercent,
+          dragStart.startYPercent,
+          REFERENCE_WIDTH,
+          REFERENCE_HEIGHT,
+        );
+
+        // 新しい位置を計算してパーセンテージに変換
+        const newPos = convertCoordinates.toPercent(
+          startPos.x + dx,
+          startPos.y + dy,
+          REFERENCE_WIDTH,
+          REFERENCE_HEIGHT,
+        );
 
         // 新しい位置を計算し、キャンバス内に制限
         const [constrainedXPercent, constrainedYPercent] = constrainPosition(
-          dragStart.startXPercent + dx,
-          dragStart.startYPercent + dy,
+          newPos.xPercent,
+          newPos.yPercent,
         );
 
         // スタイルを更新
@@ -145,7 +204,15 @@ export const useCoordinateCanvas = (
       window.addEventListener('touchmove', handleMove, { passive: false });
       window.addEventListener('touchend', handleEnd);
     },
-    [itemStyles, onUpdateStyles, constrainPosition, updateZIndex],
+
+    [
+      updateZIndex,
+      itemStyles,
+      onUpdateStyles,
+      canvasScaling.scaleFactor,
+      convertCoordinates,
+      constrainPosition,
+    ],
   );
 
   //   アイテムの変形（拡大縮小・回転）開始時の処理
@@ -226,7 +293,10 @@ export const useCoordinateCanvas = (
 
         // スケールの計算
         const scaleDelta = currentDistance / transformStart.distance;
-        const newScale = Math.max(0.5, Math.min(2, transformStart.startScale * scaleDelta));
+        const newScale = Math.max(
+          SCALE_LIMITS.MIN,
+          Math.min(SCALE_LIMITS.MAX, transformStart.startScale * scaleDelta),
+        );
 
         // 回転角度の計算
         let newRotate = currentStyle.rotate;
@@ -264,14 +334,61 @@ export const useCoordinateCanvas = (
     [itemStyles, onUpdateStyles, snapToNearestAngle],
   );
 
+  // 表示用のスタイル計算を改善
+  const getDisplayStyle = useCallback(
+    (style: ItemStyle) => {
+      const baseSize = REFERENCE_ITEM_SIZE * canvasScaling.scaleFactor;
+      return {
+        position: 'absolute' as const,
+        left: `${style.xPercent}%`,
+        top: `${style.yPercent}%`,
+        transform: `translate(-50%, -50%) scale(${style.scale}) rotate(${style.rotate}deg)`,
+        transformOrigin: 'center',
+        zIndex: style.zIndex || 0,
+        touchAction: 'none',
+        width: `${baseSize}px`,
+        height: `${baseSize}px`,
+      };
+    },
+    [canvasScaling],
+  );
+  // 背景クリック時の処理
+  const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setSelectedItemId(null);
+    }
+  }, []);
+
+  // キャンバスのリサイズ監視を改善
+  useEffect(() => {
+    const updateCanvasScaling = () => {
+      if (containerRef.current) {
+        const { offsetWidth, offsetHeight } = containerRef.current;
+        const newScaleFactor = calculateScaleFactors(offsetWidth, offsetHeight);
+        setCanvasScaling({
+          scaleFactor: newScaleFactor,
+          containerWidth: offsetWidth,
+          containerHeight: offsetHeight,
+        });
+      }
+    };
+
+    updateCanvasScaling();
+    window.addEventListener('resize', updateCanvasScaling);
+    return () => window.removeEventListener('resize', updateCanvasScaling);
+  }, []);
+
   return {
+    containerRef,
     selectedItemId,
     isDragging,
+    setSelectedItemId,
     handlers: {
-      setSelectedItemId,
       handleDragStart,
       handleTransformStart,
       updateZIndex,
+      getDisplayStyle,
+      handleBackgroundClick,
     },
   };
 };

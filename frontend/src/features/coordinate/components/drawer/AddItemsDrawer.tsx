@@ -3,21 +3,54 @@ import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCoordinateCanvasState } from '@/context/CoordinateCanvasContext';
+import { useFashionItems } from '@/context/FashionItemsContext';
 import FashionItemsContents from '@/features/my-page/fashion-item/components/content/FashionItemsContents';
 import { useIsOpen } from '@/hooks/utils/useIsOpen';
 import { Shirt, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 const AddItemsDrawer = () => {
   const { state, handlers } = useCoordinateCanvasState();
-
+  const { state: fashionState, handlers: fashionHandlers } = useFashionItems();
   const { isOpen, setIsOpen, onClose, onToggle } = useIsOpen();
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (state.selectedItems?.length === 0) {
       setIsOpen(true);
     }
   }, [state.selectedItems?.length, setIsOpen]);
+
+  /*
+   * AddItemsDrawerはScrollAreaを使用中のため、
+   * 無限スクロール（loadMoreの発火）は
+   * BaseListLayout/useInfiniteScrollを使用せず、
+   * 本コンポーネントの中で処理を定義
+   */
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && !fashionState.isLoadingMore && fashionState.hasMore) {
+        fashionHandlers.loadMore();
+      }
+    },
+    [fashionState.isLoadingMore, fashionState.hasMore, fashionHandlers],
+  );
+
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: '20px',
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver(handleObserver, options);
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   return (
     <Drawer open={isOpen} onOpenChange={onToggle}>
@@ -46,6 +79,9 @@ const AddItemsDrawer = () => {
               onSelectItem={handlers.handleSelectItem}
               selectedItems={state.selectedItems}
             />
+
+            {/* loaderRef要素のみ定義 */}
+            <div ref={loaderRef} className="h-10" />
           </div>
         </ScrollArea>
       </DrawerContent>

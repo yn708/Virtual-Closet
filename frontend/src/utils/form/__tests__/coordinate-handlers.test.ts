@@ -1,10 +1,8 @@
 import type { InitialItems } from '@/features/my-page/coordinate/types';
-import type { BaseCoordinate } from '@/types/coordinate';
+import type { BaseCoordinate, ItemsData } from '@/types/coordinate';
 import type {
-  customCoordinateCreateFormSchema,
-  customCoordinateUpdateFormSchema,
+  baseCoordinateSchema,
   photoCoordinateCreateFormSchema,
-  photoCoordinateUpdateFormSchema,
 } from '@/utils/validations/coordinate-validation';
 import type { z } from 'zod';
 import {
@@ -15,15 +13,7 @@ import {
 } from '../coordinate-handlers';
 import { handleArrayField, handleImage } from '../form-helpers';
 
-type ValidatedPhotoData =
-  | z.infer<typeof photoCoordinateCreateFormSchema>
-  | z.infer<typeof photoCoordinateUpdateFormSchema>;
-
-type ValidatedCustomData =
-  | z.infer<typeof customCoordinateCreateFormSchema>
-  | z.infer<typeof customCoordinateUpdateFormSchema>;
-
-// モックの設定
+// モック化
 jest.mock('../form-helpers', () => ({
   handleArrayField: jest.fn(),
   handleImage: jest.fn(),
@@ -37,7 +27,7 @@ describe('Coordinate Form Handlers', () => {
   describe('getPhotoCoordinateFormFields', () => {
     it('FormDataから正しくフィールドを取得する', () => {
       const formData = new FormData();
-      const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const mockFile = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
       formData.append('image', mockFile);
       formData.append('seasons', 'spring');
       formData.append('seasons', 'summer');
@@ -72,15 +62,6 @@ describe('Coordinate Form Handlers', () => {
   describe('getCustomCoordinateFormFields', () => {
     it('FormDataから正しくフィールドを取得する', () => {
       const formData = new FormData();
-      const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-      const mockItems = JSON.stringify({
-        items: [{ id: '1' }, { id: '2' }],
-        background: '#ffffff',
-      });
-
-      formData.append('image', mockFile);
-      formData.append('items', mockItems);
-      formData.append('background', '#ffffff');
       formData.append('seasons', 'spring');
       formData.append('tastes', 'casual');
       formData.append('scenes', 'daily');
@@ -88,9 +69,6 @@ describe('Coordinate Form Handlers', () => {
       const result = getCustomCoordinateFormFields(formData);
 
       expect(result).toEqual({
-        image: mockFile,
-        items: mockItems,
-        background: '#ffffff',
         seasons: ['spring'],
         tastes: ['casual'],
         scenes: ['daily'],
@@ -104,9 +82,6 @@ describe('Coordinate Form Handlers', () => {
       const result = getCustomCoordinateFormFields(formData);
 
       expect(result).toEqual({
-        image: null,
-        items: null,
-        background: null,
         seasons: ['spring'],
         tastes: [],
         scenes: [],
@@ -116,11 +91,11 @@ describe('Coordinate Form Handlers', () => {
 
   describe('photoCoordinateFormData', () => {
     const mockValidatedData = {
-      image: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+      image: new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' }),
       seasons: ['spring', 'summer'],
       tastes: ['casual'],
       scenes: ['daily'],
-    } as ValidatedPhotoData;
+    } as z.infer<typeof photoCoordinateCreateFormSchema>;
 
     it('新規作成時に正しくFormDataを生成する', () => {
       (handleImage as jest.Mock).mockReturnValue(true);
@@ -130,7 +105,7 @@ describe('Coordinate Form Handlers', () => {
 
       expect(hasChanges).toBe(true);
       expect(handleImage).toHaveBeenCalledWith(apiFormData, mockValidatedData.image);
-      expect(handleArrayField).toHaveBeenCalledTimes(3); // seasons, tastes, scenes
+      expect(handleArrayField).toHaveBeenCalledTimes(3); // seasons, tastes, scenes の3つ
     });
 
     it('更新時に変更がある場合、正しくFormDataを生成する', () => {
@@ -146,13 +121,12 @@ describe('Coordinate Form Handlers', () => {
       (handleArrayField as jest.Mock).mockReturnValue(true);
 
       const { hasChanges } = photoCoordinateFormData(mockValidatedData, mockInitialData);
-
       expect(hasChanges).toBe(true);
     });
   });
 
   describe('customCoordinateFormData', () => {
-    const mockItems = {
+    const mockItemsData: ItemsData = {
       items: [
         {
           item: '1',
@@ -179,34 +153,29 @@ describe('Coordinate Form Handlers', () => {
     };
 
     const mockValidatedData = {
-      image: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-      items: JSON.stringify(mockItems),
-      background: '#ffffff',
       seasons: ['spring', 'summer'],
       tastes: ['casual'],
       scenes: ['daily'],
-    } as ValidatedCustomData;
+    } as z.infer<typeof baseCoordinateSchema>;
 
-    it('新規作成時に正しくFormDataを生成する', () => {
+    it('新規作成時に正しくデータを生成する', () => {
       (handleArrayField as jest.Mock).mockReturnValue(true);
 
-      const { hasChanges } = customCoordinateFormData(mockValidatedData);
+      const { hasChanges, changedFields } = customCoordinateFormData(
+        mockValidatedData,
+        mockItemsData,
+      );
 
       expect(hasChanges).toBe(true);
-    });
-
-    it('更新時に画像が変更された場合、正しく処理する', () => {
-      const mockInitialData: BaseCoordinate = {
-        id: '1',
-        image: 'old-test.jpg',
-        seasons: [{ id: '1', season_name: '春' }],
-        tastes: [{ id: '1', taste: 'カジュアル' }],
-        scenes: [{ id: '1', scene: 'デイリー' }],
-      };
-
-      const { hasChanges } = customCoordinateFormData(mockValidatedData, mockInitialData);
-
-      expect(hasChanges).toBe(true);
+      expect(changedFields).toEqual({
+        data: {
+          background: '#ffffff',
+          items: mockItemsData.items,
+        },
+        seasons: ['spring', 'summer'],
+        tastes: ['casual'],
+        scenes: ['daily'],
+      });
     });
 
     it('更新時にアイテムが変更された場合、正しく処理する', () => {
@@ -232,27 +201,43 @@ describe('Coordinate Form Handlers', () => {
             },
           },
         ],
-        background: '#000000', // 異なる背景色
+        background: '#000000', // 異なる背景色で変更があるとする
       };
 
-      const { hasChanges } = customCoordinateFormData(
+      const { hasChanges, changedFields } = customCoordinateFormData(
         mockValidatedData,
+        mockItemsData,
         mockInitialData,
         mockInitialItems,
       );
 
       expect(hasChanges).toBe(true);
+      expect(changedFields).toHaveProperty('data');
+      expect(changedFields.data).toEqual({
+        background: '#ffffff',
+        items: mockItemsData.items,
+      });
     });
 
     it('無効なアイテムデータの場合、適切に処理する', () => {
-      const invalidValidatedData = {
-        ...mockValidatedData,
-        items: 'invalid-json',
-      } as ValidatedCustomData;
+      const invalidItemsData = {
+        items: [],
+        background: '',
+      } as ItemsData;
 
-      const { hasChanges } = customCoordinateFormData(invalidValidatedData);
+      const { hasChanges, changedFields } = customCoordinateFormData(
+        mockValidatedData,
+        invalidItemsData,
+      );
 
-      expect(hasChanges).toBe(true); // 画像は新規なのでtrue
+      (handleArrayField as jest.Mock).mockReturnValue(true);
+
+      expect(hasChanges).toBe(true);
+      expect(changedFields).toEqual({
+        seasons: ['spring', 'summer'],
+        tastes: ['casual'],
+        scenes: ['daily'],
+      });
     });
   });
 });

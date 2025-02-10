@@ -2,14 +2,12 @@ import { useImage } from '@/context/ImageContext';
 import { useImageSelection } from '@/hooks/image/useImageSelection';
 import imageCompression from 'browser-image-compression';
 import heic2any from 'heic2any';
-import html2canvas from 'html2canvas';
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from '../constants';
 import {
   compressImage,
   conversionImage,
   createImagePreview,
   dataURLtoFile,
-  generatePreviewImage,
   validateImage,
 } from '../imageUtils';
 
@@ -34,8 +32,6 @@ jest.mock('@/context/ImageContext', () => ({
 jest.mock('@/hooks/image/useImageSelection', () => ({
   useImageSelection: jest.fn(),
 }));
-
-jest.mock('html2canvas', () => jest.fn());
 
 describe('useImageField', () => {
   // 既存のモックの設定
@@ -263,222 +259,6 @@ describe('useImageField', () => {
           };
           reader.readAsText(result);
         });
-      });
-    });
-    describe('generatePreviewImage', () => {
-      let mockCanvas: HTMLCanvasElement;
-      let mockFileInput: HTMLInputElement;
-      let mockBlob: Blob;
-
-      beforeEach(() => {
-        // Canvas モックの設定
-        mockCanvas = document.createElement('canvas');
-        mockCanvas.toBlob = jest.fn().mockImplementation((callback) => {
-          mockBlob = new Blob([''], { type: 'image/png' });
-          callback(mockBlob);
-        });
-
-        // html2canvas モックの設定
-        (html2canvas as jest.Mock).mockResolvedValue(mockCanvas);
-
-        // DataTransfer モックの設定
-        const mockDataTransferItems = {
-          add: jest.fn(),
-          clear: jest.fn(),
-          remove: jest.fn(),
-        };
-
-        const mockDataTransferFiles = {
-          0: new File([''], 'coordinate_preview.png', { type: 'image/png' }),
-          length: 1,
-          item: () => mockDataTransferFiles[0],
-        };
-
-        const MockDataTransfer = jest.fn().mockImplementation(() => ({
-          items: mockDataTransferItems,
-          files: mockDataTransferFiles,
-        }));
-
-        global.DataTransfer = MockDataTransfer;
-
-        // グローバルモックの設定
-        global.URL.createObjectURL = jest.fn(() => 'mock-url');
-
-        // FileInputのモック設定
-        mockFileInput = document.createElement('input');
-        mockFileInput.type = 'file';
-        mockFileInput.name = 'image';
-        Object.defineProperty(mockFileInput, 'files', {
-          writable: true,
-          value: mockDataTransferFiles,
-        });
-
-        // document.querySelector モックの設定
-        document.querySelector = jest.fn(() => mockFileInput);
-
-        // getBoundingClientRect モックの設定
-        const mockDOMRect = {
-          width: 800,
-          height: 600,
-          top: 0,
-          left: 0,
-          right: 800,
-          bottom: 600,
-          x: 0,
-          y: 0,
-          toJSON: () => ({
-            width: 800,
-            height: 600,
-            top: 0,
-            left: 0,
-            right: 800,
-            bottom: 600,
-            x: 0,
-            y: 0,
-          }),
-        };
-
-        jest
-          .spyOn(Element.prototype, 'getBoundingClientRect')
-          .mockImplementation(() => mockDOMRect);
-      });
-
-      afterEach(() => {
-        jest.restoreAllMocks();
-      });
-
-      it('キャンバス要素が存在しない場合はnullを返すこと', async () => {
-        const result = await generatePreviewImage(null);
-        expect(result).toBeNull();
-      });
-
-      it('キャンバス要素から正常にプレビュー画像を生成できること', async () => {
-        const mockElement = document.createElement('div');
-        mockElement.className = 'coordinate-canvas';
-
-        // mockImageCompressionの成功ケースを設定
-        mockImageCompression.mockImplementationOnce(async (file) => {
-          return new File(['compressed'], file.name, { type: 'image/jpeg' });
-        });
-
-        const result = await generatePreviewImage(mockElement);
-
-        expect(html2canvas).toHaveBeenCalledWith(
-          mockElement,
-          expect.objectContaining({
-            scale: expect.any(Number),
-            width: 800,
-            height: 600,
-            useCORS: true,
-            allowTaint: true,
-            logging: true,
-            imageTimeout: 10000,
-            onclone: expect.any(Function),
-          }),
-        );
-        expect(result).toBe('mock-url');
-      });
-
-      it('画像生成時にエラーが発生した場合は例外をスローすること', async () => {
-        (html2canvas as jest.Mock).mockRejectedValue(new Error('Canvas generation failed'));
-
-        const mockElement = document.createElement('div');
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-
-        await expect(generatePreviewImage(mockElement)).rejects.toThrow(
-          '画像の生成に失敗しました。',
-        );
-
-        expect(consoleSpy).toHaveBeenCalledWith('Preview generation failed:', expect.any(Error));
-
-        consoleSpy.mockRestore();
-      });
-
-      it('onclone関数が要素のスタイルを正しく調整すること', async () => {
-        // テスト用の canvasRect を用意してグローバルに設定していたが、
-        // 実際は要素の getBoundingClientRect() の値が使用されるため、こちらをモックする
-        const mockElement = document.createElement('div');
-        mockElement.className = 'coordinate-canvas';
-
-        // 操作UI要素の追加
-        const operationUI = document.createElement('div');
-        operationUI.className = 'operation-ui';
-        mockElement.appendChild(operationUI);
-
-        // 画像要素の追加
-        const img = document.createElement('img');
-        Object.defineProperty(img, 'complete', { configurable: true, value: true });
-        Object.defineProperty(img, 'naturalWidth', { configurable: true, value: 100 });
-        mockElement.appendChild(img);
-
-        // ここで mockElement の getBoundingClientRect を期待のサイズにモック
-        Object.defineProperty(mockElement, 'getBoundingClientRect', {
-          value: () => ({
-            width: 300,
-            height: 150,
-            top: 0,
-            left: 0,
-            right: 300,
-            bottom: 150,
-          }),
-        });
-
-        // generatePreviewImage を呼び出す（内部で html2canvas のオプションに onclone が設定される）
-        await generatePreviewImage(mockElement);
-
-        const onclone = (html2canvas as jest.Mock).mock.calls[0][1].onclone;
-        const clonedDoc = {
-          querySelector: (selector: string) =>
-            selector === '.coordinate-canvas' ? mockElement : null,
-          getElementsByTagName: (tagName: string) => (tagName === 'img' ? [img] : []),
-        };
-
-        await onclone(clonedDoc);
-
-        // スタイルの検証
-        expect(mockElement.style.width).toBe('300px');
-        expect(mockElement.style.height).toBe('150px');
-
-        const images = mockElement.getElementsByTagName('img');
-        expect(images[0].style.imageRendering).toBe('high-quality');
-
-        const operationUIs = mockElement.querySelectorAll('.operation-ui');
-        expect((operationUIs[0] as HTMLElement).style.display).toBe('none');
-      });
-
-      it('プレビュー画像がFormDataに正しく追加されること', async () => {
-        const mockElement = document.createElement('div');
-        mockElement.className = 'coordinate-canvas';
-
-        await generatePreviewImage(mockElement);
-
-        // hidden input要素にファイルが設定されていることを確認
-        const fileInput = document.querySelector('input[name="image"]') as HTMLInputElement;
-        expect(fileInput).toBeTruthy();
-        expect(fileInput.files).toBeTruthy();
-        expect(fileInput.files![0].name).toBe('coordinate_preview.png');
-        expect(fileInput.files![0].type).toBe('image/png');
-      });
-
-      it('hidden input要素が見つからない場合でもURLを返すこと', async () => {
-        // document.querySelectorをnullを返すようにモック化
-        const originalQuerySelector = document.querySelector;
-        document.querySelector = jest.fn().mockReturnValue(null);
-
-        const mockElement = document.createElement('div');
-        mockElement.className = 'coordinate-canvas';
-
-        // mockImageCompressionの成功ケースを設定
-        mockImageCompression.mockImplementationOnce(async (file) => {
-          return new File(['compressed'], file.name, { type: 'image/jpeg' });
-        });
-
-        const result = await generatePreviewImage(mockElement);
-
-        expect(result).toBe('mock-url');
-
-        // 元のquerySelectorを復元
-        document.querySelector = originalQuerySelector;
       });
     });
   });

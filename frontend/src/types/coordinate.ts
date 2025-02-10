@@ -1,3 +1,4 @@
+import type { ItemStyle } from '@/features/coordinate/types';
 import type { Season } from './fashion-item';
 import type { BaseOption } from './form';
 
@@ -33,4 +34,21 @@ export interface BaseCoordinate {
   seasons: [{ id: string; season_name: string }];
   scenes: [{ id: string; scene: string }];
   tastes: [{ id: string; taste: string }];
+}
+
+export interface CustomCoordinateData {
+  data: ItemsData;
+  seasons: string[] | null | undefined;
+  scenes: string[] | null | undefined;
+  tastes: string[] | null | undefined;
+}
+
+export interface ItemType {
+  item: string;
+  position_data: ItemStyle;
+}
+
+export interface ItemsData {
+  items: ItemType[];
+  background: string;
 }

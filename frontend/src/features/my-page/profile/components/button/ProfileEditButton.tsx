@@ -17,7 +17,7 @@ const ProfileEditButton = ({ userDetail }: UserDetailType) => {
       isOpen={isOpen}
       onToggle={onToggle}
       trigger={
-        <Button variant="outline" className="w-full max-w mx-auto text-sm mb-8">
+        <Button variant="outline" className="w-full max-w mx-auto text-sm">
           プロフィール編集
         </Button>
       }

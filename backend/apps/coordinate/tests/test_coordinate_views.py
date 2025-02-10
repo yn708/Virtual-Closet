@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -21,7 +22,6 @@ class TestMetaDataView:
 
     def test_get_metadata(self, auth_client, season, scene, taste):
         """メタデータ取得のテスト"""
-
         url = reverse("coordinate_metadata")
         response = auth_client.get(url)
 
@@ -75,7 +75,6 @@ class TestCustomCoordinateViewSet:
         """一覧取得のテスト"""
         url = reverse("custom-coordination-list")
         response = auth_client.get(url)
-
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) >= 1
 
@@ -83,75 +82,94 @@ class TestCustomCoordinateViewSet:
         """個別取得のテスト"""
         url = reverse("custom-coordination-detail", kwargs={"pk": custom_coordinate.id})
         response = auth_client.get(url)
-
         assert response.status_code == status.HTTP_200_OK
 
-    def test_update_coordinate(self, auth_client, custom_coordinate, season, scene, taste, test_image, fashion_items):
-        """更新のテスト"""
+    @override_settings(DEBUG=True)
+    def test_create_coordinate(self, auth_client, season, scene, taste, fashion_items):
+        """作成のテスト（最低2つのアイテムを含む）"""
+        # fashion_items は conftest.py で2つ作成されている前提
+        url = reverse("custom-coordination-list")
         items_data = [
-            {"item": fashion_items[0].id, "position_data": {"x": 100, "y": 100, "scale": 1, "rotate": 0, "zIndex": 1}},
-            {"item": fashion_items[1].id, "position_data": {"x": 200, "y": 200, "scale": 1, "rotate": 0, "zIndex": 2}},
+            {
+                "item": fashion_items[0].id,
+                "position_data": {"xPercent": 50, "yPercent": 50, "scale": 1, "rotate": 0, "zIndex": 1},
+            },
+            {
+                "item": fashion_items[1].id,
+                "position_data": {"xPercent": 60, "yPercent": 60, "scale": 1, "rotate": 0, "zIndex": 2},
+            },
         ]
-
-        url = reverse("custom-coordination-detail", kwargs={"pk": custom_coordinate.id})
         data = {
-            "image": test_image,
-            "items": json.dumps(items_data),
-            "background": "bg-gray-100",
+            "data": {"items": items_data, "background": "bg-white"},
             "seasons": [season.id],
             "scenes": [scene.id],
             "tastes": [taste.id],
         }
+        response = auth_client.post(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == status.HTTP_201_CREATED
 
-        response = auth_client.put(url, data=data, format="multipart")
+    @override_settings(DEBUG=True)
+    def test_update_coordinate(self, auth_client, custom_coordinate, season, scene, taste, fashion_items):
+        """更新のテスト（最低2つのアイテムを含む）"""
+        url = reverse("custom-coordination-detail", kwargs={"pk": custom_coordinate.id})
+        items_data = [
+            {
+                "item": fashion_items[0].id,
+                "position_data": {"xPercent": 50, "yPercent": 50, "scale": 1, "rotate": 0, "zIndex": 1},
+            },
+            {
+                "item": fashion_items[1].id,
+                "position_data": {"xPercent": 60, "yPercent": 60, "scale": 1, "rotate": 0, "zIndex": 2},
+            },
+        ]
+        data = {
+            "data": {"items": items_data, "background": "bg-gray-100"},  # ネストされた辞書をそのまま
+            "seasons": [season.id],
+            "scenes": [scene.id],
+            "tastes": [taste.id],
+        }
+        # format を "json" に変更
+        response = auth_client.patch(url, data, format="json")
         assert response.status_code == status.HTTP_200_OK
 
     def test_delete_coordinate(self, auth_client, custom_coordinate):
         """削除のテスト"""
         url = reverse("custom-coordination-detail", kwargs={"pk": custom_coordinate.id})
         response = auth_client.delete(url)
-
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.django_db
-def test_coordinate_count_view_empty(user):
-    """
-    ユーザーにコーディネートが1件もない場合のテスト
-    """
-    factory = APIRequestFactory()
-    request = factory.get("/coordinate-count/")
-    force_authenticate(request, user=user)
+class TestCoordinateCountView:
+    """CoordinateCountViewのテストクラス"""
 
-    view = CoordinateCountView.as_view()
-    response = view(request)
-    response.render()  # レスポンスのレンダリングを実施
+    def test_empty_count(self, user):
+        """ユーザーにコーディネートが1件もない場合のテスト"""
+        factory = APIRequestFactory()
+        request = factory.get("/coordinate-count/")
+        force_authenticate(request, user=user)
 
-    data = response.data
-    # ユーザーに関連する PhotoCoordinate と CustomCoordinate が無いので合計は 0
-    assert data["current_count"] == 0
-    assert data["max_items"] == 100
-    assert response.status_code == status.HTTP_200_OK
+        view = CoordinateCountView.as_view()
+        response = view(request)
+        response.render()
 
+        assert response.data["current_count"] == 0
+        assert response.data["max_items"] == 100
+        assert response.status_code == status.HTTP_200_OK
 
-@pytest.mark.django_db
-def test_coordinate_count_view_with_coordinates(user):
-    """
-    ユーザーにコーディネート（PhotoCoordinate, CustomCoordinate）がある場合のテスト
-    """
-    factory = APIRequestFactory()
-    request = factory.get("/coordinate-count/")
-    force_authenticate(request, user=user)
+    def test_with_coordinates(self, user, photo_coordinate, custom_coordinate):
+        """ユーザーにコーディネートがある場合のテスト"""
+        factory = APIRequestFactory()
+        request = factory.get("/coordinate-count/")
+        force_authenticate(request, user=user)
 
-    view = CoordinateCountView.as_view()
-    response = view(request)
-    response.render()
+        view = CoordinateCountView.as_view()
+        response = view(request)
+        response.render()
 
-    data = response.data
-    # ユーザーに関連する PhotoCoordinate と CustomCoordinate の合計件数が current_count に反映される
-    expected_count = (
-        PhotoCoordinate.objects.filter(user=user).count() + CustomCoordinate.objects.filter(user=user).count()
-    )
-    assert data["current_count"] == expected_count
-    assert data["max_items"] == 100
-    assert response.status_code == status.HTTP_200_OK
+        expected_count = (
+            PhotoCoordinate.objects.filter(user=user).count() + CustomCoordinate.objects.filter(user=user).count()
+        )
+        assert response.data["current_count"] == expected_count
+        assert response.data["max_items"] == 100
+        assert response.status_code == status.HTTP_200_OK

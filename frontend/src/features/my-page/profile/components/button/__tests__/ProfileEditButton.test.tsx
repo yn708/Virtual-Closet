@@ -42,7 +42,7 @@ describe('ProfileEditButton', () => {
 
     const button = screen.getByText('プロフィール編集');
     expect(button).toBeInTheDocument();
-    expect(button.closest('button')).toHaveClass('w-full', 'max-w', 'mx-auto', 'text-sm', 'mb-8');
+    expect(button.closest('button')).toHaveClass('w-full', 'max-w', 'mx-auto', 'text-sm');
   });
 
   // ダイアログの開閉テスト
@@ -100,7 +100,7 @@ describe('ProfileEditButton', () => {
       render(<ProfileEditButton {...mockUserDetail} />);
 
       const button = screen.getByText('プロフィール編集');
-      expect(button.closest('button')).toHaveClass('w-full', 'max-w', 'mx-auto', 'text-sm', 'mb-8');
+      expect(button.closest('button')).toHaveClass('w-full', 'max-w', 'mx-auto', 'text-sm');
     });
 
     it('applies correct dialog content styles', () => {

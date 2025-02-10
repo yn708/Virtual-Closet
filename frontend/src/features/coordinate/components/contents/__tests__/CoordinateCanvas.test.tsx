@@ -11,21 +11,13 @@ import CoordinateCanvas from '../CoordinateCanvas';
 jest.mock('@/context/CoordinateCanvasContext');
 jest.mock('../../../hooks/useCoordinateCanvas');
 jest.mock('next/image', () => {
-  const MockNextImage = ({
-    src,
-    alt,
-    className,
-    width,
-    height,
-    draggable,
-  }: ImageProps): JSX.Element => {
+  const MockNextImage = ({ src, alt, className, fill, draggable }: ImageProps): JSX.Element => {
     return (
       <img
         src={src as string}
         alt={alt}
         className={className}
-        width={width}
-        height={height}
+        style={fill ? { width: '100%', height: '100%', position: 'absolute' } : undefined}
         draggable={draggable}
       />
     );
@@ -80,6 +72,8 @@ const mockItemStyles: Record<string, ItemStyle> = {
   },
 };
 
+const mockContainerRef = { current: document.createElement('div') };
+
 const mockUseCoordinateCanvasState = useCoordinateCanvasState as jest.MockedFunction<
   typeof useCoordinateCanvasState
 >;
@@ -94,6 +88,16 @@ describe('CoordinateCanvas', () => {
   const mockUpdateZIndex = jest.fn();
   const mockHandleDragStart = jest.fn();
   const mockHandleTransformStart = jest.fn();
+  const mockHandleBackgroundClick = jest.fn();
+  const mockGetDisplayStyle = jest.fn().mockReturnValue({
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%) scale(1) rotate(0deg)',
+    transformOrigin: 'center',
+    zIndex: 0,
+    touchAction: 'none',
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -118,11 +122,14 @@ describe('CoordinateCanvas', () => {
     mockUseCoordinateCanvas.mockReturnValue({
       selectedItemId: null,
       isDragging: false,
+      containerRef: mockContainerRef,
+      setSelectedItemId: mockSetSelectedItemId,
       handlers: {
-        setSelectedItemId: mockSetSelectedItemId,
+        handleBackgroundClick: mockHandleBackgroundClick,
         updateZIndex: mockUpdateZIndex,
         handleDragStart: mockHandleDragStart,
         handleTransformStart: mockHandleTransformStart,
+        getDisplayStyle: mockGetDisplayStyle,
       },
     });
   });
@@ -152,11 +159,14 @@ describe('CoordinateCanvas', () => {
     mockUseCoordinateCanvas.mockReturnValue({
       selectedItemId: '1',
       isDragging: false,
+      containerRef: mockContainerRef,
+      setSelectedItemId: mockSetSelectedItemId,
       handlers: {
-        setSelectedItemId: mockSetSelectedItemId,
+        handleBackgroundClick: mockHandleBackgroundClick,
         updateZIndex: mockUpdateZIndex,
         handleDragStart: mockHandleDragStart,
         handleTransformStart: mockHandleTransformStart,
+        getDisplayStyle: mockGetDisplayStyle,
       },
     });
 
@@ -171,11 +181,14 @@ describe('CoordinateCanvas', () => {
     mockUseCoordinateCanvas.mockReturnValue({
       selectedItemId: '1',
       isDragging: false,
+      containerRef: mockContainerRef,
+      setSelectedItemId: mockSetSelectedItemId,
       handlers: {
-        setSelectedItemId: mockSetSelectedItemId,
+        handleBackgroundClick: mockHandleBackgroundClick,
         updateZIndex: mockUpdateZIndex,
         handleDragStart: mockHandleDragStart,
         handleTransformStart: mockHandleTransformStart,
+        getDisplayStyle: mockGetDisplayStyle,
       },
     });
 
@@ -189,7 +202,7 @@ describe('CoordinateCanvas', () => {
     render(<CoordinateCanvas />);
     const canvas = screen.getByTestId('coordinate-canvas');
     fireEvent.click(canvas);
-    expect(mockSetSelectedItemId).toHaveBeenCalledWith(null);
+    expect(mockHandleBackgroundClick).toHaveBeenCalled();
   });
 
   it('ドラッグ開始時にhandleDragStartが呼ばれること', () => {
@@ -203,11 +216,14 @@ describe('CoordinateCanvas', () => {
     mockUseCoordinateCanvas.mockReturnValue({
       selectedItemId: '1',
       isDragging: false,
+      containerRef: mockContainerRef,
+      setSelectedItemId: mockSetSelectedItemId,
       handlers: {
-        setSelectedItemId: mockSetSelectedItemId,
+        handleBackgroundClick: mockHandleBackgroundClick,
         updateZIndex: mockUpdateZIndex,
         handleDragStart: mockHandleDragStart,
         handleTransformStart: mockHandleTransformStart,
+        getDisplayStyle: mockGetDisplayStyle,
       },
     });
 

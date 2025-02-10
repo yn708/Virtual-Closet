@@ -28,14 +28,14 @@ describe('Footer', () => {
 
     // FOOTER_NAV_ITEMSの内容を検証
     expect(FOOTER_NAV_ITEMS).toEqual([
-      { href: APP_ABOUT_URL, label: 'このサイトについて' },
+      { href: APP_ABOUT_URL, label: 'はじめての方へ' },
       { href: CONTACT_URL, label: 'お問い合わせ' },
       { href: PRIVACY_URL, label: 'プライバシーポリシー' },
       { href: TERMS_URL, label: '利用規約' },
     ]);
 
     // 各ナビゲーションアイテムが正しくレンダリングされているか検証
-    const aboutLink = screen.getByText('このサイトについて');
+    const aboutLink = screen.getByText('はじめての方へ');
     const contactLink = screen.getByText('お問い合わせ');
     const privacyLink = screen.getByText('プライバシーポリシー');
     const termsLink = screen.getByText('利用規約');
@@ -62,7 +62,7 @@ describe('Footer', () => {
     render(<Footer />);
 
     const navLinks = screen.getAllByRole('link');
-    expect(navLinks[0]).toHaveTextContent('このサイトについて');
+    expect(navLinks[0]).toHaveTextContent('はじめての方へ');
     expect(navLinks[1]).toHaveTextContent('お問い合わせ');
   });
 

@@ -33,7 +33,7 @@ const nextConfig = {
             },
             // {
             //   protocol: 'https',
-            //   hostname: 'd2omfeuzdtuar5.cloudfront.net',
+            //   hostname: 'd366c9wlqto432.cloudfront.net', // テスト用CloudFront
             // },
           ],
   },
