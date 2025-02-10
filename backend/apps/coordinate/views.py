@@ -270,7 +270,7 @@ class CustomCoordinateViewSet(ModelViewSet):
                 return Response(serializer.errors, status=400)
 
             self.perform_create(serializer)
-            return Response(status=201)
+            return Response({"message": "作成完了"}, status=201)
 
         except Exception as e:
             return Response({"detail": str(e)}, status=400)

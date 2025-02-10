@@ -85,6 +85,7 @@ const EditItemDialog = <T extends FashionItem | BaseCoordinate>({
     <BaseDialog
       isOpen={isOpen}
       onToggle={onToggle}
+      isCloseButtonLeft
       trigger={
         <IconButton
           Icon={Pen}

@@ -1,5 +1,7 @@
 'use client';
 
+import NormalLink from '@/components/elements/link/NormalLink';
+import { LOGIN_URL } from '@/utils/constants';
 import { useEffect } from 'react';
 
 export default function GlobalError({
@@ -34,6 +36,7 @@ export default function GlobalError({
               >
                 リロード
               </button>
+              <NormalLink label="ログイン画面に戻る" href={LOGIN_URL} />
             </div>
           </div>
         </div>

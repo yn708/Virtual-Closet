@@ -106,15 +106,13 @@ describe('Coordinate Actions', () => {
         data: {},
       });
 
-      const mockError = new Error(
-        JSON.stringify({ non_field_errors: ['APIエラーが発生しました'] }),
-      );
+      const mockError = new Error(JSON.stringify({ non_field_errors: ['エラーが発生しました'] }));
       (registerCustomCoordinateAPI as jest.Mock).mockRejectedValue(mockError);
 
       const result = await customCoordinateCreateAction(mockPrevState, mockFormData, mockItemsData);
 
       expect(result).toEqual({
-        message: 'APIエラーが発生しました',
+        message: 'エラーが発生しました',
         errors: null,
         success: false,
       });
