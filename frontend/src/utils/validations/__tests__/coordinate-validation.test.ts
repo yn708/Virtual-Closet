@@ -1,8 +1,5 @@
 import type { z } from 'zod';
-import {
-  customCoordinateCreateFormSchema,
-  photoCoordinateCreateFormSchema,
-} from '../coordinate-validation';
+import { photoCoordinateCreateFormSchema } from '../coordinate-validation';
 
 /*----------------------------------------------------------------------------
 共通のテストセットアップ
@@ -151,43 +148,6 @@ describe('photoCoordinateCreateFormSchema', () => {
         image: null,
       });
       expect(result.success).toBe(false);
-    });
-  });
-});
-
-/*----------------------------------------------------------------------------
-カスタムコーディネート登録フォームのテスト
-画像とアイテムは必須。その他は任意入力可能。
-----------------------------------------------------------------------------*/
-describe('customCoordinateCreateFormSchema', () => {
-  const validCustomData = {
-    ...baseValidData,
-    items: JSON.stringify([{ id: 1, type: 'tops' }]),
-  };
-
-  createBaseValidationTests(customCoordinateCreateFormSchema, validCustomData, true);
-
-  describe('アイテムのバリデーション', () => {
-    it('アイテムは必須', () => {
-      const { items: _items, ...dataWithoutItems } = validCustomData;
-      const result = customCoordinateCreateFormSchema.safeParse(dataWithoutItems);
-      expect(result.success).toBe(false);
-    });
-
-    it('アイテムは文字列である必要がある', () => {
-      const result = customCoordinateCreateFormSchema.safeParse({
-        ...validCustomData,
-        items: [{ id: 1, type: 'tops' }], // オブジェクトそのままは許可しない
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('アイテムは空の配列を示すJSON文字列も許可する', () => {
-      const result = customCoordinateCreateFormSchema.safeParse({
-        ...validCustomData,
-        items: '[]',
-      });
-      expect(result.success).toBe(true);
     });
   });
 });

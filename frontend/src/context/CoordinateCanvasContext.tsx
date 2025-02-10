@@ -2,6 +2,7 @@
 
 import type { CanvasState, ItemStyle } from '@/features/coordinate/types';
 import type { InitialItemsProps } from '@/features/my-page/coordinate/types';
+import { useToast } from '@/hooks/use-toast';
 import type {
   ChildrenType,
   CoordinateCanvasContextHandlers,
@@ -60,6 +61,8 @@ export const CoordinateCanvasStateProvider = ({
 
   const [state, setState] = useState<CanvasState>(initialState); // キャンバスの状態を管理
 
+  const { toast } = useToast();
+
   // カテゴリーに基づく初期位置の取得
   const getInitialPositionByCategory = useCallback((category: string) => {
     return INITIAL_POSITIONS[category] || DEFAULT_POSITION;
@@ -86,6 +89,16 @@ export const CoordinateCanvasStateProvider = ({
               itemStyles: newItemStyles,
             };
           }
+
+          // 選択上限(10個)に達している場合はトーストで通知し、追加しない
+          if (prev.selectedItems.length >= 10) {
+            toast({
+              title: '選択上限に達しました',
+              description: '最大10個まで選択可能です。',
+              variant: 'destructive',
+            });
+            return prev;
+          }
           // 新規アイテムの追加処理
           const initialPosition = getInitialPositionByCategory(item.sub_category.category);
           const maxZIndex = Math.max(
@@ -108,7 +121,7 @@ export const CoordinateCanvasStateProvider = ({
           };
         });
       },
-      [getInitialPositionByCategory],
+      [getInitialPositionByCategory, toast],
     ),
 
     // 特定のアイテムを削除

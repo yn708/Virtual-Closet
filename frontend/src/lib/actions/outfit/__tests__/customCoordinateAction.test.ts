@@ -1,29 +1,17 @@
 import type { InitialItems } from '@/features/my-page/coordinate/types';
-import { registerCoordinateAPI, updateCoordinateAPI } from '@/lib/api/coordinateApi';
-import type { BaseCoordinate } from '@/types/coordinate';
+import { registerCustomCoordinateAPI, updateCustomCoordinateAPI } from '@/lib/api/coordinateApi';
+import type { BaseCoordinate, ItemsData } from '@/types/coordinate';
 import { customCoordinateFormData } from '@/utils/form/coordinate-handlers';
-import {
-  customCoordinateCreateFormSchema,
-  customCoordinateUpdateFormSchema,
-} from '@/utils/validations/coordinate-validation';
-import { revalidatePath } from 'next/cache';
+import { baseCoordinateSchema } from '@/utils/validations/coordinate-validation';
 import {
   customCoordinateCreateAction,
   customCoordinateUpdateAction,
 } from '../customCoordinateAction';
 
 // モックの設定
-jest.mock('next/cache', () => ({
-  revalidatePath: jest.fn(),
-}));
-
-jest.mock('next/navigation', () => ({
-  redirect: jest.fn(),
-}));
-
 jest.mock('@/lib/api/coordinateApi', () => ({
-  registerCoordinateAPI: jest.fn(),
-  updateCoordinateAPI: jest.fn(),
+  registerCustomCoordinateAPI: jest.fn(),
+  updateCustomCoordinateAPI: jest.fn(),
 }));
 
 jest.mock('@/utils/form/coordinate-handlers', () => ({
@@ -32,10 +20,7 @@ jest.mock('@/utils/form/coordinate-handlers', () => ({
 }));
 
 jest.mock('@/utils/validations/coordinate-validation', () => ({
-  customCoordinateCreateFormSchema: {
-    safeParse: jest.fn(),
-  },
-  customCoordinateUpdateFormSchema: {
+  baseCoordinateSchema: {
     safeParse: jest.fn(),
   },
 }));
@@ -51,60 +36,88 @@ describe('Coordinate Actions', () => {
       message: null,
       errors: null,
     };
+    const mockItemsData: ItemsData = {
+      items: [
+        {
+          item: '1',
+          position_data: {
+            scale: 1,
+            rotate: 0,
+            zIndex: 1,
+            xPercent: 0,
+            yPercent: 0,
+          },
+        },
+      ],
+      background: '#ffffff',
+    };
 
     it('バリデーション成功時に正しく処理が実行される', async () => {
-      // バリデーション成功のモック
       const mockValidatedData = {
-        image: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        items: JSON.stringify({ items: [], background: '#ffffff' }),
         seasons: ['1'],
         scenes: ['1'],
         tastes: ['1'],
       };
 
-      (customCoordinateCreateFormSchema.safeParse as jest.Mock).mockReturnValue({
+      (baseCoordinateSchema.safeParse as jest.Mock).mockReturnValue({
         success: true,
         data: mockValidatedData,
       });
 
-      // FormDataの生成モック
-      const mockApiFormData = new FormData();
-      (customCoordinateFormData as jest.Mock).mockReturnValue({
-        apiFormData: mockApiFormData,
-        hasChanges: true,
+      await customCoordinateCreateAction(mockPrevState, mockFormData, mockItemsData);
+
+      expect(registerCustomCoordinateAPI).toHaveBeenCalledWith({
+        data: mockItemsData,
+        seasons: mockValidatedData.seasons,
+        scenes: mockValidatedData.scenes,
+        tastes: mockValidatedData.tastes,
       });
-
-      await customCoordinateCreateAction(mockPrevState, mockFormData);
-
-      expect(registerCoordinateAPI).toHaveBeenCalledWith('custom', mockApiFormData);
-      expect(revalidatePath).toHaveBeenCalled();
     });
 
     it('バリデーション失敗時にエラーを返す', async () => {
-      // バリデーション失敗のモック
       const mockError = {
         flatten: () => ({
           fieldErrors: {
-            image: ['画像は必須です'],
+            seasons: ['シーズンは必須です'],
           },
         }),
       };
 
-      (customCoordinateCreateFormSchema.safeParse as jest.Mock).mockReturnValue({
+      (baseCoordinateSchema.safeParse as jest.Mock).mockReturnValue({
         success: false,
         error: mockError,
       });
 
-      const result = await customCoordinateCreateAction(mockPrevState, mockFormData);
+      const result = await customCoordinateCreateAction(mockPrevState, mockFormData, mockItemsData);
 
       expect(result).toEqual({
         message: 'バリデーションエラー',
         errors: {
-          image: ['画像は必須です'],
+          seasons: ['シーズンは必須です'],
         },
         success: false,
       });
-      expect(registerCoordinateAPI).not.toHaveBeenCalled();
+      expect(registerCustomCoordinateAPI).not.toHaveBeenCalled();
+    });
+
+    it('APIエラー時に適切なエラーメッセージを返す', async () => {
+      (baseCoordinateSchema.safeParse as jest.Mock).mockReturnValue({
+        success: true,
+        data: {},
+      });
+
+      const mockError = new Error(
+        JSON.stringify({ non_field_errors: ['APIエラーが発生しました'] }),
+      );
+      (registerCustomCoordinateAPI as jest.Mock).mockRejectedValue(mockError);
+
+      const result = await customCoordinateCreateAction(mockPrevState, mockFormData, mockItemsData);
+
+      expect(result).toEqual({
+        message: 'APIエラーが発生しました',
+        errors: null,
+        success: false,
+      });
     });
   });
 
@@ -137,38 +150,58 @@ describe('Coordinate Actions', () => {
       ],
       background: '#ffffff',
     };
+    const mockItemsData: ItemsData = {
+      items: [
+        {
+          item: '2',
+          position_data: {
+            scale: 1,
+            rotate: 0,
+            zIndex: 1,
+            xPercent: 10,
+            yPercent: 10,
+          },
+        },
+      ],
+      background: '#000000',
+    };
 
     it('バリデーション成功かつ変更がある場合に正しく更新される', async () => {
       const mockValidatedData = {
-        image: new File([''], 'new-test.jpg', { type: 'image/jpeg' }),
-        items: JSON.stringify({ items: [], background: '#000000' }),
         seasons: ['2'],
         scenes: ['2'],
         tastes: ['2'],
       };
 
-      (customCoordinateUpdateFormSchema.safeParse as jest.Mock).mockReturnValue({
+      (baseCoordinateSchema.safeParse as jest.Mock).mockReturnValue({
         success: true,
         data: mockValidatedData,
       });
 
-      const mockApiFormData = new FormData();
+      const mockChangedFields = {
+        data: mockItemsData,
+        seasons: ['2'],
+        scenes: ['2'],
+        tastes: ['2'],
+      };
+
       (customCoordinateFormData as jest.Mock).mockReturnValue({
-        apiFormData: mockApiFormData,
         hasChanges: true,
+        changedFields: mockChangedFields,
       });
 
-      const mockUpdatedItem = { ...mockInitialData, image: 'new-test.jpg' };
-      (updateCoordinateAPI as jest.Mock).mockResolvedValue(mockUpdatedItem);
+      const mockUpdatedItem = { ...mockInitialData, seasons: [{ id: '2', season_name: '夏' }] };
+      (updateCustomCoordinateAPI as jest.Mock).mockResolvedValue(mockUpdatedItem);
 
       const result = await customCoordinateUpdateAction(
         mockPrevState,
         mockFormData,
         mockInitialData,
+        mockItemsData,
         mockInitialItems,
       );
 
-      expect(updateCoordinateAPI).toHaveBeenCalledWith('custom', '1', mockApiFormData);
+      expect(updateCustomCoordinateAPI).toHaveBeenCalledWith('1', mockChangedFields);
       expect(result).toEqual({
         message: '更新が完了しました',
         errors: null,
@@ -179,32 +212,25 @@ describe('Coordinate Actions', () => {
     });
 
     it('変更がない場合は更新を実行しない', async () => {
-      const mockValidatedData = {
-        image: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        items: JSON.stringify(mockInitialItems),
-        seasons: ['1'],
-        scenes: ['1'],
-        tastes: ['1'],
-      };
-
-      (customCoordinateUpdateFormSchema.safeParse as jest.Mock).mockReturnValue({
+      (baseCoordinateSchema.safeParse as jest.Mock).mockReturnValue({
         success: true,
-        data: mockValidatedData,
+        data: {},
       });
 
       (customCoordinateFormData as jest.Mock).mockReturnValue({
-        apiFormData: new FormData(),
         hasChanges: false,
+        changedFields: {},
       });
 
       const result = await customCoordinateUpdateAction(
         mockPrevState,
         mockFormData,
         mockInitialData,
+        mockItemsData,
         mockInitialItems,
       );
 
-      expect(updateCoordinateAPI).not.toHaveBeenCalled();
+      expect(updateCustomCoordinateAPI).not.toHaveBeenCalled();
       expect(result).toEqual({
         message: '変更がありません',
         errors: null,
@@ -215,22 +241,23 @@ describe('Coordinate Actions', () => {
 
     it('エラー発生時に適切なエラーメッセージを返す', async () => {
       const mockError = new Error('APIエラー');
-      (customCoordinateUpdateFormSchema.safeParse as jest.Mock).mockReturnValue({
+      (baseCoordinateSchema.safeParse as jest.Mock).mockReturnValue({
         success: true,
         data: {},
       });
 
       (customCoordinateFormData as jest.Mock).mockReturnValue({
-        apiFormData: new FormData(),
         hasChanges: true,
+        changedFields: {},
       });
 
-      (updateCoordinateAPI as jest.Mock).mockRejectedValue(mockError);
+      (updateCustomCoordinateAPI as jest.Mock).mockRejectedValue(mockError);
 
       const result = await customCoordinateUpdateAction(
         mockPrevState,
         mockFormData,
         mockInitialData,
+        mockItemsData,
         mockInitialItems,
       );
 

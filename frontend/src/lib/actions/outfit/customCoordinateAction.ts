@@ -1,19 +1,14 @@
 'use server';
 
 import type { InitialItems } from '@/features/my-page/coordinate/types';
-import { registerCoordinateAPI, updateCoordinateAPI } from '@/lib/api/coordinateApi';
+import { registerCustomCoordinateAPI, updateCustomCoordinateAPI } from '@/lib/api/coordinateApi';
 import type { FormState, FormStateCoordinateUpdate } from '@/types';
-import type { BaseCoordinate } from '@/types/coordinate';
-import { COORDINATE_CREATE_CANVAS_URL } from '@/utils/constants';
+import type { BaseCoordinate, ItemsData } from '@/types/coordinate';
 import {
   customCoordinateFormData,
   getCustomCoordinateFormFields,
 } from '@/utils/form/coordinate-handlers';
-import {
-  customCoordinateCreateFormSchema,
-  customCoordinateUpdateFormSchema,
-} from '@/utils/validations/coordinate-validation';
-import { revalidatePath } from 'next/cache';
+import { baseCoordinateSchema } from '@/utils/validations/coordinate-validation';
 
 /* ----------------------------------------------------------------
 カスタムコーディネート登録アクション
@@ -21,11 +16,10 @@ import { revalidatePath } from 'next/cache';
 export async function customCoordinateCreateAction(
   _prevState: FormState,
   formData: FormData,
+  itemsData: ItemsData,
 ): Promise<FormState> {
   // バリデーション
-  const validatedFields = customCoordinateCreateFormSchema.safeParse(
-    getCustomCoordinateFormFields(formData),
-  );
+  const validatedFields = baseCoordinateSchema.safeParse(getCustomCoordinateFormFields(formData));
 
   if (!validatedFields.success) {
     return {
@@ -35,10 +29,16 @@ export async function customCoordinateCreateAction(
     };
   }
 
-  const { apiFormData } = customCoordinateFormData(validatedFields.data);
+  const coordinateData = {
+    data: itemsData,
+    seasons: validatedFields.data.seasons,
+    scenes: validatedFields.data.scenes,
+    tastes: validatedFields.data.tastes,
+  };
+
   try {
-    await registerCoordinateAPI('custom', apiFormData);
-    revalidatePath(COORDINATE_CREATE_CANVAS_URL);
+    await registerCustomCoordinateAPI(coordinateData);
+
     return {
       message: null,
       errors: null,
@@ -46,17 +46,29 @@ export async function customCoordinateCreateAction(
     };
   } catch (error) {
     if (error instanceof Error) {
-      const errorData = JSON.parse(error.message);
-      const errorMessage = errorData.non_field_errors?.[0];
+      try {
+        const errorData = JSON.parse(error.message);
+        const errorMessage = errorData.non_field_errors?.[0];
 
-      return {
-        message: errorMessage,
-        errors: null,
-        success: false,
-      };
+        return {
+          message: errorMessage,
+          errors: null,
+          success: false,
+        };
+      } catch (parseError) {
+        console.error(parseError);
+
+        // JSONとしてパースできなかった場合
+        return {
+          message: 'エラーが発生しました。',
+          errors: null,
+          success: false,
+        };
+      }
     }
+
     return {
-      message: null,
+      message: '不明なエラーが発生しました。',
       errors: null,
       success: false,
     };
@@ -70,13 +82,12 @@ export async function customCoordinateUpdateAction(
   _prevState: FormStateCoordinateUpdate,
   formData: FormData,
   initialData: BaseCoordinate,
+  itemsData: ItemsData,
   initialItems?: InitialItems,
 ): Promise<FormStateCoordinateUpdate> {
   try {
     // バリデーション
-    const validatedFields = customCoordinateUpdateFormSchema.safeParse(
-      getCustomCoordinateFormFields(formData),
-    );
+    const validatedFields = baseCoordinateSchema.safeParse(getCustomCoordinateFormFields(formData));
 
     if (!validatedFields.success) {
       return {
@@ -86,8 +97,9 @@ export async function customCoordinateUpdateAction(
       };
     }
 
-    const { apiFormData, hasChanges } = customCoordinateFormData(
+    const { hasChanges, changedFields } = customCoordinateFormData(
       validatedFields.data,
+      itemsData,
       initialData,
       initialItems,
     );
@@ -100,7 +112,8 @@ export async function customCoordinateUpdateAction(
         hasChanges: false,
       };
     }
-    const updatedItem = await updateCoordinateAPI('custom', initialData.id, apiFormData);
+
+    const updatedItem = await updateCustomCoordinateAPI(initialData.id, changedFields);
 
     return {
       message: '更新が完了しました',

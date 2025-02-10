@@ -173,8 +173,8 @@ class CustomCoordinateSerializer(BaseCoordinateSerializer):
     def validate_items(self, value):
         if len(value) < 2:
             raise serializers.ValidationError("コーディネートには最低2つのアイテムが必要です。")
-        if len(value) > 20:
-            raise serializers.ValidationError("コーディネートは最大20アイテムまで登録可能です。")
+        if len(value) > 10:
+            raise serializers.ValidationError("コーディネートは最大10アイテムまで登録可能です。")
         return value
 
     @transaction.atomic

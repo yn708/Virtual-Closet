@@ -6,10 +6,9 @@ import BaseListLayout from '@/features/my-page/common/components/layout/BaseList
 import BaseContentsLayout from '@/features/my-page/common/components/layout/BaseScrollContentsLayout';
 import { coordinateConfig } from '@/features/my-page/common/config/filterConfigs';
 import type { BaseCoordinate } from '@/types/coordinate';
-import { useCoordinates } from '../../hooks/useCoordinates';
 import type { CoordinateCategory, CoordinateFilters } from '../../types';
 import CoordinateDetailInfo from './CoordinateDetailInfo';
-import ItemCounter from '@/components/elements/utils/ItemCounter';
+import { useCoordinates } from '@/context/CoordinatesContext';
 
 const CoordinateContents = () => {
   const { state, handlers } = useCoordinates();
@@ -20,9 +19,6 @@ const CoordinateContents = () => {
 
   return (
     <BaseContentsLayout selectedCategory={selectedCategory}>
-      {state.countData && state.countData.current_count > 0 && (
-        <ItemCounter countData={state.countData} />
-      )}
       <CategorySelector<CoordinateFilters>
         onCategoryChange={(categoryId: string) => {
           handleCategoryChange(categoryId as CoordinateCategory | '');

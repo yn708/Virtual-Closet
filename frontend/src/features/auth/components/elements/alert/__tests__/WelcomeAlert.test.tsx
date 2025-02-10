@@ -167,7 +167,9 @@ describe('WelcomeAlert', () => {
         const indicator = screen.getByTestId(`step-indicator-${index}`);
         if (index === 0) {
           expect(indicator.className).toContain('bg-blue-600');
-          expect(indicator.className).toContain('w-4');
+          expect(indicator.className).toContain(
+            'h-1.5 rounded-full transition-all duration-300 bg-blue-600 w-6',
+          );
         } else {
           expect(indicator.className).toContain('bg-gray-200');
           expect(indicator.className).toContain('w-1.5');

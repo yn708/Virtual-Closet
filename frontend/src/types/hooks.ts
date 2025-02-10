@@ -1,6 +1,11 @@
 import type { ItemStyle } from '@/features/coordinate/types';
+import type {
+  CoordinateCache,
+  CoordinateCategory,
+  CoordinateFilters,
+} from '@/features/my-page/coordinate/types';
 import type { CategoryCache, FashionItemFilters } from '@/features/my-page/fashion-item/types';
-import type { CountDataType } from './common';
+import type { BaseCoordinate } from './coordinate';
 import type { FashionItem } from './fashion-item';
 
 /* ----------------------------------------------------------------
@@ -38,7 +43,6 @@ export interface FashionItemsState {
   currentItems: FashionItem[];
   hasMore: boolean;
   currentPage: number;
-  countData: CountDataType | null;
 }
 
 // ハンドラーの型定義
@@ -53,6 +57,35 @@ export interface FashionItemsHandlers {
 export interface FashionItemsContextValue {
   state: FashionItemsState;
   handlers: FashionItemsHandlers;
+}
+
+/* ----------------------------------------------------------------
+CoordinatesContext
+------------------------------------------------------------------ */
+// 状態の型定義
+export interface CoordinatesContextState {
+  coordinateCache: CoordinateCache;
+  selectedCategory: CoordinateCategory | '';
+  filters: CoordinateFilters;
+  isInitialLoading: boolean;
+  isLoadingMore: boolean;
+  currentItems: BaseCoordinate[];
+  hasMore: boolean;
+  currentPage: number;
+}
+
+// ハンドラーの型定義
+export interface CoordinatesHandlers {
+  handleCategoryChange: (categoryId: CoordinateCategory | '') => Promise<void>;
+  handleFilterChange: (newFilters: Partial<CoordinateFilters>) => void;
+  handleLoadMore: () => void;
+  handleDelete: (id: string) => Promise<void>;
+  handleUpdate: (updatedCoordinate: BaseCoordinate) => void;
+}
+
+export interface CoordinatesContextValue {
+  state: CoordinatesContextState;
+  handlers: CoordinatesHandlers;
 }
 
 /* ----------------------------------------------------------------

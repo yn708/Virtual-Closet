@@ -14,6 +14,10 @@ jest.mock('@/components/elements/utils/ProfileAvatar', () => {
   ));
 });
 
+jest.mock('@/components/elements/utils/ItemCounter', () => {
+  return jest.fn(() => <div data-testid="mock-item-counter">Item Counter Component</div>);
+});
+
 jest.mock('../../button/ProfileEditButton', () => {
   return jest.fn(({ userDetail: _userDetail }: { userDetail: UserDetailType['userDetail'] }) => (
     <button data-testid="mock-profile-edit-button">プロフィール編集</button>
@@ -66,6 +70,13 @@ describe('UserProfileDetailContent', () => {
 
     const editButton = screen.getByTestId('mock-profile-edit-button');
     expect(editButton).toBeInTheDocument();
+  });
+
+  it('renders item counter component', async () => {
+    render(await UserProfileDetailContent());
+
+    const itemCounter = screen.getByTestId('mock-item-counter');
+    expect(itemCounter).toBeInTheDocument();
   });
 
   describe('optional fields', () => {

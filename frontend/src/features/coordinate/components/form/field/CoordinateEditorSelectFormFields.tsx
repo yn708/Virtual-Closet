@@ -9,7 +9,6 @@ import type { BaseFieldsStateProps } from '@/types';
 const CoordinateEditorSelectFormFields = ({
   metaData,
   initialData,
-  isProcessing,
   state,
 }: BaseFieldsStateProps & CoordinateMetaDataTypes & CoordinateInitialDataTypes) => {
   return (
@@ -47,12 +46,7 @@ const CoordinateEditorSelectFormFields = ({
 
       {/* 送信ボタン */}
       <div className="flex justify-end items-center">
-        <SubmitButton
-          label="保存"
-          disabled={isProcessing}
-          loading={isProcessing}
-          className="w-full md:w-1/3 rounded-xl shadow-md"
-        />
+        <SubmitButton label="保存" className="w-full md:w-1/3 rounded-xl shadow-md" />
       </div>
     </div>
   );

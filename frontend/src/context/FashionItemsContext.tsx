@@ -1,19 +1,14 @@
 'use client';
 import type { CategoryCache, FashionItemFilters } from '@/features/my-page/fashion-item/types';
 import { useToast } from '@/hooks/use-toast';
-import {
-  deleteFashionItemAPI,
-  fetchFashionCountAPI,
-  fetchFashionItemsByCategoryAPI,
-} from '@/lib/api/fashionItemsApi';
+import { deleteFashionItemAPI, fetchFashionItemsByCategoryAPI } from '@/lib/api/fashionItemsApi';
 import type {
-  CountDataType,
   FashionItem,
   FashionItemsContextValue,
   FashionItemsHandlers,
   FashionItemsState,
 } from '@/types';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 /**
  * ファッションアイテムの表示、編集、削除に関するコンテキスト
@@ -38,31 +33,8 @@ export const FashionItemsProvider = ({ children }: { children: React.ReactNode }
     status: [],
     season: [],
   });
-  const [countData, setCountData] = useState<CountDataType | null>(null); // アイテムのカウント（残りの登録可能アイテムに使用）
 
   const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const response = await fetchFashionCountAPI();
-        setCountData(response);
-      } catch (error) {
-        console.error('アイテムカウント取得エラー:', error);
-      }
-    };
-    fetchCount();
-  }, []);
-
-  // カウント数の更新
-  const updateCount = async () => {
-    try {
-      const response = await fetchFashionCountAPI();
-      setCountData(response);
-    } catch (error) {
-      console.error('カウント更新エラー:', error);
-    }
-  };
 
   /**
    * フィルタリング関数
@@ -94,7 +66,6 @@ export const FashionItemsProvider = ({ children }: { children: React.ReactNode }
     currentItems,
     hasMore,
     currentPage: currentPage[selectedCategory] || 1,
-    countData,
   };
 
   const handlers: FashionItemsHandlers = {
@@ -206,7 +177,6 @@ export const FashionItemsProvider = ({ children }: { children: React.ReactNode }
           });
           return newCache;
         });
-        await updateCount();
         toast({
           title: '削除完了',
           description: 'アイテムを削除しました。',

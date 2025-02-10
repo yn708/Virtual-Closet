@@ -1,3 +1,4 @@
+import ItemCounter from '@/components/elements/utils/ItemCounter';
 import ProfileAvatar from '@/components/elements/utils/ProfileAvatar';
 import { fetchUserDataAPI } from '@/lib/api/userApi';
 import { IMAGE_URL } from '@/utils/constants';
@@ -30,8 +31,9 @@ const UserProfileDetailContent = async () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-center sm:justify-start mt-6">
+      <div className="flex flex-col justify-start gap-2 mt-6">
         <ProfileEditButton userDetail={userData} />
+        <ItemCounter />
       </div>
     </div>
   );

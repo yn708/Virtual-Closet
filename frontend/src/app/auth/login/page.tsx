@@ -4,7 +4,7 @@ import SocialAuthButtons from '@/features/auth/components/elements/button/Social
 import LoginErrorMessage from '@/features/auth/components/elements/content/LoginErrorMessage';
 import LoginForm from '@/features/auth/components/elements/form/LoginForm';
 import AuthPageTemplate from '@/features/auth/components/layout/AuthPageTemplate';
-import { SIGN_UP_URL } from '@/utils/constants';
+import { PASSWORD_RESET_URL, SIGN_UP_URL } from '@/utils/constants';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function LoginPage() {
 
         <div className="space-y-4">
           <LinkWithText
-            href="/auth/password/reset"
+            href={PASSWORD_RESET_URL}
             text="パスワードをお忘れの方は"
             label="こちら"
             className="text-center text-sm text-gray-600"

@@ -31,17 +31,17 @@ const BaseListLayout = <T extends { id: string }>({
   ) : !items?.length ? (
     <EmptyState />
   ) : (
-    <>
+    <div className="pb-16">
       <div className="p-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4 max-w-screen-2xl mx-auto">
         {items.map((item) => renderItem(item))}
       </div>
 
       {hasMore && isLoadingMore && (
-        <div className="flex justify-center p-4">
+        <div className="flex justify-center mt-10 p-4">
           <LoadingElements message="読み込み中..." />
         </div>
       )}
-    </>
+    </div>
   );
 };
 export default BaseListLayout;

@@ -1,4 +1,3 @@
-import type { CountDataType } from '@/types';
 import type { BaseCoordinate } from '@/types/coordinate';
 
 /*---------------------------------------------
@@ -16,29 +15,6 @@ export interface CoordinateFilters {
   scenes: string[];
   tastes: string[];
   [key: string]: unknown;
-}
-
-/*---------------------------------------------
-Hooks
-----------------------------------------------*/
-export interface CoordinatesState {
-  coordinateCache: CoordinateCache;
-  selectedCategory: CoordinateCategory | '';
-  filters: CoordinateFilters;
-  isInitialLoading: boolean;
-  isLoadingMore: boolean;
-  currentItems: BaseCoordinate[];
-  hasMore: boolean;
-  currentPage: number;
-  countData: CountDataType | null;
-}
-
-export interface CoordinatesHandlers {
-  handleCategoryChange: (categoryId: CoordinateCategory | '') => Promise<void>;
-  handleFilterChange: (newFilters: Partial<CoordinateFilters>) => void;
-  handleLoadMore: () => void;
-  handleDelete: (id: string) => Promise<void>;
-  handleUpdate: (updatedCoordinate: BaseCoordinate) => void;
 }
 
 /*---------------------------------------------

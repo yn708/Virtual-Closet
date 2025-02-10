@@ -1,11 +1,12 @@
+import type { CoordinatesContextState, CoordinatesHandlers } from '@/types';
 import { render, screen } from '@testing-library/react';
-import type { CoordinateCategory, CoordinatesHandlers, CoordinatesState } from '../../../types';
+import type { CoordinateCategory } from '../../../types';
 import CoordinateContents from '../CoordinateContents';
 
 // モックの型定義を正しく行う
 const createMockContextValue = (
   overrides: {
-    state?: Partial<CoordinatesState>;
+    state?: Partial<CoordinatesContextState>;
     handlers?: Partial<CoordinatesHandlers>;
   } = {},
 ) => ({
@@ -24,7 +25,7 @@ const createMockContextValue = (
     isPending: false,
     currentItems: [],
     ...overrides.state,
-  } as CoordinatesState,
+  } as CoordinatesContextState,
   handlers: {
     handleCategoryChange: jest.fn(async () => {}),
     handleFilterChange: jest.fn(),
@@ -36,7 +37,7 @@ const createMockContextValue = (
 
 // コンテキストのモック
 const mockContextValue = createMockContextValue();
-jest.mock('../../../hooks/useCoordinates', () => ({
+jest.mock('@/context/CoordinatesContext.tsx', () => ({
   useCoordinates: () => mockContextValue,
 }));
 
@@ -85,7 +86,6 @@ describe('CoordinateContents', () => {
       createMockContextValue({
         state: {
           selectedCategory: '',
-          isPending: false,
           filters: {
             category: '',
             seasons: [],
@@ -111,7 +111,6 @@ describe('CoordinateContents', () => {
       createMockContextValue({
         state: {
           selectedCategory: 'photo',
-          isPending: true,
           filters: {
             category: '',
             seasons: [],

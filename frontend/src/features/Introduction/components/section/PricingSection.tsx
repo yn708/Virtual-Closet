@@ -23,14 +23,15 @@ const PricingSection = () => {
             </div>
             <ul className="space-y-4">
               {[
-                'ファッションアイテムの登録（100枚まで）',
-                'コーディネート画像の保存（100枚まで）',
+                'ファッションアイテムの登録（最大:100）',
+                'コーディネート画像の保存（最大:100）',
               ].map((feature, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <CheckCircle2 className="size-5 text-blue-500 shrink-0 mt-1" />
                   <span className="text-gray-600">{feature}</span>
                 </li>
               ))}
+              <p className="pt-4 pl-2 text-xs text-gray-600">基本的に不便なく使用可能です。</p>
             </ul>
           </div>
 

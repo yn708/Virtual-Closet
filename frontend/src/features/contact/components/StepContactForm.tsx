@@ -26,7 +26,7 @@ const StepContactForm = ({ isSession }: { isSession: boolean }) => {
           <ConfirmationStep isSession={isSession} formData={states.formData} onBack={handleBack} />
         )}
       </form>
-      {states.currentStep === 3 && <CompletionStep />}
+      {states.currentStep === 3 && <CompletionStep isSession={isSession} />}
     </div>
   );
 };
