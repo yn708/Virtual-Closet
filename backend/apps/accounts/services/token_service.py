@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -30,6 +31,8 @@ class TokenService:
         try:
             refresh = RefreshToken(refresh_token_str)
             refresh_expires = datetime.fromtimestamp(refresh["exp"])
+            if refresh_expires < datetime.now():
+                raise TokenError("Refresh token has expired")
             remaining_time = refresh_expires - datetime.now()
 
             # リフレッシュトークンの期限が近い場合は新しいリフレッシュトークンを発行
@@ -46,7 +49,7 @@ class TokenService:
             # 通常のレスポンス
             return {
                 "access": str(refresh.access_token),
-                "refresh": str(refresh),
+                "refresh": refresh_token_str,  # 既存のリフレッシュトークンを継続使用
                 "expires_at": datetime.fromtimestamp(refresh.access_token["exp"]).isoformat(),
                 "refresh_expires_at": refresh_expires.isoformat(),
             }
