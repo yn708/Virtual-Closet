@@ -7,6 +7,7 @@ import {
   LOGIN_GOOGLE_ENDPOINT,
   LOGIN_URL,
 } from '@/utils/constants';
+import { toZonedTime } from 'date-fns-tz';
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
@@ -154,7 +155,8 @@ export const authOptions: NextAuthOptions = {
 
       // バックエンドトークンが存在し、有効期限情報がある場合
       if (token.backendTokens && token.backendTokens.expires_at) {
-        const currentTime = Math.floor(Date.now() / 1000); // 現在時刻（秒）
+        const tokyoTime = toZonedTime(new Date(), 'Asia/Tokyo');
+        const currentTime = Math.floor(tokyoTime.getTime() / 1000); // 現在時刻（秒）
         const tokenExpiryTime = Math.floor(
           new Date(token.backendTokens.expires_at).getTime() / 1000,
         );
