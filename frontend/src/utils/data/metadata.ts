@@ -45,10 +45,10 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: 'summary_large_image', // 大きい画像を表示する場合
+    card: 'summary',
     title: SITE_NAME,
     description: DESCRIPTION,
-    images: ['/images/og-image.png'],
+    images: ['/images/og-image-small.png'],
   },
 };
 
