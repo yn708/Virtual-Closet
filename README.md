@@ -92,14 +92,14 @@ Email・Google アカウントで簡単に作成できます。
 | フロントエンド           | TypeScript <br>Next.js <br>React      |
 | バックエンド             | Python<br> Django                     |
 | DB                       | PostgreSQL                            |
-| インフラ                 | Vercel / Render                       |
+| インフラ                 | Vercel / Render / neon                  |
 | CI/CD                    | GitHub Actions                        |
 | 画像ストレージ           | S3 / CloudFront                       |
 | 開発環境                 | Docker                                |
 | テスト                   | Jest / React Testing Library / pytest |
 | 認証                     | NextAuth.js                           |
 | その他（フロントエンド） | ESLint / Prettier / shadcn/ui         |
-| その他（バックエンド）   | Ruff                                  |
+| その他（バックエンド）   | Ruff / OpenCV（画像処理）                |
 
 ## ER 図
 
