@@ -35,11 +35,20 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     url: SITE_URL,
+    images: [
+      {
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'サイトの説明画像',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image', // 大きい画像を表示する場合
     title: SITE_NAME,
     description: DESCRIPTION,
+    images: ['/images/og-image.png'],
   },
 };
 
