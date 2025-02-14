@@ -48,7 +48,12 @@ export const metadata: Metadata = {
     card: 'summary',
     title: SITE_NAME,
     description: DESCRIPTION,
-    images: ['/images/og-image-small.png'],
+    images: {
+      url: '/images/og-image-small.png',
+      type: 'image/png',
+      width: 800,
+      height: 800,
+    },
   },
 };
 
