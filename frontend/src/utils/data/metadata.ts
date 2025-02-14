@@ -48,12 +48,7 @@ export const metadata: Metadata = {
     card: 'summary',
     title: SITE_NAME,
     description: DESCRIPTION,
-    images: {
-      url: '/images/og-image-small.png',
-      type: 'image/png',
-      width: 800,
-      height: 800,
-    },
+    images: [`${SITE_URL}/images/og-image-small.png`], // 配列形式で指定
   },
 };
 
