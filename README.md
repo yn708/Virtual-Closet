@@ -1,7 +1,7 @@
 # サービス名
 
 ![Image](https://github.com/user-attachments/assets/3f1468bc-46d0-4b34-ada1-4985b01411ae)
-[Virtual Closet](https://www.virtual-closet.jp/)
+[Virtual Closet](https://www.virtual-closet.jp/about)
 
 ## サービス概要
 
